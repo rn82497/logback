@@ -14,6 +14,8 @@
 package ch.qos.logback.classic.spi;
 
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 
 import sun.reflect.Reflection;
@@ -53,11 +55,17 @@ public class PackagingDataCalculator {
   public PackagingDataCalculator() {
   }
 
-  public void calculate(IThrowableProxy tp) {
-    while (tp != null) {
-      populateFrames(tp.getStackTraceElementProxyArray());
-      tp = tp.getCause();
-    }
+  public void calculate(final IThrowableProxy tp) {
+    AccessController.doPrivileged(new PrivilegedAction<Void>() {
+      public Void run() {
+        IThrowableProxy working = tp;
+        while (working != null) {
+          populateFrames(working.getStackTraceElementProxyArray());
+          working = working.getCause();
+        }
+        return null;
+      }
+    });
   }
 
   void populateFrames(StackTraceElementProxy[] stepArray) {
