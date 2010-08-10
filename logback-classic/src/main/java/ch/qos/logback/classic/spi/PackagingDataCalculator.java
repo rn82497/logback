@@ -56,16 +56,24 @@ public class PackagingDataCalculator {
   }
 
   public void calculate(final IThrowableProxy tp) {
-    AccessController.doPrivileged(new PrivilegedAction<Void>() {
-      public Void run() {
-        IThrowableProxy working = tp;
-        while (working != null) {
-          populateFrames(working.getStackTraceElementProxyArray());
-          working = working.getCause();
+    if (System.getSecurityManager() != null) {
+      AccessController.doPrivileged(new PrivilegedAction<Void>() {
+        public Void run() {
+          doCalculate(tp);
+          return null;
         }
-        return null;
-      }
-    });
+      });
+    }
+    else {
+      doCalculate(tp);
+    }
+  }
+  
+  private void doCalculate(IThrowableProxy tp) {
+    while (tp != null) {
+      populateFrames(tp.getStackTraceElementProxyArray());
+      tp = tp.getCause();
+    }
   }
 
   void populateFrames(StackTraceElementProxy[] stepArray) {
