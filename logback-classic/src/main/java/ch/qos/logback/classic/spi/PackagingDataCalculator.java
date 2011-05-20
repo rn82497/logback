@@ -216,6 +216,9 @@ public class PackagingDataCalculator {
       return null;
     } catch (NoClassDefFoundError e1) {
       return null;
+    } catch (IllegalStateException e1) {
+      // happens in osgi environments
+      return null;
     } catch (Exception e) {
       e.printStackTrace(); // this is unexpected
       return null;
