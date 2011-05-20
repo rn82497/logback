@@ -13,6 +13,7 @@
  */
 package ch.qos.logback.classic.spi;
 
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -157,6 +158,10 @@ public class PackagingDataCalculator {
     if (type == null) {
       return "na";
     }
+    Object b = getBundle(type);
+    if (b != null) {
+      return getBundleVersion(b);
+    }
     Package aPackage = type.getPackage();
     if (aPackage != null) {
       String v = aPackage.getImplementationVersion();
@@ -173,6 +178,10 @@ public class PackagingDataCalculator {
   String getCodeLocation(Class type) {
     try {
       if (type != null) {
+        Object b = getBundle(type);
+	if (b != null) {
+	  return getBundleName(b);
+	}
         // file:/C:/java/maven-2.0.8/repo/com/icegreen/greenmail/1.3/greenmail-1.3.jar
         URL resource = type.getProtectionDomain().getCodeSource().getLocation();
         if (resource != null) {
@@ -258,6 +267,57 @@ public class PackagingDataCalculator {
       e.printStackTrace(); // this is unexpected
       return null;
     }
+  }
+
+  // call OSGi methods reflectively,
+  // as we may not be running in OSGi framework
+
+  private static boolean setBundle = false;
+  private static Method bundleMethod;
+
+  private Object getBundle(Class type) {
+    if (bundleMethod == null) {
+      if (!setBundle) {
+	try {
+	  Class c = getClass().getClassLoader().loadClass("org.osgi.framework.FrameworkUtil");
+	  bundleMethod = c.getMethod("getBundle", new Class[] { Class.class});
+	}
+	catch (Exception e) {
+	}
+      }
+
+      setBundle = true;
+      if (bundleMethod == null) {
+        return null;
+      }
+    }
+
+    try {
+      return bundleMethod.invoke(null, new Object[] { type });
+    }
+    catch (Exception e) {
+    }
+    return null;
+  }
+
+  private String getBundleName(Object bundle) {
+    try {
+      Method m = bundle.getClass().getMethod("getSymbolicName", null);
+      return (String) m.invoke(bundle, null);
+    }
+    catch (Exception e) {
+    }
+    return "na";
+  }
+
+  private String getBundleVersion(Object bundle) {
+    try {
+      Method m = bundle.getClass().getMethod("getVersion", null);
+      return m.invoke(bundle, null).toString();
+    }
+    catch (Exception e) {
+    }
+    return "na";
   }
 
 }
