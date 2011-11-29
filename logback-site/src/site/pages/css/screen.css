@@ -13,7 +13,6 @@ body {
 }
 
 .footer {
-  text-align: right;
   color: #564b47;
   background-color: #fff;
   padding:0px;
@@ -22,6 +21,14 @@ body {
 	font-size: smaller;
 }
 
+
+#job img {
+   border:1px solid #DDDDDD;
+}
+
+#job:hover img {
+   border:1px solid #8888EE;
+}
 
 p.menu {
  padding-top: 0px;

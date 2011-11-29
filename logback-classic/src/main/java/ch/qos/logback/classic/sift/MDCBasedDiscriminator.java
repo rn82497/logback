@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -12,8 +12,6 @@
  * as published by the Free Software Foundation.
  */
 package ch.qos.logback.classic.sift;
-
-import org.slf4j.MDC;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.sift.Discriminator;
@@ -37,9 +35,6 @@ public class MDCBasedDiscriminator extends ContextAwareBase implements
   private String defaultValue;
   private boolean started = false;
 
-  public MDCBasedDiscriminator() {
-  }
-
   /**
    * Return the value associated with an MDC entry designated by the Key
    * property. If that value is null, then return the value assigned to the
@@ -47,7 +42,7 @@ public class MDCBasedDiscriminator extends ContextAwareBase implements
    */
   public String getDiscriminatingValue(ILoggingEvent event) {
     // http://jira.qos.ch/browse/LBCLASSIC-213
-    Map<String, String> mdcMap = event.getMdc();
+    Map<String, String> mdcMap = event.getMDCPropertyMap();
     if (mdcMap == null) {
       return defaultValue;
     }

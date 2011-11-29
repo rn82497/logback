@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -13,14 +13,15 @@
  */
 package ch.qos.logback.core.rolling.helper;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.status.ErrorStatus;
 import ch.qos.logback.core.status.WarnStatus;
@@ -35,21 +36,17 @@ public class Compressor extends ContextAwareBase {
 
   final CompressionMode compressionMode;
 
-  // final String nameOfFile2Compress;
-  // final String nameOfCompressedFile;
-
   public Compressor(CompressionMode compressionMode) {
     this.compressionMode = compressionMode;
   }
 
-  // public Compressor(CompressionMode compressionMode, String
-  // nameOfFile2Compress, String nameOfCompressedFile) {
-  // this.compressionMode = compressionMode;
-  // //this.nameOfFile2Compress = nameOfFile2Compress;
-  // //this.nameOfCompressedFile = nameOfCompressedFile;
-  // }
-
-  public void compress(String nameOfFile2Compress, String nameOfCompressedFile) {
+    /**
+     *
+     * @param nameOfFile2Compress
+     * @param nameOfCompressedFile
+     * @param innerEntryName The name of the file within the zip file. Use for ZIP compression.
+     */
+  public void compress(String nameOfFile2Compress, String nameOfCompressedFile, String innerEntryName) {
     switch (compressionMode) {
     case GZ:
       addInfo("GZ compressing [" + nameOfFile2Compress + "].");
@@ -57,7 +54,7 @@ public class Compressor extends ContextAwareBase {
       break;
     case ZIP:
       addInfo("ZIP compressing [" + nameOfFile2Compress + "].");
-      zipCompress(nameOfFile2Compress, nameOfCompressedFile);
+      zipCompress(nameOfFile2Compress, nameOfCompressedFile, innerEntryName);
       break;
     case NONE:
       throw new UnsupportedOperationException(
@@ -65,13 +62,18 @@ public class Compressor extends ContextAwareBase {
     }
   }
 
-  private void zipCompress(String nameOfFile2zip, String nameOfZippedFile) {
+  private void zipCompress(String nameOfFile2zip, String nameOfZippedFile, String innerEntryName) {
     File file2zip = new File(nameOfFile2zip);
 
     if (!file2zip.exists()) {
       addStatus(new WarnStatus("The file to compress named [" + nameOfFile2zip
           + "] does not exist.", this));
 
+      return;
+    }
+
+    if(innerEntryName == null) {
+      addStatus(new WarnStatus("The innerEntryName parameter cannot be null", this));
       return;
     }
 
@@ -88,23 +90,26 @@ public class Compressor extends ContextAwareBase {
       return;
     }
 
+    BufferedInputStream bis = null;
+    ZipOutputStream zos = null;
     try {
-      FileOutputStream fos = new FileOutputStream(nameOfZippedFile);
-      ZipOutputStream zos = new ZipOutputStream(fos);
-      FileInputStream fis = new FileInputStream(nameOfFile2zip);
+      bis = new BufferedInputStream(new FileInputStream(nameOfFile2zip));
+      zos = new ZipOutputStream(new FileOutputStream(nameOfZippedFile));
 
-      ZipEntry zipEntry = computeZipEntry(zippedFile);
+      ZipEntry zipEntry = computeZipEntry(innerEntryName);
       zos.putNextEntry(zipEntry);
 
       byte[] inbuf = new byte[8102];
       int n;
 
-      while ((n = fis.read(inbuf)) != -1) {
+      while ((n = bis.read(inbuf)) != -1) {
         zos.write(inbuf, 0, n);
       }
 
-      fis.close();
+      bis.close();
+      bis = null;
       zos.close();
+      zos = null;
 
       if (!file2zip.delete()) {
         addStatus(new WarnStatus("Could not delete [" + nameOfFile2zip + "].",
@@ -113,7 +118,24 @@ public class Compressor extends ContextAwareBase {
     } catch (Exception e) {
       addStatus(new ErrorStatus("Error occurred while compressing ["
           + nameOfFile2zip + "] into [" + nameOfZippedFile + "].", this, e));
+    } finally {
+      if(bis != null) {
+        try {
+          bis.close();
+        } catch (IOException e) {
+          // ignore
+        }
+      }
+      if(zos != null) {
+        try {
+          zos.close();
+        } catch (IOException e) {
+          // ignore
+        }
+      }
     }
+
+
   }
 
   // http://jira.qos.ch/browse/LBCORE-98
@@ -122,7 +144,7 @@ public class Compressor extends ContextAwareBase {
   // Case 1: RawFile = null, Patern = foo-%d.zip
   // nestedFilename = foo-${current-date}
   //
-  // Case 2: RawFile = hello.txtm, Pattern = = foo-%d.zip
+  // Case 2: RawFile = hello.txt, Pattern = = foo-%d.zip
   // nestedFilename = foo-${current-date}
   //
   // in both cases, the strategy consisting of removing the compression
@@ -132,10 +154,14 @@ public class Compressor extends ContextAwareBase {
   // all having the same name, which could make it harder for the user
   // to unzip the file without collisions
   ZipEntry computeZipEntry(File zippedFile) {
-    String nameOfFileNestedWithinArchive = TimeBasedRollingPolicy
-        .computeFileNameStr_WCS(zippedFile.getName(), compressionMode);
+    return computeZipEntry(zippedFile.getName());
+  }
+
+  ZipEntry computeZipEntry(String filename) {
+    String nameOfFileNestedWithinArchive = computeFileNameStr_WCS(filename, compressionMode);
     return new ZipEntry(nameOfFileNestedWithinArchive);
   }
+
 
   private void gzCompress(String nameOfFile2gz, String nameOfgzedFile) {
     File file2gz = new File(nameOfFile2gz);
@@ -160,19 +186,22 @@ public class Compressor extends ContextAwareBase {
       return;
     }
 
+    BufferedInputStream bis = null;
+    GZIPOutputStream gzos = null;
     try {
-      FileOutputStream fos = new FileOutputStream(nameOfgzedFile);
-      GZIPOutputStream gzos = new GZIPOutputStream(fos);
-      FileInputStream fis = new FileInputStream(nameOfFile2gz);
+      bis = new BufferedInputStream(new FileInputStream(nameOfFile2gz));
+      gzos = new GZIPOutputStream(new FileOutputStream(nameOfgzedFile));
       byte[] inbuf = new byte[8102];
       int n;
 
-      while ((n = fis.read(inbuf)) != -1) {
+      while ((n = bis.read(inbuf)) != -1) {
         gzos.write(inbuf, 0, n);
       }
 
-      fis.close();
+      bis.close();
+      bis = null;
       gzos.close();
+      gzos = null;
 
       if (!file2gz.delete()) {
         addStatus(new WarnStatus("Could not delete [" + nameOfFile2gz + "].",
@@ -181,7 +210,42 @@ public class Compressor extends ContextAwareBase {
     } catch (Exception e) {
       addStatus(new ErrorStatus("Error occurred while compressing ["
           + nameOfFile2gz + "] into [" + nameOfgzedFile + "].", this, e));
+    } finally {
+      if(bis != null) {
+        try {
+          bis.close();
+        } catch (IOException e) {
+          // ignore
+        }
+      }
+      if(gzos != null) {
+        try {
+          gzos.close();
+        } catch (IOException e) {
+          // ignore
+        }
+      }
     }
+  }
+
+  static public String computeFileNameStr_WCS(String fileNamePatternStr,
+                                              CompressionMode compressionMode) {
+    int len = fileNamePatternStr.length();
+    switch (compressionMode) {
+      case GZ:
+    	  if(fileNamePatternStr.endsWith(".gz")) 
+            return fileNamePatternStr.substring(0, len - 3);
+    	  else 
+    		 return fileNamePatternStr;
+      case ZIP:
+    	  if(fileNamePatternStr.endsWith(".zip")) 
+    	  return fileNamePatternStr.substring(0, len - 4);
+    	  else 
+    		return fileNamePatternStr;	  
+      case NONE:
+        return fileNamePatternStr;
+    }
+    throw new IllegalStateException("Execution should not reach this point");
   }
 
   @Override

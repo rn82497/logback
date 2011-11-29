@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -14,17 +14,17 @@
 package ch.qos.logback.access.dummy;
 
 import ch.qos.logback.access.spi.AccessEvent;
+import ch.qos.logback.access.spi.IAccessEvent;
 
 public class DummyAccessEventBuilder {
 
   
-  static public AccessEvent buildNewAccessEvent() {
+  static public IAccessEvent buildNewAccessEvent() {
     DummyRequest request = new DummyRequest();
     DummyResponse response = new DummyResponse();
     DummyServerAdapter adapter = new DummyServerAdapter(request, response);
     
-    AccessEvent ae = new AccessEvent(request, response, adapter);
-    return ae;
+    return new AccessEvent(request, response, adapter);
   }
   
 }

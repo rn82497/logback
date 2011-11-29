@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -47,10 +47,9 @@ public class ThrowableProxyConverterTest {
   }
 
   private ILoggingEvent createLoggingEvent(Throwable t) {
-    ILoggingEvent le = new LoggingEvent(this.getClass().getName(), lc
+    return new LoggingEvent(this.getClass().getName(), lc
         .getLogger(Logger.ROOT_LOGGER_NAME), Level.DEBUG, "test message", t,
         null);
-    return le;
   }
 
   @Test

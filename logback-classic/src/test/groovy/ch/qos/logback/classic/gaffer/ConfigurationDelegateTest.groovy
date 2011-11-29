@@ -21,6 +21,8 @@ import ch.qos.logback.core.rolling.RollingFileAppender
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.core.util.CoreTestConstants
+import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP
+import ch.qos.logback.core.joran.action.TimestampAction
 
 /**
  * @author Ceki G&uuml;c&uuml;
@@ -61,6 +63,13 @@ class ConfigurationDelegateTest {
   @Test
   void timestamp() {
     String result = configurationDelegate.timestamp("yyyy")
+    long year = Calendar.getInstance().get(Calendar.YEAR);
+    assertEquals(year.toString(), result)
+  }
+
+  @Test
+  void timestampWithContextBirthAsReference() {
+    String result = configurationDelegate.timestamp("yyyy", context.birthTime)
     long year = Calendar.getInstance().get(Calendar.YEAR);
     assertEquals(year.toString(), result)
   }
@@ -188,7 +197,7 @@ class ConfigurationDelegateTest {
     PatternLayout layout = sa.layout
     assertEquals("%m%n", layout.pattern)
 
-    assertEquals(["a", "b"], sa.toList.sort());
+    assertEquals(["a%nopex", "b%nopex"], sa.getToAsListOfString().sort());
   }
 
   // test parent injection
@@ -196,12 +205,12 @@ class ConfigurationDelegateTest {
   @Test
   void appenderRolling() {
 
-    String logFile = randomOutputDir+"log.txt";
+    String logFile = randomOutputDir + "log.txt";
 
     configurationDelegate.appender("ROLLING", RollingFileAppender) {
       file = logFile
       rollingPolicy(TimeBasedRollingPolicy) {
-        fileNamePattern = randomOutputDir+"log.%d{yyyy-MM}.log.zip"
+        fileNamePattern = randomOutputDir + "log.%d{yyyy-MM}.log.zip"
       }
       encoder(PatternLayoutEncoder) {
         pattern = '%msg%n'
@@ -211,5 +220,28 @@ class ConfigurationDelegateTest {
     RollingFileAppender back = configurationDelegate.appenderList.find {it.name = "ROLLING"}
     assertNotNull(back)
     assertEquals(logFile, back.rollingPolicy.getParentsRawFileProperty())
+  }
+
+
+  // See LBCLASSIC-231
+  @Test
+  void withSizeAndTimeBasedFNATP() {
+    String logFile = randomOutputDir + "log.txt";
+    configurationDelegate.appender("ROLLING", RollingFileAppender) {
+      file = logFile
+      rollingPolicy(TimeBasedRollingPolicy) {
+        fileNamePattern = "mylog-%d{yyyy-MM-dd}.%i.txt"
+        timeBasedFileNamingAndTriggeringPolicy(SizeAndTimeBasedFNATP) {
+          maxFileSize = "100MB"
+        }
+      }
+      encoder(PatternLayoutEncoder) {
+        pattern = "%msg%n"
+      }
+    }
+    RollingFileAppender back = configurationDelegate.appenderList.find {it.name = "ROLLING"}
+    assertNotNull(back)
+    assertEquals(logFile, back.rollingPolicy.getParentsRawFileProperty())
+    assertTrue(back.rollingPolicy.timeBasedFileNamingAndTriggeringPolicy.isStarted())
   }
 }

@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -65,7 +65,7 @@ public class FileFilterUtil {
 
   /**
    * Return the set of files matching the stemRegex as found in 'directory'. A
-   * stemRegex does not contain any slash characters or any folder seperators.
+   * stemRegex does not contain any slash characters or any folder separators.
    * 
    * @param file
    * @param stemRegex
@@ -80,12 +80,21 @@ public class FileFilterUtil {
     if (!file.exists() || !file.isDirectory()) {
       return new File[0];
     }
-    File[] matchingFileArray = file.listFiles(new FilenameFilter() {
+    return file.listFiles(new FilenameFilter() {
       public boolean accept(File dir, String name) {
         return name.matches(stemRegex);
       }
     });
-    return matchingFileArray;
+  }
+
+  static public int findHighestCounter(File[] matchingFileArray, final String stemRegex) {
+    int max = Integer.MIN_VALUE;
+    for (File aFile : matchingFileArray) {
+      int aCounter = FileFilterUtil.extractCounter(aFile, stemRegex);
+      if (max < aCounter)
+        max = aCounter;
+    }
+    return max;
   }
 
   static public int extractCounter(File file, final String stemRegex) {
@@ -98,8 +107,7 @@ public class FileFilterUtil {
           + "] should match [" + lastFileName + "]");
     }
     String counterAsStr = m.group(1);
-    int counter = new Integer(counterAsStr).intValue();
-    return counter;
+    return new Integer(counterAsStr).intValue();
   }
 
   public static String slashify(String in) {

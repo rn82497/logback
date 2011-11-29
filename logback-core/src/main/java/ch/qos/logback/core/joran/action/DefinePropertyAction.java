@@ -1,15 +1,15 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2010, QOS.ch. All rights reserved.
- * 
- * This program and the accompanying materials are dual-licensed under either
- * the terms of the Eclipse Public License v1.0 as published by the Eclipse
- * Foundation
- * 
- * or (per the licensee's choosing)
- * 
- * under the terms of the GNU Lesser General Public License version 2.1 as
- * published by the Free Software Foundation.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
+ *
+ * This program and the accompanying materials are dual-licensed under
+ * either the terms of the Eclipse Public License v1.0 as published by
+ * the Eclipse Foundation
+ *
+ *   or (per the licensee's choosing)
+ *
+ * under the terms of the GNU Lesser General Public License version 2.1
+ * as published by the Free Software Foundation.
  */
 package ch.qos.logback.core.joran.action;
 
@@ -91,8 +91,12 @@ public class DefinePropertyAction extends Action {
       addInfo("Popping property definer for property named [" + propertyName
           + "] from the object stack");
       ec.popObject();
-      // let's put defined property and value to context
-      context.putProperty(propertyName, definer.getPropertyValue());
+      // let's put defined property and value to context but only if it is
+      // not null
+      String propertyValue = definer.getPropertyValue();
+      if(propertyValue != null) {
+        context.putProperty(propertyName, propertyValue);
+      }
     }
   }
 }

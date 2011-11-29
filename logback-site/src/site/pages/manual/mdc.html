@@ -36,11 +36,11 @@
 		complex distributed applications.  Most real-world distributed
 		systems need to deal with multiple clients simultaneously.  In a
 		typical multithreaded implementation of such a system, different
-		threads will handle different clients. A possible but discouraged
-		approach to differentiate the logging output of one client from
-		another consists of instantiating a new and separate logger for
-		each client.  This technique promotes the proliferation of loggers
-		and considerably increases their management overhead.
+		threads will handle different clients. A possible but slightly
+		discouraged approach to differentiate the logging output of one
+		client from another consists of instantiating a new and separate
+		logger for each client.  This technique promotes the proliferation
+		of loggers and may increase their management overhead.
 		</p>
 		
     <script src="../templates/setup.js" type="text/javascript"></script>
@@ -73,7 +73,7 @@ public class MDC {
   //Get the context identified by the <code>key</code> parameter.
   <b>public static String get(String key);</b>
 
-  //Remove the the context identified by the <code>key</code> parameter.
+  //Remove the context identified by the <code>key</code> parameter.
   <b>public static void remove(String key);</b>
 
   //Clear all entries in the MDC.
@@ -94,6 +94,9 @@ public class MDC {
 		information in each log entry.
 		</p>
 
+    <p>Please note that MDC as implemented by logback-classic assumes
+    that values are placed into the MDC with moderate frequency. </p>
+
 		<p>
 			The next application named 
 			<code><a href="../xref/chapters/mdc/SimpleMDC.html">SimpleMDC</a></code> 
@@ -113,7 +116,7 @@ import ch.qos.logback.core.ConsoleAppender;
 public class SimpleMDC {
   static public void main(String[] args) throws Exception {
 
-   // You can put values in the MDC at any time. Before anything else 
+    // You can put values in the MDC at any time. Before anything else
     // we put the first name
     MDC.put("first", "Dorothy");
 
@@ -315,7 +318,7 @@ public class NumberCruncherServer extends UnicastRemoteObject
       }
 
       // Placing artificial delays in tight loops will also lead to
-      // sub-optimal resuts. :-)
+      // sub-optimal results. :-)
       delay(100);
     }
 
@@ -639,8 +642,8 @@ public class UserServletFilter implements Filter {
   <h2><a name="mis"
   href="#mis"><code>MDCInsertingServletFilter</code></a></h2>
 
-  <p>Within web-applications, it often proves helpful to know the
-  hostname, request uri and user-agent associated with a given http
+  <p>Within web applications, it often proves helpful to know the
+  hostname, request uri and user-agent associated with a given HTTP
   request. <a
   href="../xref/ch/qos/logback/classic/helpers/MDCInsertingServletFilter.html"><code>MDCInsertingServletFilter</code></a>
   inserts such data into the MDC under the following keys.
@@ -716,7 +719,7 @@ public class UserServletFilter implements Filter {
   &lt;url-pattern>/*&lt;/url-pattern>
 &lt;/filter-mapping> </pre>
 
-  <p><b>If your web-app has multiple filter, make sure that
+  <p><b>If your web-app has multiple filters, make sure that
   <code>MDCInsertingServletFilter</code> is declared before other
   filters.</b> For example, assuming the main processing in your
   web-app is done in filter 'F', the MDC values set by
@@ -727,7 +730,7 @@ public class UserServletFilter implements Filter {
 
   <p>Once the filter is installed, values corresponding to each MDC
   key will be output by the %X <a
-  href="layouts.html#conversionWord">conversion word</a> acoording to
+  href="layouts.html#conversionWord">conversion word</a> according to
   the key passes as first option. For example, to print the remote
   host followed by the request URI on one line, the date followed by
   the message on the next, you would set <code>PatternLayout</code>'s

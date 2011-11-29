@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -30,10 +30,11 @@ public class ConfigurationAction extends Action {
   static final String SCAN_PERIOD_ATTR = "scanPeriod";
 
   boolean debugMode = false;
+  long threshold = 0;
 
   public void begin(InterpretationContext ec, String name, Attributes attributes) {
-    String debugAttrib = attributes.getValue(INTERNAL_DEBUG_ATTR);
-
+    String debugAttrib = ec.subst(attributes.getValue(INTERNAL_DEBUG_ATTR));
+    threshold = System.currentTimeMillis();
     if (OptionHelper.isEmpty(debugAttrib)
         || debugAttrib.equalsIgnoreCase("false")
         || debugAttrib.equalsIgnoreCase("null")) {
@@ -79,10 +80,7 @@ public class ConfigurationAction extends Action {
     if (debugMode) {
       addInfo("End of configuration.");
       LoggerContext loggerContext = (LoggerContext) context;
-      StatusPrinter.print(loggerContext);
-
-      // LoggerContext loggerContext = (LoggerContext) context;
-      // ConfiguratorBase.detachTemporaryConsoleAppender(repository, errorList);
+      StatusPrinter.print(loggerContext, threshold);
     }
     ec.popObject();
   }

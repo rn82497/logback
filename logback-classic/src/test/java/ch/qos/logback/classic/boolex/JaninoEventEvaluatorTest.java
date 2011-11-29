@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -59,10 +59,9 @@ public class JaninoEventEvaluatorTest {
   }
 
   LoggingEvent makeLoggingEvent(Exception ex) {
-    LoggingEvent e = new LoggingEvent(
+    return new LoggingEvent(
         ch.qos.logback.core.pattern.FormattingConverter.class.getName(),
         logger, Level.INFO, "Some message", ex, null);
-    return e;
   }
 
   @Test
@@ -70,6 +69,7 @@ public class JaninoEventEvaluatorTest {
     jee.setExpression("message.equals(\"Some message\")");
     jee.start();
 
+    StatusPrinter.print(loggerContext);
     ILoggingEvent event = makeLoggingEvent(null);
     assertTrue(jee.evaluate(event));
   }
@@ -263,7 +263,8 @@ public class JaninoEventEvaluatorTest {
 
   @Test
   public void nullMDC() throws EvaluationException {
-    jee.setExpression("mdc == null");
+    MDC.clear();
+    jee.setExpression("mdc.isEmpty()");
     jee.start();
 
     LoggingEvent event = makeLoggingEvent(null);

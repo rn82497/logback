@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -30,19 +30,19 @@ public class MyApp3 {
 
   public static void main(String[] args) {
     // assume SLF4J is bound to logback in the current environment
-    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+    LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 
     try {
       JoranConfigurator configurator = new JoranConfigurator();
-      configurator.setContext(lc);
-      // the context was probably already configured by default configuration
-      // rules
-      lc.reset();
+      configurator.setContext(context);
+      // Call context.reset() to clear any previous configuration, e.g. default
+      // configuration. For multi-step configuration, omit calling context.reset().
+      context.reset();
       configurator.doConfigure(args[0]);
     } catch (JoranException je) {
       // StatusPrinter will handle this
     }
-    StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
+    StatusPrinter.printInCaseOfErrorsOrWarnings(context);
 
     logger.info("Entering application.");
 

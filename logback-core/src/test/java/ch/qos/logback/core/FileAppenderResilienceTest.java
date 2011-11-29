@@ -1,3 +1,16 @@
+/**
+ * Logback: the reliable, generic, fast and flexible logging framework.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
+ *
+ * This program and the accompanying materials are dual-licensed under
+ * either the terms of the Eclipse Public License v1.0 as published by
+ * the Eclipse Foundation
+ *
+ *   or (per the licensee's choosing)
+ *
+ * under the terms of the GNU Lesser General Public License version 2.1
+ * as published by the Free Software Foundation.
+ */
 package ch.qos.logback.core;
 
 import java.io.File;
@@ -63,20 +76,25 @@ public class FileAppenderResilienceTest {
     Thread t = new Thread(runner);
     t.start();
 
-    double delayCoeff = 2.0;
+    double delayCoefficient = 2.0;
     for (int i = 0; i < 5; i++) {
-      Thread.sleep((int)(RecoveryCoordinator.BACKOFF_COEFFICIENT_MIN * delayCoeff));
-      ResilientFileOutputStream resilientFOS = (ResilientFileOutputStream) fa
-          .getOutputStream();
-      FileChannel fileChannel = resilientFOS.getChannel();
-      fileChannel.close();
+      Thread.sleep((int)(RecoveryCoordinator.BACKOFF_COEFFICIENT_MIN * delayCoefficient));
+      closeLogFileOnPurpose();
     }
     runner.setDone(true);
     t.join();
 
-    double bestCase = 1/delayCoeff;
+    double bestCaseSuccessRatio = 1/delayCoefficient;
+    double lossinessFactor = 0.8;
     ResilienceUtil
-        .verify(logfileStr, "^hello (\\d{1,5})$", runner.getCounter(), bestCase);
+        .verify(logfileStr, "^hello (\\d{1,5})$", runner.getCounter(), bestCaseSuccessRatio * lossinessFactor);
+  }
+
+  private void closeLogFileOnPurpose() throws IOException {
+    ResilientFileOutputStream resilientFOS = (ResilientFileOutputStream) fa
+      .getOutputStream();
+    FileChannel fileChannel = resilientFOS.getChannel();
+    fileChannel.close();
   }
 }
 
@@ -91,11 +109,9 @@ class Runner extends RunnableWithCounterAndDone {
     while (!isDone()) {
       counter++;
       fa.doAppend("hello " + counter);
-      if (counter % 1024 == 0) {
-        try {
-          Thread.sleep(10);
-        } catch (InterruptedException e) {
-        }
+      if (counter % 128 == 0) {
+        try { Thread.sleep(10);
+        } catch (InterruptedException e) { }
       }
     }
   }

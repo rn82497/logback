@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -237,11 +237,10 @@ public class Pattern {
 
   @Override
   public String toString() {
-    int size = partList.size();
-    String result = "";
-    for (int i = 0; i < size; i++) {
-      result += "[" + partList.get(i) + "]";
+    StringBuilder result = new StringBuilder();
+    for (String current : partList) {
+      result.append("[").append(current).append("]");
     }
-    return result;
+    return result.toString();
   }
 }

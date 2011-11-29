@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -46,7 +46,7 @@ public class AppenderRefAction extends Action {
 
     AppenderAttachable appenderAttachable = (AppenderAttachable) o;
 
-    String appenderName = attributes.getValue(ActionConst.REF_ATTRIBUTE);
+    String appenderName = ec.subst(attributes.getValue(ActionConst.REF_ATTRIBUTE));
 
     if (OptionHelper.isEmpty(appenderName)) {
       // print a meaningful error message and return
@@ -63,7 +63,7 @@ public class AppenderRefAction extends Action {
 
     if (appender == null) {
       String msg = "Could not find an appender named [" + appenderName
-          + "]. Did you define it below in the config file?";
+          + "]. Did you define it below instead of above in the configuration file?";
       inError = true;
       addError(msg);
       addError("See " + CoreConstants.CODES_URL

@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Stack;
 
+import ch.qos.logback.core.testUtil.FileTestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,6 +52,7 @@ public class IncludeActionTest {
   final static String SECOND_FILE_KEY = "secondFileKey";
 
   Context context = new ContextBase();
+  StatusChecker statusChecker = new StatusChecker(context);
   TrivialConfigurator tc;
 
   static final String INCLUSION_DIR_PREFIX = CoreTestConstants.JORAN_INPUT_PREFIX
@@ -82,12 +84,15 @@ public class IncludeActionTest {
 
   int diff = RandomUtil.getPositiveInt();
 
+  StackAction stackAction = new StackAction();
+
   @Before
   public void setUp() throws Exception {
+    FileTestUtil.makeTestOutputDir();
     HashMap<Pattern, Action> rulesMap = new HashMap<Pattern, Action>();
     rulesMap.put(new Pattern("x"), new NOPAction());
     rulesMap.put(new Pattern("x/include"), new IncludeAction());
-    rulesMap.put(new Pattern("x/stack"), new StackAction());
+    rulesMap.put(new Pattern("x/stack"), stackAction);
 
     tc = new TrivialConfigurator(rulesMap);
     tc.setContext(context);
@@ -100,7 +105,7 @@ public class IncludeActionTest {
     System.clearProperty(INCLUDE_KEY);
     System.clearProperty(SECOND_FILE_KEY);
     System.clearProperty(SUB_FILE_KEY);
-    StackAction.reset();
+    //StackAction.reset();
   }
 
   @Test
@@ -128,9 +133,8 @@ public class IncludeActionTest {
   public void noFileFound() throws JoranException {
     System.setProperty(INCLUDE_KEY, "toto");
     tc.doConfigure(TOP_BY_FILE);
-    assertEquals(Status.ERROR, context.getStatusManager().getLevel());
-    StatusChecker sc = new StatusChecker(context.getStatusManager());
-    assertTrue(sc.containsException(FileNotFoundException.class));
+    assertEquals(Status.ERROR, statusChecker.getHighestLevel(0));
+    assertTrue(statusChecker.containsException(FileNotFoundException.class));
   }
 
   @Test
@@ -138,9 +142,8 @@ public class IncludeActionTest {
     String tmpOut = copyToTemp(INVALID);
     System.setProperty(INCLUDE_KEY, tmpOut);
     tc.doConfigure(TOP_BY_FILE);
-    assertEquals(Status.ERROR, context.getStatusManager().getLevel());
-    StatusChecker sc = new StatusChecker(context.getStatusManager());
-    assertTrue(sc.containsException(SAXParseException.class));
+    assertEquals(Status.ERROR, statusChecker.getHighestLevel(0));
+    assertTrue(statusChecker.containsException(SAXParseException.class));
 
     // we like to erase the temp file in order to see
     // if http://jira.qos.ch/browse/LBCORE-122 was fixed
@@ -167,23 +170,20 @@ public class IncludeActionTest {
   public void malformedURL() throws JoranException {
     System.setProperty(INCLUDE_KEY, "htp://logback.qos.ch");
     tc.doConfigure(TOP_BY_URL);
-    assertEquals(Status.ERROR, context.getStatusManager().getLevel());
-    StatusChecker sc = new StatusChecker(context.getStatusManager());
-    assertTrue(sc.containsException(MalformedURLException.class));
+    assertEquals(Status.ERROR, statusChecker.getHighestLevel(0));
+    assertTrue(statusChecker.containsException(MalformedURLException.class));
   }
 
   @Test
   public void unknownURL() throws JoranException {
     System.setProperty(INCLUDE_KEY, "http://logback2345.qos.ch");
     tc.doConfigure(TOP_BY_URL);
-    assertEquals(Status.ERROR, context.getStatusManager().getLevel());
-    StatusChecker sc = new StatusChecker(context.getStatusManager()); 
-
+    assertEquals(Status.ERROR, statusChecker.getHighestLevel(0));
     // OS X throws IOException instead of UnknownHostException
     // http://jira.qos.ch/browse/LBCORE-129
     // This behavior has been observed on Windows XP as well
-    assertTrue(sc.containsException(UnknownHostException.class)
-        || sc.containsException(IOException.class));
+    assertTrue(statusChecker.containsException(UnknownHostException.class)
+        || statusChecker.containsException(IOException.class));
   }
 
   @Test
@@ -195,7 +195,7 @@ public class IncludeActionTest {
     witness.push("a");
     witness.push("b");
     witness.push("c");
-    assertEquals(witness, StackAction.stack);
+    assertEquals(witness, stackAction.getStack());
   }
 
   @Test
@@ -209,7 +209,7 @@ public class IncludeActionTest {
   void verifyConfig(String[] expected) {
     Stack<String> witness = new Stack<String>();
     witness.addAll(Arrays.asList(expected));
-    assertEquals(witness, StackAction.stack);
+    assertEquals(witness, stackAction.getStack());
   }
 
 }

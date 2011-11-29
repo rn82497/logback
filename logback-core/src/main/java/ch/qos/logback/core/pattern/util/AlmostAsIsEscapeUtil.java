@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -21,7 +21,7 @@ import ch.qos.logback.core.rolling.helper.FileNamePattern;
  * 
  * @author Ceki G&uuml;lc&uuml;
  */
-public class AlmostAsIsEscapeUtil implements IEscapeUtil {
+public class AlmostAsIsEscapeUtil extends RestrictedEscapeUtil {
 
   /**
    * Do not perform any character escaping, except for '%', and ')'.
@@ -40,16 +40,6 @@ public class AlmostAsIsEscapeUtil implements IEscapeUtil {
    */
   public void escape(String escapeChars, StringBuffer buf, char next,
       int pointer) {
-
-    if (next == CoreConstants.PERCENT_CHAR
-        || next == CoreConstants.RIGHT_PARENTHESIS_CHAR) {
-      buf.append(next);
-    } else {
-      // restitute the escape char (because it was consumed
-      // before this method was called).
-      buf.append("\\");
-      // restitute the next character
-      buf.append(next);
-    }
+    super.escape(""+CoreConstants.PERCENT_CHAR+CoreConstants.RIGHT_PARENTHESIS_CHAR, buf, next, pointer);
   }
 }

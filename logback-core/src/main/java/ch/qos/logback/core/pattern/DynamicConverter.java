@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -15,13 +15,19 @@ package ch.qos.logback.core.pattern;
 
 import java.util.List;
 
+import ch.qos.logback.core.Context;
+import ch.qos.logback.core.spi.ContextAware;
+import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.spi.LifeCycle;
+import ch.qos.logback.core.status.Status;
 
 abstract public class DynamicConverter<E> extends FormattingConverter<E>
-    implements LifeCycle {
+    implements LifeCycle, ContextAware {
+
+  ContextAwareBase cab = new ContextAwareBase(this);
 
   // Contains a list of option Strings.
-  private List optionList;
+  private List<String> optionList;
 
   /**
    * Is this component active?
@@ -46,7 +52,7 @@ abstract public class DynamicConverter<E> extends FormattingConverter<E>
     return started;
   }
 
-  public void setOptionList(List optionList) {
+  public void setOptionList(List<String> optionList) {
     this.optionList = optionList;
   }
 
@@ -60,11 +66,47 @@ abstract public class DynamicConverter<E> extends FormattingConverter<E>
     if (optionList == null || optionList.size() == 0) {
       return null;
     } else {
-      return (String) optionList.get(0);
+      return optionList.get(0);
     }
   }
 
-  protected List getOptionList() {
+  protected List<String> getOptionList() {
     return optionList;
+  }
+
+  public void setContext(Context context) {
+    cab.setContext(context);
+  }
+
+  public Context getContext() {
+    return cab.getContext();
+  }
+
+  public void addStatus(Status status) {
+    cab.addStatus(status);
+  }
+
+  public void addInfo(String msg) {
+    cab.addInfo(msg);
+  }
+
+  public void addInfo(String msg, Throwable ex) {
+    cab.addInfo(msg, ex);
+  }
+
+  public void addWarn(String msg) {
+    cab.addWarn(msg);
+  }
+
+  public void addWarn(String msg, Throwable ex) {
+    cab.addWarn(msg, ex);
+  }
+
+  public void addError(String msg) {
+    cab.addError(msg);
+  }
+
+  public void addError(String msg, Throwable ex) {
+    cab.addError(msg, ex);
   }
 }

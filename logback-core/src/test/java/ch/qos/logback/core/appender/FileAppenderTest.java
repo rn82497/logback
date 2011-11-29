@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.List;
 
+import ch.qos.logback.core.status.StatusChecker;
 import org.junit.Test;
 
 import ch.qos.logback.core.Appender;
@@ -31,7 +32,6 @@ import ch.qos.logback.core.status.StatusManager;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
 import ch.qos.logback.core.util.FileUtil;
-import ch.qos.logback.core.util.StatusPrinter;
 
 public class FileAppenderTest extends AbstractAppenderTest<Object> {
 
@@ -110,8 +110,9 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     assertTrue(appender.isAppend());
 
     StatusManager sm = context.getStatusManager();
-    StatusPrinter.print(context);
-    assertEquals(Status.WARN, sm.getLevel());
+    //StatusPrinter.print(context);
+    StatusChecker statusChecker = new StatusChecker(context);
+    assertEquals(Status.WARN, statusChecker.getHighestLevel(0));
     List<Status> statusList = sm.getCopyOfStatusList();
     assertTrue("Expecting status list size to be 2 or larger, but was "
         + statusList.size(), statusList.size() >= 2);

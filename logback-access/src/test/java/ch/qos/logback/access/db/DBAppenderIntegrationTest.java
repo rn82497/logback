@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -17,6 +17,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Random;
 
+import ch.qos.logback.access.spi.IAccessEvent;
+import ch.qos.logback.core.status.StatusChecker;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -27,7 +29,6 @@ import org.junit.Test;
 import ch.qos.logback.access.dummy.DummyAccessEventBuilder;
 import ch.qos.logback.access.joran.JoranConfigurator;
 import ch.qos.logback.access.spi.AccessContext;
-import ch.qos.logback.access.spi.AccessEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.status.Status;
@@ -41,6 +42,7 @@ public class DBAppenderIntegrationTest {
 
   int diff = new Random(System.nanoTime()).nextInt(10000);
   AccessContext context = new AccessContext();
+  StatusChecker statusChecker = new StatusChecker(context);
   
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
@@ -64,17 +66,17 @@ public class DBAppenderIntegrationTest {
     configurator.setContext(context);
     configurator.doConfigure(configFile);
 
-    Appender<AccessEvent> appender = context.getAppender("DB");
+    Appender<IAccessEvent> appender = context.getAppender("DB");
     
     for (int i = 0; i < 10; i++) {
-      AccessEvent event = DummyAccessEventBuilder.buildNewAccessEvent();
+      IAccessEvent event = DummyAccessEventBuilder.buildNewAccessEvent();
       appender.doAppend(event);
     }
     
     StatusPrinter.print(context);
     
     // check that there were no errors
-    assertEquals(Status.INFO,  context.getStatusManager().getLevel());
+    assertEquals(Status.INFO,  statusChecker.getHighestLevel(0));
     
   }
   

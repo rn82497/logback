@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -74,7 +74,7 @@ public class TokenStreamTest {
       List tl = new TokenStream("%c").tokenize();
       List<Token> witness = new ArrayList<Token>();
       witness.add(Token.PERCENT_TOKEN);
-      witness.add(new Token(Token.KEYWORD, "c"));
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "c"));
       assertEquals(witness, tl);
     }
 
@@ -83,9 +83,9 @@ public class TokenStreamTest {
       List tl = new TokenStream("%a%b").tokenize();
       List<Token> witness = new ArrayList<Token>();
       witness.add(Token.PERCENT_TOKEN);
-      witness.add(new Token(Token.KEYWORD, "a"));
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "a"));
       witness.add(Token.PERCENT_TOKEN);
-      witness.add(new Token(Token.KEYWORD, "b"));
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "b"));
       assertEquals(witness, tl);
     }
 
@@ -96,7 +96,7 @@ public class TokenStreamTest {
       witness.add(new Token(Token.LITERAL, "xyz"));
       witness.add(Token.PERCENT_TOKEN);
       witness.add(new Token(Token.FORMAT_MODIFIER, "-34"));
-      witness.add(new Token(Token.KEYWORD, "c"));
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "c"));
       assertEquals(witness, tl);
     }
   }
@@ -106,15 +106,17 @@ public class TokenStreamTest {
     List tl = new TokenStream("%d{1234} [%34.-67toto] %n").tokenize();
     List<Token> witness = new ArrayList<Token>();
     witness.add(Token.PERCENT_TOKEN);
-    witness.add(new Token(Token.KEYWORD, "d"));
-    witness.add(new Token(Token.OPTION, "1234"));
+    witness.add(new Token(Token.SIMPLE_KEYWORD, "d"));
+    List ol = new ArrayList<String>();
+    ol.add("1234");
+    witness.add(new Token(Token.OPTION, ol));
     witness.add(new Token(Token.LITERAL, " ["));
     witness.add(Token.PERCENT_TOKEN);
     witness.add(new Token(Token.FORMAT_MODIFIER, "34.-67"));
-    witness.add(new Token(Token.KEYWORD, "toto"));
+    witness.add(new Token(Token.SIMPLE_KEYWORD, "toto"));
     witness.add(new Token(Token.LITERAL, "] "));
     witness.add(Token.PERCENT_TOKEN);
-    witness.add(new Token(Token.KEYWORD, "n"));
+    witness.add(new Token(Token.SIMPLE_KEYWORD, "n"));
     assertEquals(witness, tl);
   }
 
@@ -132,7 +134,7 @@ public class TokenStreamTest {
     List tl = new TokenStream("%()").tokenize();
     List<Token> witness = new ArrayList<Token>();
     witness.add(Token.PERCENT_TOKEN);
-    witness.add(Token.LEFT_PARENTHESIS_TOKEN);
+    witness.add(Token.BARE_COMPOSITE_KEYWORD_TOKEN);
     witness.add(Token.RIGHT_PARENTHESIS_TOKEN);
     assertEquals(witness, tl);
   }
@@ -158,7 +160,7 @@ public class TokenStreamTest {
       List<Token> witness = new ArrayList<Token>();
       witness.add(new Token(Token.LITERAL, "\\"));
       witness.add(Token.PERCENT_TOKEN);
-      witness.add(new Token(Token.KEYWORD, "x"));
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "x"));
       assertEquals(witness, tl);
     }
 
@@ -166,7 +168,7 @@ public class TokenStreamTest {
       List tl = new TokenStream("%x\\)").tokenize();
       List<Token> witness = new ArrayList<Token>();
       witness.add(Token.PERCENT_TOKEN);
-      witness.add(new Token(Token.KEYWORD, "x"));
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "x"));
       witness.add(new Token(Token.LITERAL, ")"));
       assertEquals(witness, tl);
     }
@@ -175,7 +177,7 @@ public class TokenStreamTest {
       List tl = new TokenStream("%x\\_a").tokenize();
       List<Token> witness = new ArrayList<Token>();
       witness.add(Token.PERCENT_TOKEN);
-      witness.add(new Token(Token.KEYWORD, "x"));
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "x"));
       witness.add(new Token(Token.LITERAL, "a"));
       assertEquals(witness, tl);
     }
@@ -183,9 +185,9 @@ public class TokenStreamTest {
       List tl = new TokenStream("%x\\_%b").tokenize();
       List<Token> witness = new ArrayList<Token>();
       witness.add(Token.PERCENT_TOKEN);
-      witness.add(new Token(Token.KEYWORD, "x"));
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "x"));
       witness.add(Token.PERCENT_TOKEN);
-      witness.add(new Token(Token.KEYWORD, "b"));
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "b"));
       assertEquals(witness, tl);
     }
   }
@@ -196,8 +198,10 @@ public class TokenStreamTest {
       List tl = new TokenStream("%x{t}").tokenize();
       List<Token> witness = new ArrayList<Token>();
       witness.add(Token.PERCENT_TOKEN);
-      witness.add(new Token(Token.KEYWORD, "x"));
-      witness.add(new Token(Token.OPTION, "t"));
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "x"));
+      List ol = new ArrayList<String>();
+      ol.add("t");
+      witness.add(new Token(Token.OPTION, ol));
       assertEquals(witness, tl);
     }
 
@@ -205,8 +209,11 @@ public class TokenStreamTest {
       List tl = new TokenStream("%x{t,y}").tokenize();
       List<Token> witness = new ArrayList<Token>();
       witness.add(Token.PERCENT_TOKEN);
-      witness.add(new Token(Token.KEYWORD, "x"));
-      witness.add(new Token(Token.OPTION, "t,y"));
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "x"));
+      List ol = new ArrayList<String>();
+      ol.add("t");
+      ol.add("y");
+      witness.add(new Token(Token.OPTION, ol));
       assertEquals(witness, tl);
     }
 
@@ -214,17 +221,22 @@ public class TokenStreamTest {
       List tl = new TokenStream("%x{\"hello world.\", \"12y  \"}").tokenize();
       List<Token> witness = new ArrayList<Token>();
       witness.add(Token.PERCENT_TOKEN);
-      witness.add(new Token(Token.KEYWORD, "x"));
-      witness.add(new Token(Token.OPTION, "\"hello world.\", \"12y  \""));
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "x"));
+      List ol = new ArrayList<String>();
+      ol.add("hello world.");
+      ol.add("12y  ");
+      witness.add(new Token(Token.OPTION, ol));
       assertEquals(witness, tl);
     }
 
     {
-      List tl = new TokenStream("%x{opt\\}}").tokenize();
+      List tl = new TokenStream("%x{'opt}'}").tokenize();
       List<Token> witness = new ArrayList<Token>();
       witness.add(Token.PERCENT_TOKEN);
-      witness.add(new Token(Token.KEYWORD, "x"));
-      witness.add(new Token(Token.OPTION, "opt}"));
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "x"));
+      List ol = new ArrayList<String>();
+      ol.add("opt}");
+      witness.add(new Token(Token.OPTION, ol));
       assertEquals(witness, tl);
     }
   }
@@ -234,11 +246,13 @@ public class TokenStreamTest {
     List tl = new TokenStream("%(hello %class{.4?})").tokenize();
     List<Token> witness = new ArrayList<Token>();
     witness.add(Token.PERCENT_TOKEN);
-    witness.add(Token.LEFT_PARENTHESIS_TOKEN);
+    witness.add(Token.BARE_COMPOSITE_KEYWORD_TOKEN);
     witness.add(new Token(Token.LITERAL, "hello "));
     witness.add(Token.PERCENT_TOKEN);
-    witness.add(new Token(Token.KEYWORD, "class"));
-    witness.add(new Token(Token.OPTION, ".4?"));
+    witness.add(new Token(Token.SIMPLE_KEYWORD, "class"));
+    List ol = new ArrayList<String>();
+     ol.add(".4?");
+     witness.add(new Token(Token.OPTION, ol));
     witness.add(Token.RIGHT_PARENTHESIS_TOKEN);
     assertEquals(witness, tl);
   }
@@ -249,15 +263,17 @@ public class TokenStreamTest {
     List<Token> witness = new ArrayList<Token>();
     witness.add(new Token(Token.LITERAL, "X "));
     witness.add(Token.PERCENT_TOKEN);
-    witness.add(new Token(Token.KEYWORD, "a"));
+    witness.add(new Token(Token.SIMPLE_KEYWORD, "a"));
     witness.add(new Token(Token.LITERAL, " "));
     witness.add(Token.PERCENT_TOKEN);
     witness.add(new Token(Token.FORMAT_MODIFIER, "-12.550"));
-    witness.add(Token.LEFT_PARENTHESIS_TOKEN);
+    witness.add(Token.BARE_COMPOSITE_KEYWORD_TOKEN);
     witness.add(new Token(Token.LITERAL, "hello "));
     witness.add(Token.PERCENT_TOKEN);
-    witness.add(new Token(Token.KEYWORD, "class"));
-    witness.add(new Token(Token.OPTION, ".4?"));
+    witness.add(new Token(Token.SIMPLE_KEYWORD, "class"));
+    List ol = new ArrayList<String>();
+    ol.add(".4?");
+    witness.add(new Token(Token.OPTION, ol));
     witness.add(Token.RIGHT_PARENTHESIS_TOKEN);
     assertEquals(witness, tl);
   }
@@ -268,18 +284,18 @@ public class TokenStreamTest {
     List<Token> witness = new ArrayList<Token>();
     witness.add(Token.PERCENT_TOKEN);
     witness.add(new Token(Token.FORMAT_MODIFIER, "-1"));
-    witness.add(Token.LEFT_PARENTHESIS_TOKEN);
+    witness.add(Token.BARE_COMPOSITE_KEYWORD_TOKEN);
     witness.add(Token.PERCENT_TOKEN);
-    witness.add(new Token(Token.KEYWORD, "d"));
+    witness.add(new Token(Token.SIMPLE_KEYWORD, "d"));
     witness.add(new Token(Token.LITERAL, " "));
     witness.add(Token.PERCENT_TOKEN);
     witness.add(new Token(Token.FORMAT_MODIFIER, "45"));
-    witness.add(Token.LEFT_PARENTHESIS_TOKEN);
+    witness.add(Token.BARE_COMPOSITE_KEYWORD_TOKEN);
     witness.add(Token.PERCENT_TOKEN);
-    witness.add(new Token(Token.KEYWORD, "class"));
+    witness.add(new Token(Token.SIMPLE_KEYWORD, "class"));
     witness.add(new Token(Token.LITERAL, " "));
     witness.add(Token.PERCENT_TOKEN);
-    witness.add(new Token(Token.KEYWORD, "file"));
+    witness.add(new Token(Token.SIMPLE_KEYWORD, "file"));
     witness.add(Token.RIGHT_PARENTHESIS_TOKEN);
     witness.add(Token.RIGHT_PARENTHESIS_TOKEN);
 
@@ -291,13 +307,13 @@ public class TokenStreamTest {
     List tl = new TokenStream("%(%a%(%b))").tokenize();
     List<Token> witness = new ArrayList<Token>();
     witness.add(Token.PERCENT_TOKEN);
-    witness.add(Token.LEFT_PARENTHESIS_TOKEN);
+    witness.add(Token.BARE_COMPOSITE_KEYWORD_TOKEN);
     witness.add(Token.PERCENT_TOKEN);
-    witness.add(new Token(Token.KEYWORD, "a"));
+    witness.add(new Token(Token.SIMPLE_KEYWORD, "a"));
     witness.add(Token.PERCENT_TOKEN);
-    witness.add(Token.LEFT_PARENTHESIS_TOKEN);
+    witness.add(Token.BARE_COMPOSITE_KEYWORD_TOKEN);
     witness.add(Token.PERCENT_TOKEN);
-    witness.add(new Token(Token.KEYWORD, "b"));
+    witness.add(new Token(Token.SIMPLE_KEYWORD, "b"));
     witness.add(Token.RIGHT_PARENTHESIS_TOKEN);
     witness.add(Token.RIGHT_PARENTHESIS_TOKEN);
 
@@ -312,7 +328,7 @@ public class TokenStreamTest {
       List<Token> witness = new ArrayList<Token>();
       witness.add(new Token(Token.LITERAL, "("));
       witness.add(Token.PERCENT_TOKEN);
-      witness.add(new Token(Token.KEYWORD, "h"));
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "h"));
       witness.add(new Token(Token.LITERAL, ")"));
       assertEquals(witness, tl);
     }
@@ -321,22 +337,83 @@ public class TokenStreamTest {
       List<Token> witness = new ArrayList<Token>();
       witness.add(new Token(Token.LITERAL, "("));
       witness.add(Token.PERCENT_TOKEN);
-      witness.add(new Token(Token.KEYWORD, "h"));
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "h"));
       witness.add(new Token(Token.LITERAL, ")"));
+      assertEquals(witness, tl);
+    }
+    {
+      List tl = new TokenStream("%a(x\\)").tokenize();
+      List<Token> witness = new ArrayList<Token>();
+      witness.add(Token.PERCENT_TOKEN);
+      witness.add(new Token(Token.COMPOSITE_KEYWORD, "a"));
+      witness.add(new Token(Token.LITERAL, "x)"));
+      assertEquals(witness, tl);
+    }
+    {
+      List tl = new TokenStream("%a\\(x)").tokenize();
+      List<Token> witness = new ArrayList<Token>();
+      witness.add(Token.PERCENT_TOKEN);
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "a"));
+      witness.add(new Token(Token.LITERAL, "(x"));
+      witness.add(new Token(Token.RIGHT_PARENTHESIS));
+
       assertEquals(witness, tl);
     }
   }
 
   @Test
   public void testWindowsLikeBackSlashes() throws ScanException {
-    {
-      List tl = new TokenStream("c:\\hello\\world.%i",
-          new AlmostAsIsEscapeUtil()).tokenize();
+    List tl = new TokenStream("c:\\hello\\world.%i",
+            new AlmostAsIsEscapeUtil()).tokenize();
 
+    List<Token> witness = new ArrayList<Token>();
+    witness.add(new Token(Token.LITERAL, "c:\\hello\\world."));
+    witness.add(Token.PERCENT_TOKEN);
+    witness.add(new Token(Token.SIMPLE_KEYWORD, "i"));
+    assertEquals(witness, tl);
+  }
+
+  @Test
+  public void compositedKeyword() throws ScanException {
+    {
+      List tl = new TokenStream("%d(A)",
+              new AlmostAsIsEscapeUtil()).tokenize();
       List<Token> witness = new ArrayList<Token>();
-      witness.add(new Token(Token.LITERAL, "c:\\hello\\world."));
       witness.add(Token.PERCENT_TOKEN);
-      witness.add(new Token(Token.KEYWORD, "i"));
+      witness.add(new Token(Token.COMPOSITE_KEYWORD, "d"));
+      witness.add(new Token(Token.LITERAL, "A"));
+      witness.add(Token.RIGHT_PARENTHESIS_TOKEN);
+      assertEquals(witness, tl);
+    }
+    {
+      List tl = new TokenStream("a %subst(%b C)",
+              new AlmostAsIsEscapeUtil()).tokenize();
+      List<Token> witness = new ArrayList<Token>();
+      witness.add(new Token(Token.LITERAL, "a "));
+      witness.add(Token.PERCENT_TOKEN);
+      witness.add(new Token(Token.COMPOSITE_KEYWORD, "subst"));
+      witness.add(Token.PERCENT_TOKEN);
+      witness.add(new Token(Token.SIMPLE_KEYWORD, "b"));
+      witness.add(new Token(Token.LITERAL, " C"));
+      witness.add(Token.RIGHT_PARENTHESIS_TOKEN);
+      assertEquals(witness, tl);
+    }
+  }
+
+  @Test
+  public void compositedKeywordFollowedByOptions() throws ScanException {
+    {
+      List tl = new TokenStream("%d(A){o}",
+              new AlmostAsIsEscapeUtil()).tokenize();
+      List<Token> witness = new ArrayList<Token>();
+      witness.add(Token.PERCENT_TOKEN);
+      witness.add(new Token(Token.COMPOSITE_KEYWORD, "d"));
+      witness.add(new Token(Token.LITERAL, "A"));
+      witness.add(Token.RIGHT_PARENTHESIS_TOKEN);
+      List ol = new ArrayList<String>();
+      ol.add("o");
+      witness.add(new Token(Token.OPTION, ol));
+
       assertEquals(witness, tl);
     }
   }

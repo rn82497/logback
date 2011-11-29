@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -34,7 +34,7 @@ public class AccessEventSerializationTest  {
       ClassNotFoundException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
-    AccessEvent ae = DummyAccessEventBuilder.buildNewAccessEvent();
+    IAccessEvent ae = DummyAccessEventBuilder.buildNewAccessEvent();
     // average time for the next method: 5000 nanos
     ae.prepareForDeferredProcessing();
     oos.writeObject(ae);
@@ -50,7 +50,7 @@ public class AccessEventSerializationTest  {
   public void testSerialization() throws IOException, ClassNotFoundException {
     Object o = buildSerializedAccessEvent();
     assertNotNull(o);
-    AccessEvent aeBack = (AccessEvent) o;
+    IAccessEvent aeBack = (IAccessEvent) o;
 
 
     assertEquals(DummyResponse.DUMMY_DEFAULT_HDEADER_MAP, aeBack

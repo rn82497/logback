@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -39,7 +39,7 @@ import ch.qos.logback.core.status.WarnStatus;
 /**
  * LoggerContext glues many of the logback-classic components together. In
  * principle, every logback-classic component instance is attached either
- * directly or indirecty to a LoggerContext instance. Just as importantly
+ * directly or indirectly to a LoggerContext instance. Just as importantly
  * LoggerContext implements the {@link ILoggerFactory} acting as the
  * manufacturing source of {@link Logger} instances.
  * 
@@ -208,10 +208,13 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
   }
 
   /**
-   * This method clears all internal properties, closes all appenders, removes
-   * any turboFilters, fires an OnReset event, removes all status listeners,
-   * removes all context listeners (except those which are reset resistant).
-   */
+   * This method clears all internal properties, except internal status messages,
+   * closes all appenders, removes any turboFilters, fires an OnReset event,
+   * removes all status listeners, removes all context listeners
+   * (except those which are reset resistant).
+   * <p>
+   * As mentioned above, internal status messages survive resets.
+   * */
   @Override
   public void reset() {
     resetCount++;
@@ -306,6 +309,12 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
 
   public List<LoggerContextListener> getCopyOfListenerList() {
     return new ArrayList<LoggerContextListener>(loggerContextListenerList);
+  }
+
+  void fireOnLevelChange(Logger logger, Level level) {
+    for (LoggerContextListener listener : loggerContextListenerList) {
+      listener.onLevelChange(logger, level);
+    }
   }
 
   private void fireOnReset() {

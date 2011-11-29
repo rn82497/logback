@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -15,8 +15,8 @@ package ch.qos.logback.core.pattern.parser;
 
 public class Node {
 	static final int LITERAL = 0;
-	static final int KEYWORD = 1;
-	static final int COMPOSITE = 2;
+	static final int SIMPLE_KEYWORD = 1;
+	static final int COMPOSITE_KEYWORD = 2;
 
 	final int type;
 	final Object value;

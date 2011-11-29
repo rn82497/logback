@@ -25,13 +25,16 @@
     </div>
 
     <div id="popupContents">
-      <br/>
-      <h3>Would you like to participate in our one-question survey?</h3>
+      <p style="font-size: large; padding-bottom: 5px; ">Would you like to subscribe to the
+      QOS.CH announcements mailing list?</p>
 
+
+      <p>The list is reserved for announcements related to QOS.CH
+      projects such as cal10n, logback, mistletoe and SLF4J.</p>
       <br/>
       <table width="100%">
         <tr>
-          <td><a class="popupLink" id="announce">Yes, take me to the survey.</a></td>
+          <td><a class="popupLink" id="announce">Yes, I'd like to subscribe.</a></td>
           <td><a class="popupLink" id="popupContentsClose">No, thanks.</a></td>
         </tr>
       </table>
@@ -49,8 +52,8 @@
 		</p>
 
 		<ul>
-      <li><a href="dist/logback-${pom.version}.zip">logback-${pom.version}.zip</a></li>
-      <li><a href="dist/logback-${project.version}.tar.gz">logback-${pom.version}.tar.gz</a></li>
+      <li><a href="dist/logback-${project.version}.zip">logback-${project.version}.zip</a></li>
+      <li><a href="dist/logback-${project.version}.tar.gz">logback-${project.version}.tar.gz</a></li>
 		</ul>
 		
 		
@@ -60,12 +63,13 @@
 
    
     <p>A console plugin for Eclipse is also available. It allows you
-    to recieve logging events in a convenient Eclipse view, and
-    offers, among other features, integrates with logbacks filtering
-    framework. A more precise description can be found in the plugin's
+    to receive logging events in a convenient Eclipse view, and offers
+    integration with logback's filtering framework, among other
+    features. A more precise description can be found in the plugin's
     <a href="consolePlugin.html">user guide</a>. <b>Unfortunately, the
-    console plugin is somewhat outdated. It expects logback version
-    0.9.9.  It will be upgraded in the coming weeks.</b></p>
+    console plugin is very much outdated. It expects logback version
+    0.9.9.  It will be upgraded during the second semester of
+    2011.</b></p>
 
     
     <ul>
@@ -78,7 +82,12 @@
 	
     <hr/>
 
-    <h2>Third-party tools</h2>
+    <h2>Third-party tools, extensions or forks (in chronological order)</h2>
+
+    <p>If you are the author of a logback-related project and would
+    like us to add your project to the list below please drop a line
+    on the logback-dev mailing list.</p>
+
 
     <dl>
       <dt>
@@ -92,28 +101,83 @@
       classic.</p>
       </dd>
       
-
+      <!-- ============================================================ -->
       <dt>
         <a href="http://lilith.huxhorn.de">Lilith</a> by Joern Huxhorn
       </dt>
 
       <dd>
-        <p>Lilith is a Logging- and AccessEvent viewer for logback. 
+        <p>Lilith is a Logging- and AccessEvent viewer for logback.</p> 
+      </dd>
+
+      <!-- ============================================================ -->
+      <dt>
+        <a
+        href="https://github.com/mojolly/logback-akka">Logback-akka</a>
+        by Ivan Porto Carrero.
+      </dt>
+
+      <dd>
+        <p>Consists of several akka-based logback utilities, including
+        ActorAppender, HoptoadActorAppender and Logstash redis
+        appender.
         </p> 
       </dd>
 
+    <!-- ============================================================ -->
+      <dt>
+        <a
+        href="https://github.com/tony19/logback-android">Logback-android</a>
+        by Tony Trinh.
+      </dt>
+
+      <dd>
+        <p>Logback-Android brings the power of Logback to Android.
+        </p> 
+      </dd>
+
+
+    <!-- ============================================================ -->
+      <dt>
+        <a
+        href="http://code.google.com/p/simpledb-appender/">
+        Simpledb-appender</a> by Gabriel Nell
+      </dt>
+
+      <dd>
+        <p>Logback Appender writing to Amazon SimpleDB. See also <a
+        href="http://www.peecho.com/blog/logging-the-cloud-with-simpledb.html">Logging
+        the cloud with SimpleDB</a>.</p>
+      </dd>
+
+
+      <!-- ============================================================ -->
+      <dt>
+        <a href="http://perf4j.codehaus.org/">Perf4J</a> by Alex
+        Devine, Doran Chakraborty et al.
+      </dt>
+
+      <dd>
+        <p>Perf4J is a set of utilities for calculating and displaying
+        performance statistics for Java code.</p>
+      </dd>
+
+
+      <!-- ============================================================ -->
+      <dt>
+        <a
+        href="https://github.com/Moocar/logback-gelf">Logback-gelf</a>
+        by Anthony Marcar
+      </dt>
+
+      <dd>Logback-gelf can log messages to a <a
+      href="http://graylog2.org/">Graylog2</a> server via GELF
+      messages.
+      </dd>
+      
     </dl>
 
-    
-  <hr/>
-
-  <h2>Forks</h2>
-
-  <p>At present time there are 13 forks of logback on github. If you
-  are the author of one of those forks and would like feedback from
-  potential users, plase drop us a line at logback-dev mailing list
-  with a brief description of your fork. We will gladly add a link to
-  your fork to the list below (currently empty).</p>
+    <p/>  
 
     
 

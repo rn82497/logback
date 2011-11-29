@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -25,6 +25,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.util.LogbackMDCAdapter;
+import org.slf4j.spi.MDCAdapter;
 
 /**
  * The internal representation of logging events. When an affirmative decision
@@ -66,7 +67,7 @@ public class LoggingEvent implements ILoggingEvent {
    * Level of logging event.
    * 
    * <p>
-   * This field should not be accessed directly. You shoud use the
+   * This field should not be accessed directly. You should use the
    * {@link #getLevel} method instead.
    * </p>
    * 
@@ -77,7 +78,7 @@ public class LoggingEvent implements ILoggingEvent {
 
   // we gain significant space at serialization time by marking
   // formattedMessage as transient and constructing it lazily in
-  // getFormmatedMessage()
+  // getFormattedMessage()
   private transient String formattedMessage;
 
   private transient Object[] argumentArray;
@@ -89,6 +90,7 @@ public class LoggingEvent implements ILoggingEvent {
   private Marker marker;
 
   private Map<String, String> mdcPropertyMap;
+  private static final Map<String, String> CACHED_NULL_MAP = new HashMap<String, String>();
 
   /**
    * The number of milliseconds elapsed from 1/1/1970 until logging event was
@@ -128,11 +130,6 @@ public class LoggingEvent implements ILoggingEvent {
     }
 
     timeStamp = System.currentTimeMillis();
-
-    // ugly but under the circumstances acceptable
-    LogbackMDCAdapter logbackMDCAdapter = (LogbackMDCAdapter) MDC
-        .getMDCAdapter();
-    mdcPropertyMap = logbackMDCAdapter.getPropertyMap();
   }
 
   public void setArgumentArray(Object[] argArray) {
@@ -209,9 +206,7 @@ public class LoggingEvent implements ILoggingEvent {
     this.getFormattedMessage();
     this.getThreadName();
     // fixes http://jira.qos.ch/browse/LBCLASSIC-104
-    if (mdcPropertyMap != null) {
-      mdcPropertyMap = new HashMap<String, String>(mdcPropertyMap);
-    }
+    this.getMDCPropertyMap();
   }
 
   public LoggerContextVO getLoggerContextVO() {
@@ -309,11 +304,27 @@ public class LoggingEvent implements ILoggingEvent {
   }
 
   public Map<String, String> getMDCPropertyMap() {
+    // populate mdcPropertyMap if null
+    if (mdcPropertyMap == null) {
+      MDCAdapter mdc = MDC.getMDCAdapter();
+      if (mdc instanceof LogbackMDCAdapter)
+        mdcPropertyMap = ((LogbackMDCAdapter)mdc).getPropertyMap();
+      else
+        mdcPropertyMap = mdc.getCopyOfContextMap();
+    }
+    // mdcPropertyMap still null, use CACHED_NULL_MAP
+    if (mdcPropertyMap == null)
+      mdcPropertyMap = CACHED_NULL_MAP;
+
     return mdcPropertyMap;
   }
 
+  /**
+   * Synonym for [@link #getMDCPropertyMap}.
+   * @deprecated  Replaced by [@link #getMDCPropertyMap}
+   */
   public Map<String, String> getMdc() {
-    return mdcPropertyMap;
+      return getMDCPropertyMap();
   }
 
   @Override

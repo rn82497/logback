@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2010, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -23,17 +23,15 @@ import ch.qos.logback.core.helpers.CyclicBuffer;
  */
 public interface CyclicBufferTracker<E> {
 
-  public static int DEFAULT_BUFFER_SIZE = 256;
-  public static int DEFAULT_NUMBER_OF_BUFFERS = 64;
+  int DEFAULT_BUFFER_SIZE = 256;
+  int DEFAULT_NUMBER_OF_BUFFERS = 64;
 
-  static int THRESHOLD = 30 * 60 * CoreConstants.MILLIS_IN_ONE_SECOND; // 30 minutes
+  int THRESHOLD = 30 * 60 * CoreConstants.MILLIS_IN_ONE_SECOND; // 30 minutes
 
-  public int getBufferSize();
+  int getBufferSize();
 
-  public void setBufferSize(int size);
-
-
-  public int getMaxNumberOfBuffers();
+  void setBufferSize(int size);
+  int getMaxNumberOfBuffers();
 
   /**
    * Set the maximum number of tracked buffers. After reaching the maximum number of
@@ -42,7 +40,7 @@ public interface CyclicBufferTracker<E> {
    *
    * @param maxNumBuffers
    */
-  public void setMaxNumberOfBuffers(int maxNumBuffers);
+  void setMaxNumberOfBuffers(int maxNumBuffers);
 
 
   /**
@@ -54,7 +52,12 @@ public interface CyclicBufferTracker<E> {
    * @param timestamp
    * @return
    */
-  CyclicBuffer<E> get(String key, long timestamp);
+  CyclicBuffer<E> getOrCreate(String key, long timestamp);
+
+  /**
+   * Remove a cyclic buffer identified by its key.
+   */
+  void removeBuffer(String key);
 
   /**
    * Clear (and detach) buffers which are stale.

@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2010, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -16,7 +16,6 @@ package ch.qos.logback.classic.gaffer;
 import ch.qos.logback.classic.ClassicConstants;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.status.ErrorStatus;
-import ch.qos.logback.core.status.InfoStatus;
 import ch.qos.logback.core.status.StatusManager;
 
 import java.io.File;
@@ -50,8 +49,7 @@ public class GafferUtil {
     try {
       Class gcClass = Class.forName(ClassicConstants.GAFFER_CONFIGURATOR_FQCN);
       Constructor c = gcClass.getConstructor(LoggerContext.class);
-      GafferConfigurator gafferConfigurator = (GafferConfigurator) c.newInstance(loggerContext);
-      return gafferConfigurator;
+      return (GafferConfigurator) c.newInstance(loggerContext);
     } catch (ClassNotFoundException e) {
       addError(loggerContext, origin, ERROR_MSG, e);
     } catch (NoSuchMethodException e) {

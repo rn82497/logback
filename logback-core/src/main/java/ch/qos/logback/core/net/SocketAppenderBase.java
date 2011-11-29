@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -136,7 +136,7 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
         msg += " We will try again later.";
         fireConnector(); // fire the connector thread
       }
-      addWarn(msg, e);
+      addInfo(msg, e);
     }
   }
 
@@ -206,8 +206,7 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
   }
 
   /**
-   * The <b>RemoteHost</b> option takes a string value which should be the host
-   * name of the server where a {@link SocketNode} is running.
+   * The <b>RemoteHost</b> property takes the name of of the host where a corresponding server is running.
    */
   public void setRemoteHost(String host) {
     address = getAddressByName(host);
@@ -215,14 +214,14 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
   }
 
   /**
-   * Returns value of the <b>RemoteHost</b> option.
+   * Returns value of the <b>RemoteHost</b> property.
    */
   public String getRemoteHost() {
     return remoteHost;
   }
 
   /**
-   * The <b>Port</b> option takes a positive integer representing the port
+   * The <b>Port</b> property takes a positive integer representing the port
    * where the server is waiting for connections.
    */
   public void setPort(int port) {
@@ -230,18 +229,18 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
   }
 
   /**
-   * Returns value of the <b>Port</b> option.
+   * Returns value of the <b>Port</b> property.
    */
   public int getPort() {
     return port;
   }
 
   /**
-   * The <b>ReconnectionDelay</b> option takes a positive integer representing
+   * The <b>reconnectionDelay</b> property takes a positive integer representing
    * the number of milliseconds to wait between each failed connection attempt
    * to the server. The default value of this option is 30000 which corresponds
    * to 30 seconds.
-   * 
+   *
    * <p>
    * Setting this option to zero turns off reconnection capability.
    */
@@ -250,7 +249,7 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
   }
 
   /**
-   * Returns value of the <b>ReconnectionDelay</b> option.
+   * Returns value of the <b>reconnectionDelay</b> property.
    */
   public int getReconnectionDelay() {
     return reconnectionDelay;
@@ -264,7 +263,7 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
    * 
    * <p>
    * It stops trying whenever a connection is established. It will restart to
-   * try reconnect to the server when previpously open connection is droppped.
+   * try reconnect to the server when previously open connection is dropped.
    * 
    * @author Ceki G&uuml;lc&uuml;
    * @since 0.8.4

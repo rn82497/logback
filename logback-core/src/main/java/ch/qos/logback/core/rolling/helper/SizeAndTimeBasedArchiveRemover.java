@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -23,16 +23,18 @@ public class SizeAndTimeBasedArchiveRemover extends DefaultArchiveRemover {
     super(fileNamePattern, rc);
   }
 
-  @Override
-  public void clean(Date now) {
-    Date dateOfPeriodToClean = rc.getRelativeDate(now, periodOffsetForDeletionTarget);
+  public void cleanByPeriodOffset(Date now, int periodOffset) {
+    Date dateOfPeriodToClean = rc.getRelativeDate(now, periodOffset);
 
     String regex = fileNamePattern.toRegex(dateOfPeriodToClean);
     String stemRegex = FileFilterUtil.afterLastSlash(regex);
     File archive0 = new File(fileNamePattern.convertMultipleArguments(
         dateOfPeriodToClean, 0));
+    // in case the file has no directory part, i.e. if it's written into the
+    // user's current directory.
+    archive0 = archive0.getAbsoluteFile();
 
-    File parentDir = archive0.getParentFile();
+    File parentDir = archive0.getAbsoluteFile().getParentFile();
     File[] matchingFileArray = FileFilterUtil.filesInFolderMatchingStemRegex(
         parentDir, stemRegex);
 
@@ -41,8 +43,9 @@ public class SizeAndTimeBasedArchiveRemover extends DefaultArchiveRemover {
     }
 
     if (parentClean) {
-      removeFolderIfEmpty(parentDir, 0);
+      removeFolderIfEmpty(parentDir);
     }
   }
+
 
 }

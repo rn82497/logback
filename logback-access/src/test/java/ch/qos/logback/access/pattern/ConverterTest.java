@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -20,6 +20,7 @@ import java.util.List;
 
 import javax.servlet.http.Cookie;
 
+import ch.qos.logback.access.spi.IAccessEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +32,7 @@ import ch.qos.logback.access.spi.AccessEvent;
 
 public class ConverterTest  {
 
-  AccessEvent event;
+  IAccessEvent event;
   DummyRequest request;
   DummyResponse response;
 
@@ -62,7 +63,7 @@ public class ConverterTest  {
     DateConverter converter = new DateConverter();
     converter.start();
     String result = converter.convert(event);
-    assertEquals(converter.simpleFormat.format(event.getTimeStamp()), result);
+    assertEquals(converter.cachingDateFormatter.format(event.getTimeStamp()), result);
   }
 
   public void testLineLocalPortConverter() {
@@ -191,10 +192,9 @@ public class ConverterTest  {
     assertEquals(Integer.toString(event.getServerAdapter().getStatusCode()), result);
   }
 
-  private AccessEvent createEvent() {
+  private IAccessEvent createEvent() {
     DummyServerAdapter dummyAdapter = new DummyServerAdapter(request, response);
-    AccessEvent ae = new AccessEvent(request, response, dummyAdapter);
-    return ae;
+    return new AccessEvent(request, response, dummyAdapter);
   }
 
 }

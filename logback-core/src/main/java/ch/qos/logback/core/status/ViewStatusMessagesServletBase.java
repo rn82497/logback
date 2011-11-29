@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -18,7 +18,6 @@ import static ch.qos.logback.core.CoreConstants.LINE_SEPARATOR;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -28,11 +27,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.helpers.Transform;
+import ch.qos.logback.core.util.CachingDateFormatter;
 
 abstract public class ViewStatusMessagesServletBase extends HttpServlet {
 
   private static final long serialVersionUID = -3551928133801157219L;
-  private static SimpleDateFormat SDF = new SimpleDateFormat(
+  private static CachingDateFormatter SDF = new CachingDateFormatter(
       "yyyy-MM-dd HH:mm:ss");
 
   static String SUBMIT = "submit";

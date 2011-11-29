@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -13,10 +13,11 @@
  */
 package ch.qos.logback.core.rolling.helper;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.pattern.DynamicConverter;
+import ch.qos.logback.core.util.CachingDateFormatter;
 
 /**
  * Returns a date formatted by SimpleDateFormatter.
@@ -29,24 +30,21 @@ public class DateTokenConverter<E> extends DynamicConverter<E> implements MonoTy
    * The conversion word/character with which this converter is registered.
    */
   public final static String CONVERTER_KEY = "d";
+  public static final String DEFAULT_DATE_PATTERN = CoreConstants.DAILY_DATE_PATTERN;
 
   private String datePattern;
-  private SimpleDateFormat sdf;
-
-  public DateTokenConverter() {
-  }
+  private CachingDateFormatter cdf;
 
   public void start() {
     this.datePattern = getFirstOption();
     if (this.datePattern == null) {
-      this.datePattern = "yyyy-MM-dd";
-      ;
+      this.datePattern = DEFAULT_DATE_PATTERN;
     }
-    sdf = new SimpleDateFormat(datePattern);
+    cdf = new CachingDateFormatter(datePattern);
   }
 
   public String convert(Date date) {
-    return sdf.format(date);
+    return cdf.format(date.getTime());
   }
 
   public String convert(Object o) {

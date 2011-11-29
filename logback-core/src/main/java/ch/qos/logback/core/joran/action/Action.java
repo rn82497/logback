@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -22,18 +22,18 @@ import ch.qos.logback.core.joran.spi.Interpreter;
 import ch.qos.logback.core.spi.ContextAwareBase;
 
 /**
- * 
+ *
  * Most of the work for configuring logback is done by Actions.
- * 
+ *
  * <p>Action methods are invoked as the XML file is parsed.
- * 
+ *
  * <p>This class is largely inspired from the relevant class in the
  * commons-digester project of the Apache Software Foundation.
- * 
+ *
  * @author Craig McClanahan
  * @author Christopher Lenz
  * @author Ceki G&uuml;lc&uuml;
- * 
+ *
  */
 public abstract class Action extends ContextAwareBase {
 
@@ -43,6 +43,8 @@ public abstract class Action extends ContextAwareBase {
   public static final String FILE_ATTRIBUTE = "file";
   public static final String CLASS_ATTRIBUTE = "class";
   public static final String PATTERN_ATTRIBUTE = "pattern";
+  public static final String SCOPE_ATTRIBUTE = "scope";
+
 
   public static final String ACTION_CLASS_ATTRIBUTE = "actionClass";
 
@@ -94,8 +96,7 @@ public abstract class Action extends ContextAwareBase {
   }
 
   protected String getLineColStr(InterpretationContext ic) {
-    String line = "line: " + getLineNumber(ic) + ", column: "
+    return "line: " + getLineNumber(ic) + ", column: "
         + getColumnNumber(ic);
-    return line;
   }
 }

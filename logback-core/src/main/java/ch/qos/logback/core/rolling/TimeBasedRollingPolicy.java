@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -18,12 +18,7 @@ import java.util.Date;
 import java.util.concurrent.Future;
 
 import ch.qos.logback.core.CoreConstants;
-import ch.qos.logback.core.rolling.helper.ArchiveRemover;
-import ch.qos.logback.core.rolling.helper.AsynchronousCompressor;
-import ch.qos.logback.core.rolling.helper.CompressionMode;
-import ch.qos.logback.core.rolling.helper.Compressor;
-import ch.qos.logback.core.rolling.helper.FileNamePattern;
-import ch.qos.logback.core.rolling.helper.RenameUtil;
+import ch.qos.logback.core.rolling.helper.*;
 
 /**
  * <code>TimeBasedRollingPolicy</code> is both easy to configure and quite
@@ -38,7 +33,7 @@ import ch.qos.logback.core.rolling.helper.RenameUtil;
 public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
     TriggeringPolicy<E> {
   static final String FNP_NOT_SET = "The FileNamePattern option must be set before using TimeBasedRollingPolicy. ";
-  static final int NO_DELETE_HISTORY = 0;
+  static final int INFINITE_HISTORY = 0;
 
   // WCS: without compression suffix
   FileNamePattern fileNamePatternWCS;
@@ -47,10 +42,12 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
   private RenameUtil renameUtil = new RenameUtil();
   Future<?> future;
 
-  private int maxHistory = NO_DELETE_HISTORY;
+  private int maxHistory = INFINITE_HISTORY;
   private ArchiveRemover archiveRemover;
 
   TimeBasedFileNamingAndTriggeringPolicy<E> timeBasedFileNamingAndTriggeringPolicy;
+
+  boolean cleanHistoryOnStart = false;
 
   public void start() {
     // set the LR for our utility object
@@ -71,11 +68,16 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
     compressor.setContext(context);
 
     // wcs : without compression suffix
-    fileNamePatternWCS = new FileNamePattern(computeFileNameStr_WCS(
-        fileNamePatternStr, compressionMode), this.context);
+    fileNamePatternWCS = new FileNamePattern(Compressor.computeFileNameStr_WCS(
+            fileNamePatternStr, compressionMode), this.context);
 
     addInfo("Will use the pattern " + fileNamePatternWCS
         + " for the active file");
+
+     if(compressionMode == CompressionMode.ZIP) {
+      String zipEntryFileNamePatternStr = transformFileNamePattern2ZipEntry(fileNamePatternStr);
+      zipEntryFileNamePattern = new FileNamePattern(zipEntryFileNamePatternStr, context);
+    }
 
     if (timeBasedFileNamingAndTriggeringPolicy == null) {
       timeBasedFileNamingAndTriggeringPolicy = new DefaultTimeBasedFileNamingAndTriggeringPolicy<E>();
@@ -86,11 +88,22 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
 
     // the maxHistory property is given to TimeBasedRollingPolicy instead of to
     // the TimeBasedFileNamingAndTriggeringPolicy. This makes it more convenient
-    // for the user at the cost of inconsistency at the level of this code.
-    if (maxHistory != NO_DELETE_HISTORY) {
+    // for the user at the cost of inconsistency here.
+    if (maxHistory != INFINITE_HISTORY) {
       archiveRemover = timeBasedFileNamingAndTriggeringPolicy.getArchiveRemover();
       archiveRemover.setMaxHistory(maxHistory);
+      if(cleanHistoryOnStart) {
+        addInfo("Cleaning on start up");
+        archiveRemover.clean(new Date(timeBasedFileNamingAndTriggeringPolicy.getCurrentTime()));
+      }
     }
+
+    super.start();
+  }
+
+  private String transformFileNamePattern2ZipEntry(String fileNamePatternStr) {
+    String slashified = FileFilterUtil.slashify(fileNamePatternStr);
+    return FileFilterUtil.afterLastSlash(slashified);
   }
 
   public void setTimeBasedFileNamingAndTriggeringPolicy(
@@ -102,20 +115,6 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
     return timeBasedFileNamingAndTriggeringPolicy;
   }
 
-  static public String computeFileNameStr_WCS(String fileNamePatternStr,
-      CompressionMode compressionMode) {
-    int len = fileNamePatternStr.length();
-    switch (compressionMode) {
-    case GZ:
-      return fileNamePatternStr.substring(0, len - 3);
-    case ZIP:
-      return fileNamePatternStr.substring(0, len - 4);
-    case NONE:
-      return fileNamePatternStr;
-    }
-    throw new IllegalStateException("Execution should not reach this point");
-  }
-
   public void rollover() throws RolloverFailure {
 
     // when rollover is called the elapsed period's file has
@@ -124,15 +123,18 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
     String elapsedPeriodsFileName = timeBasedFileNamingAndTriggeringPolicy
         .getElapsedPeriodsFileName();
 
+    String elpasedPeriodStem = FileFilterUtil.afterLastSlash(elapsedPeriodsFileName);
+
+
     if (compressionMode == CompressionMode.NONE) {
       if (getParentsRawFileProperty() != null) {
         renameUtil.rename(getParentsRawFileProperty(), elapsedPeriodsFileName);
       } // else { nothing to do if CompressionMode == NONE and parentsRawFileProperty == null }
     } else {
       if (getParentsRawFileProperty() == null) {
-        future = asyncCompress(elapsedPeriodsFileName, elapsedPeriodsFileName);
+        future = asyncCompress(elapsedPeriodsFileName, elapsedPeriodsFileName, elpasedPeriodStem);
       } else {
-        future = renamedRawAndAsyncCompress(elapsedPeriodsFileName);
+        future = renamedRawAndAsyncCompress(elapsedPeriodsFileName, elpasedPeriodStem);
       }
     }
 
@@ -141,18 +143,18 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
     }
   }
 
-  Future asyncCompress(String nameOfFile2Compress, String nameOfCompressedFile)
+  Future asyncCompress(String nameOfFile2Compress, String nameOfCompressedFile, String innerEntryName)
       throws RolloverFailure {
     AsynchronousCompressor ac = new AsynchronousCompressor(compressor);
-    return ac.compressAsynchronously(nameOfFile2Compress, nameOfCompressedFile);
+    return ac.compressAsynchronously(nameOfFile2Compress, nameOfCompressedFile, innerEntryName);
   }
 
-  Future renamedRawAndAsyncCompress(String nameOfCompressedFile)
+  Future renamedRawAndAsyncCompress(String nameOfCompressedFile, String innerEntryName)
       throws RolloverFailure {
     String parentsRawFile = getParentsRawFileProperty();
     String tmpTarget = parentsRawFile + System.nanoTime() + ".tmp";
     renameUtil.rename(parentsRawFile, tmpTarget);
-    return asyncCompress(tmpTarget, nameOfCompressedFile);
+    return asyncCompress(tmpTarget, nameOfCompressedFile, innerEntryName);
   }
 
   /**
@@ -207,6 +209,21 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
   public void setMaxHistory(int maxHistory) {
     this.maxHistory = maxHistory;
   }
+
+
+  public boolean isCleanHistoryOnStart() {
+    return cleanHistoryOnStart;
+  }
+
+  /**
+   * Should archive removal be attempted on application start up? Default is false.
+   * @since 1.0.1
+   * @param cleanHistoryOnStart
+   */
+  public void setCleanHistoryOnStart(boolean cleanHistoryOnStart) {
+    this.cleanHistoryOnStart = cleanHistoryOnStart;
+  }
+
 
   @Override
   public String toString() {

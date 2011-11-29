@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -15,9 +15,7 @@ package ch.qos.logback.classic.rolling;
 
 import static org.junit.Assert.assertTrue;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
+import ch.qos.logback.core.util.CachingDateFormatter;
 import org.junit.Test;
 
 import ch.qos.logback.classic.ClassicTestConstants;
@@ -51,11 +49,11 @@ public class UniqueFileTest {
   @Test
   public void basic() throws Exception {
     loadConfig(ClassicTestConstants.JORAN_INPUT_PREFIX + "unique.xml");
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
-    String timestamp = sdf.format(new Date()); 
+    CachingDateFormatter sdf = new CachingDateFormatter("yyyyMMdd'T'HHmmss");
+    String timestamp = sdf.format(System.currentTimeMillis());
     
     StatusChecker sc = new StatusChecker(lc);
-    assertTrue(sc.isErrorFree());
+    assertTrue(sc.isErrorFree(0));
 
     Logger root = lc.getLogger(Logger.ROOT_LOGGER_NAME);
     root.info("hello");

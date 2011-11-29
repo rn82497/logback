@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2010, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -13,7 +13,6 @@
  */
 package ch.qos.logback.core.spi;
 
-import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.helpers.CyclicBuffer;
 
@@ -32,9 +31,10 @@ public class CyclicBufferTrackerImpl<E> implements CyclicBufferTracker<E> {
   int bufferCount = 0;
 
   // 5 minutes
-  static final int DELAY_BETWEEN_CLEARING_STALE_BUFFERS = 300*CoreConstants.MILLIS_IN_ONE_SECOND ;
+  static final int DELAY_BETWEEN_CLEARING_STALE_BUFFERS = 300 * CoreConstants.MILLIS_IN_ONE_SECOND;
 
- 
+
+  boolean isStarted = false;
 
   private Map<String, Entry> map = new HashMap<String, Entry>();
 
@@ -52,7 +52,8 @@ public class CyclicBufferTrackerImpl<E> implements CyclicBufferTracker<E> {
     return bufferSize;
   }
 
-  public void setBufferSize(int size) {
+  public void setBufferSize(int bufferSize) {
+    this.bufferSize = bufferSize;
   }
 
   public int getMaxNumberOfBuffers() {
@@ -63,15 +64,27 @@ public class CyclicBufferTrackerImpl<E> implements CyclicBufferTracker<E> {
     this.maxNumBuffers = maxNumBuffers;
   }
 
-  public CyclicBuffer<E> get(String key, long timestamp) {
+  public CyclicBuffer<E> getOrCreate(String key, long timestamp) {
     Entry existing = map.get(key);
     if (existing == null) {
-      CyclicBuffer<E> cb = processNewEntry(key, timestamp);
-      return cb;
+      return processNewEntry(key, timestamp);
     } else {
       existing.setTimestamp(timestamp);
       moveToTail(existing);
       return existing.value;
+    }
+  }
+
+  public void removeBuffer(String key) {
+    Entry existing = map.get(key);
+    if (existing != null) {
+      bufferCount--;
+      map.remove(key);
+      unlink(existing);
+      CyclicBuffer<E> cb = existing.value;
+      if(cb != null) {
+        cb.clear();
+      }
     }
   }
 
@@ -80,7 +93,7 @@ public class CyclicBufferTrackerImpl<E> implements CyclicBufferTracker<E> {
     Entry entry = new Entry(key, cb, timestamp);
     map.put(key, entry);
     bufferCount++;
-    rearrangeTailLinks(entry);
+    linkBeforeTail(entry);
     if (bufferCount >= maxNumBuffers) {
       removeHead();
     }
@@ -99,11 +112,11 @@ public class CyclicBufferTrackerImpl<E> implements CyclicBufferTracker<E> {
   }
 
   private void moveToTail(Entry e) {
-    rearrangePreexistingLinks(e);
-    rearrangeTailLinks(e);
+    unlink(e);
+    linkBeforeTail(e);
   }
 
-  private void rearrangePreexistingLinks(Entry e) {
+  private void unlink(Entry e) {
     if (e.prev != null) {
       e.prev.next = e.next;
     }
@@ -123,8 +136,6 @@ public class CyclicBufferTrackerImpl<E> implements CyclicBufferTracker<E> {
     lastCheck = now;
 
     while (head.value != null && isEntryStale(head, now)) {
-      CyclicBuffer<E> cb = head.value;
-      cb.clear();
       removeHead();
     }
   }
@@ -133,11 +144,11 @@ public class CyclicBufferTrackerImpl<E> implements CyclicBufferTracker<E> {
     return map.size();
   }
 
-  final private boolean isEntryStale(Entry entry, long now) {
+  private boolean isEntryStale(Entry entry, long now) {
     return ((entry.timestamp + THRESHOLD) < now);
   }
 
-   List<String> keyList() {
+  List<String> keyList() {
     List<String> result = new LinkedList<String>();
     Entry e = head;
     while (e != tail) {
@@ -146,7 +157,8 @@ public class CyclicBufferTrackerImpl<E> implements CyclicBufferTracker<E> {
     }
     return result;
   }
-  private void rearrangeTailLinks(Entry e) {
+
+  private void linkBeforeTail(Entry e) {
     if (head == tail) {
       head = e;
     }

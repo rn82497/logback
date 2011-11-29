@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -16,7 +16,7 @@ package ch.qos.logback.access.net;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.qos.logback.access.spi.AccessEvent;
+import ch.qos.logback.access.spi.IAccessEvent;
 import ch.qos.logback.core.boolex.EvaluationException;
 import ch.qos.logback.core.boolex.EventEvaluator;
 import ch.qos.logback.core.spi.ContextAwareBase;
@@ -27,9 +27,6 @@ public class URLEvaluator extends ContextAwareBase implements EventEvaluator, Li
   boolean started;
   String name;
   private List<String> URLList = new ArrayList<String>();
-
-  public URLEvaluator() {
-  }
 
   public void addURL(String url) {
     URLList.add(url);
@@ -44,7 +41,7 @@ public class URLEvaluator extends ContextAwareBase implements EventEvaluator, Li
   }
     
   public boolean evaluate(Object eventObject) throws NullPointerException, EvaluationException {
-    AccessEvent event = (AccessEvent)eventObject;
+    IAccessEvent event = (IAccessEvent)eventObject;
     String url = event.getRequestURL();
     for(String expected:URLList) {
       if (url.contains(expected)) {

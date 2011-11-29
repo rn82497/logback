@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -14,11 +14,15 @@
 package ch.qos.logback.core.rolling.helper;
 
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import ch.qos.logback.core.CoreConstants;
+import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.RolloverFailure;
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.util.FileUtil;
@@ -31,6 +35,7 @@ import ch.qos.logback.core.util.FileUtil;
  */
 public class RenameUtil extends ContextAwareBase {
 
+  static String RENAMING_ERROR_URL = CoreConstants.CODES_URL+"#renamingError";
 
   /**
    * A robust file renaming method which in case of failure falls back to
@@ -59,8 +64,9 @@ public class RenameUtil extends ContextAwareBase {
 
       if (!result) {
         addWarn("Failed to rename file [" + fromFile + "] to [" + toFile + "].");
-        addWarn("Attempting to rename by copying.");
-        renameByCopying(from, to);
+        addWarn("Please consider leaving the [file] option of "+ RollingFileAppender.class.getSimpleName()+" empty.");
+        addWarn("See also "+ RENAMING_ERROR_URL);
+
       }
     } else {
       throw new RolloverFailure("File [" + from + "] does not exist.");
@@ -71,18 +77,22 @@ public class RenameUtil extends ContextAwareBase {
 
   public void renameByCopying(String from, String to)
           throws RolloverFailure {
+    BufferedInputStream bis = null;
+    BufferedOutputStream bos = null;
     try {
-      FileInputStream fis = new FileInputStream(from);
-      FileOutputStream fos = new FileOutputStream(to);
+      bis = new BufferedInputStream(new FileInputStream(from));
+      bos = new BufferedOutputStream(new FileOutputStream(to));
       byte[] inbuf = new byte[BUF_SIZE];
       int n;
 
-      while ((n = fis.read(inbuf)) != -1) {
-        fos.write(inbuf, 0, n);
+      while ((n = bis.read(inbuf)) != -1) {
+        bos.write(inbuf, 0, n);
       }
 
-      fis.close();
-      fos.close();
+      bis.close();
+      bis = null;
+      bos.close();
+      bos = null;
 
       File fromFile = new File(from);
 
@@ -92,6 +102,21 @@ public class RenameUtil extends ContextAwareBase {
     } catch (IOException ioe) {
       addError("Failed to rename file by copying", ioe);
       throw new RolloverFailure("Failed to rename file by copying");
+    } finally {
+      if(bis != null) {
+        try {
+          bis.close();
+        } catch (IOException e) {
+          // ignore
+        }
+      }
+      if(bos != null) {
+        try {
+          bos.close();
+        } catch (IOException e) {
+          // ignore
+        }
+      }
     }
   }
 

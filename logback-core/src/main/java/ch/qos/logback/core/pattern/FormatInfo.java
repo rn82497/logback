@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -45,7 +45,7 @@ public class FormatInfo {
    * a FormatInfo.
    * 
    * @param str A String to convert into a FormatInfo object
-   * @return A newly created and approprioately initialized FormatInfo object.
+   * @return A newly created and appropriately initialized FormatInfo object.
    * @throws IllegalArgumentException
    */
   public static FormatInfo valueOf(String str) throws IllegalArgumentException {

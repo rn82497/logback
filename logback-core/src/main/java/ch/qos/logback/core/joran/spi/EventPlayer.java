@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -13,6 +13,7 @@
  */
 package ch.qos.logback.core.joran.spi;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.qos.logback.core.joran.event.BodyEvent;
@@ -29,9 +30,18 @@ public class EventPlayer {
   public EventPlayer(Interpreter interpreter) {
     this.interpreter = interpreter; 
   }
-  
-  public void play(List<SaxEvent> seList) {
-    eventList = seList;
+
+  /**
+   * Return a copy of the current event list in the player.
+   * @return
+   * @since 0.9.20
+   */
+  public List<SaxEvent> getCopyOfPlayerEventList() {
+    return new ArrayList<SaxEvent>(eventList);
+  }
+
+  public void play(List<SaxEvent> aSaxEventList) {
+    eventList = aSaxEventList;
     SaxEvent se;
     for(currentIndex = 0; currentIndex < eventList.size(); currentIndex++) {
       se = eventList.get(currentIndex);

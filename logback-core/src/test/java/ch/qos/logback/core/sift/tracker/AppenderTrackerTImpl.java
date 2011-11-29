@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -32,9 +32,6 @@ public class AppenderTrackerTImpl implements AppenderTracker<Object> {
 
   List<TEntry> entryList = new LinkedList<TEntry>();
   long lastCheck = 0;
-
-  public AppenderTrackerTImpl() {
-  }
 
   @SuppressWarnings("unchecked")
   synchronized public void put(String k, Appender<Object> appender,
@@ -85,7 +82,7 @@ public class AppenderTrackerTImpl implements AppenderTracker<Object> {
 
   }
 
-  final private boolean isEntryStale(TEntry entry, long now) {
+  private boolean isEntryStale(TEntry entry, long now) {
     return ((entry.timestamp + THRESHOLD) < now);
   }
 

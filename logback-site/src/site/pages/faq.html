@@ -70,7 +70,7 @@
 
       <li>
         <a href="#setup_jetty">How can Jetty be instructed to use
-        logback-classic as its logging implementataion?
+        logback-classic as its logging implementation?
         </a>
       </li>
     </ol>
@@ -92,7 +92,7 @@
         
         <dd>
           <p>The logback project is dual licensed under the LGPL and
-          the EPL for two mains reasons. For one, the different
+          the EPL for two main reasons. For one, the different
           license emphasizes that the fact that logback is a related
           but <em>different</em> project than log4j. 
           </p>
@@ -102,7 +102,7 @@
           require that derivate work be licensed under the same
           license. While there might be debate about the exact
           definition of derivative work, we find such reciprocity both
-          justified and morally appealing -- that tis the second
+          justified and morally appealing -- that is the second
           reason for our choice of the LGPL &amp; EPL
           dual-license. The subtly more liberal approach embodied in
           the ASL is not necessarily wrong. It is the expression of a
@@ -187,7 +187,7 @@
         <dd>
           <p>Yes. A logback logger <em>is</em> an SLF4J logger and SLF4J
           loggers are serializable. This means that an object
-          referencing a logger will be alble to log after its
+          referencing a logger will be able to log after its
           deserialization.
           </p>
           
@@ -213,7 +213,7 @@
           href="manual/configuration.html#variableSubstitution">variable
           substitution</a>, it is possible to have a single
           configuration file to output logs to different destinations
-          depending on each JEE application. Here is a sample
+          for each JEE application. Here is a sample
           configuration file designed for this purpose.</p>
           
           <p class="source">&lt;configuration>
@@ -242,12 +242,12 @@
           </p>
 
           <p class="source">  LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-  // inject the name of the current application as "applicaiton-name" 
-  // property of the LoggerContext
-  <b>context.putProperty("application-name", NAME_OF_CURRENT_APPLICATION);</b>
   JoranConfigurator jc = new JoranConfigurator();
   jc.setContext(context);
   context.reset(); // override default configuration
+  // inject the name of the current application as "application-name"
+  // property of the LoggerContext
+  <b>context.putProperty("application-name", NAME_OF_CURRENT_APPLICATION);</b>
   jc.doConfigure("/path/to/the/above/configuration/file.xml"); </p>
 
           <hr/>
@@ -262,9 +262,9 @@
           </a>
         </dt>
         <dd>
-          <p>Logback does not allow disabling logging from the command
+          <p>Logback does not allow logging to be disabled from the command
           line. However, if the configuration file allows it, you can
-          set the level of logers on the command line via a java
+          set the level of loggers on the command line via a Java
           system property. Here is such a configuration file.</p>
 
           <p class="source">&lt;configuration>
@@ -320,7 +320,7 @@
           </p>
 
           
-          <p>Since Jetty's uses an older version of SLF4J internally,
+          <p>Since Jetty uses an older version of SLF4J internally,
           we recommend that the old version be replaced by
           <em>slf4j-api-${slf4j.version}.jar</em>. This file can be
           downloaded from the <a
@@ -328,7 +328,7 @@
           </p>
         
           
-          <p>For automaticly configuring logback-classic, you can
+          <p>For automatically configuring logback-classic, you can
           place the file <em>logback.xml</em> under the
           <em>$JETTY_HOME/resources</em> directory. You can find
           sample configuration files in the

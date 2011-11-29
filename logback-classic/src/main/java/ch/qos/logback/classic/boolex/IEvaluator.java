@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2010, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -21,6 +21,6 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
  * @author Ceki G&uuml;c&uuml;
  */
 public interface IEvaluator {
-  public boolean doEvaluate(ILoggingEvent event);
+  boolean doEvaluate(ILoggingEvent event);
 }
  

@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -15,7 +15,19 @@ package ch.qos.logback.core.status;
 
 import ch.qos.logback.core.Context;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class StatusUtil {
+
+  static public List<Status> filterStatusListByTimeThreshold(List<Status> rawList, long threshold) {
+    List<Status> filteredList = new ArrayList<Status>();
+    for (Status s : rawList) {
+      if (s.getDate() >= threshold)
+        filteredList.add(s);
+    }
+    return filteredList;
+  }
 
   static public void addStatus(Context context, Status status) {
     if (context == null) {

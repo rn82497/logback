@@ -1,15 +1,15 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2010, QOS.ch. All rights reserved.
- * 
- * This program and the accompanying materials are dual-licensed under either
- * the terms of the Eclipse Public License v1.0 as published by the Eclipse
- * Foundation
- * 
- * or (per the licensee's choosing)
- * 
- * under the terms of the GNU Lesser General Public License version 2.1 as
- * published by the Free Software Foundation.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
+ *
+ * This program and the accompanying materials are dual-licensed under
+ * either the terms of the Eclipse Public License v1.0 as published by
+ * the Eclipse Foundation
+ *
+ *   or (per the licensee's choosing)
+ *
+ * under the terms of the GNU Lesser General Public License version 2.1
+ * as published by the Free Software Foundation.
  */
 package ch.qos.logback.core;
 
@@ -117,7 +117,7 @@ public class FileAppenderResilience_AS_ROOT_Test {
     p.waitFor();
     // the extrernal script has the file system ready for IO 50% of the time
     double bestCase = 0.5;
-    ResilienceUtil.verify(logfileStr, "^(\\d{1,3}) x*$", NUM_STEPS, bestCase);
+    ResilienceUtil.verify(logfileStr, "^(\\d{1,3}) x*$", NUM_STEPS, bestCase*0.6);
     System.out.println("Done go");
   }
 
@@ -132,7 +132,6 @@ public class FileAppenderResilience_AS_ROOT_Test {
     }
     ProcessBuilder pb = new ProcessBuilder();
     pb.command("/usr/bin/sudo", PATH_LOOPFS_SCRIPT, cmd.toString());
-    Process process = pb.start();
-    return process;
+    return pb.start();
   }
 }

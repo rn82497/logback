@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -16,8 +16,8 @@ package ch.qos.logback.classic.issue.lbclassic36;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+//import org.joda.time.format.DateTimeFormat;
+//import org.joda.time.format.DateTimeFormatter;
 
 public class DateFormatPerf_Tapp {
   public static final String ISO8601_PATTERN = "yyyy-MM-dd HH:mm:ss,SSS";
@@ -40,11 +40,11 @@ public class DateFormatPerf_Tapp {
   }
 
   static double doRawJoda() {
-    DateTimeFormatter jodaFormat = DateTimeFormat.forPattern(ISO8601_PATTERN);
+//    DateTimeFormatter jodaFormat = DateTimeFormat.forPattern(ISO8601_PATTERN);
     long timeInMillis = new Date().getTime();
     long start = System.nanoTime();
     for (int i = 0; i < RUN_LENGTH; ++i) {
-      jodaFormat.print(timeInMillis);
+//      jodaFormat.print(timeInMillis);
     }
     return (System.nanoTime() - start) * 1.0d / RUN_LENGTH;
   }

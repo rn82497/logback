@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -34,13 +34,6 @@ public class RollingFileAppender<E> extends FileAppender<E> {
   File currentlyActiveFile;
   TriggeringPolicy<E> triggeringPolicy;
   RollingPolicy rollingPolicy;
-
-  /**
-   * The default constructor simply calls its {@link FileAppender#FileAppender
-   * parents constructor}.
-   */
-  public RollingFileAppender() {
-  }
 
   public void start() {
     if (triggeringPolicy == null) {
@@ -77,6 +70,13 @@ public class RollingFileAppender<E> extends FileAppender<E> {
     currentlyActiveFile = new File(getFile());
     addInfo("Active log file name: " + getFile());
     super.start();
+  }
+
+  @Override
+  public void stop() {
+    if(rollingPolicy != null) rollingPolicy.stop();
+    if(triggeringPolicy != null) triggeringPolicy.stop();
+    super.stop();
   }
 
   @Override

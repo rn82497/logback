@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.Date;
 
 import ch.qos.logback.core.joran.spi.NoAutoStart;
+import ch.qos.logback.core.rolling.helper.CompressionMode;
 import ch.qos.logback.core.rolling.helper.FileFilterUtil;
 import ch.qos.logback.core.rolling.helper.SizeAndTimeBasedArchiveRemover;
 import ch.qos.logback.core.util.FileSize;
@@ -52,8 +53,8 @@ public class SizeAndTimeBasedFNATP<E> extends
 
   void computeCurrentPeriodsHighestCounterValue(final String stemRegex) {
     File file = new File(getCurrentPeriodsFileNameWithoutCompressionSuffix());
-
     File parentDir = file.getParentFile();
+
     File[] matchingFileArray = FileFilterUtil
             .filesInFolderMatchingStemRegex(parentDir, stemRegex);
 
@@ -61,9 +62,12 @@ public class SizeAndTimeBasedFNATP<E> extends
       currentPeriodsCounter = 0;
       return;
     }
-    FileFilterUtil.reverseSortFileArrayByName(matchingFileArray);
-    currentPeriodsCounter = FileFilterUtil.extractCounter(matchingFileArray[0], stemRegex);
-    if (tbrp.getParentsRawFileProperty() != null) {
+    currentPeriodsCounter = FileFilterUtil.findHighestCounter(matchingFileArray, stemRegex);
+
+    // if parent raw file property is not null, then the next
+    // counter is max  found counter+1
+    if (tbrp.getParentsRawFileProperty() != null || (tbrp.compressionMode != CompressionMode.NONE)) {
+      // TODO test me
       currentPeriodsCounter++;
     }
   }
@@ -92,8 +96,8 @@ public class SizeAndTimeBasedFNATP<E> extends
     if (((++invocationCounter) & invocationMask) != invocationMask) {
       return false;
     }
-    if (invocationMask < 0x0F)  {
-      invocationMask = (invocationMask << 1) + 1 ;
+    if (invocationMask < 0x0F) {
+      invocationMask = (invocationMask << 1) + 1;
     }
 
     if (activeFile.length() >= maxFileSize.getSize()) {
@@ -105,6 +109,12 @@ public class SizeAndTimeBasedFNATP<E> extends
 
     return false;
   }
+
+  private String getFileNameIncludingCompressionSuffix(Date date, int counter) {
+    return tbrp.fileNamePattern.convertMultipleArguments(
+            dateInCurrentPeriod, counter);
+  }
+
 
   @Override
   public String getCurrentPeriodsFileNameWithoutCompressionSuffix() {

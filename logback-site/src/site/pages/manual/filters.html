@@ -63,9 +63,9 @@
 
 		<p>Regular logback-classic filters extend the <a
 		href="../xref/ch/qos/logback/core/filter/Filter.html"><code>Filter</code></a>
-		abstract class which essentially consists of a single method,
+		abstract class which essentially consists of a single
 		<code>decide()</code> method taking an <code>ILoggingEvent</code>
-		instance as parameter.
+		instance as its parameter.
 		</p>
 		
 
@@ -126,13 +126,13 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
   }
 }</pre>
 
-		<p>The configutation files shown next attaches a
-		<code>SampleFilter</code> to a <code>ConsoleAppener</code>.
+		<p>The configuration files shown next attaches a
+		<code>SampleFilter</code> to a <code>ConsoleAppender</code>.
 		</p>
 
     <em>Example: SampleFilter configuration
     (logback-examples/src/main/java/chapters/filters/SampleFilterConfig.xml)</em>
-    <span class="asGroovy" onclick="return asGroovy('SampleFilterConfig');">View as .grovvy</span>
+    <span class="asGroovy" onclick="return asGroovy('SampleFilterConfig');">View as .groovy</span>
     <pre id="SampleFilterConfig" class="prettyprint source">&lt;configuration>
   &lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 
@@ -151,16 +151,16 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
 &lt;/configuration></pre>
 
 		<p>With the help of Joran, logback's configuration framework,
-		specifiying properties or sub-componenets to filters is also
+		specifying properties or sub-components to filters is also
 		easy. After adding the corresponding setter method in the filter
 		class, specify the value of the property in an xml element named
-		after the property, nesting it within <code>&lt;filter></code>
+		after the property, nesting it within a <code>&lt;filter></code>
 		element. 
 		</p>
 		
-		<p>Often times, the desired filter logic consists of two
+		<p>Often, the desired filter logic consists of two
 		orthogonal parts, a match/mismatch test and a response depending
-		on the match/mismatch. For example, for a given test, say message
+		on the match/mismatch. For example, for a given test, e.g. message
 		equals "foobar", one filter might respond ACCEPT on match and
 		NEUTRAL on mismatch, and another filter might respond NEUTRAL on
 		match and DENY on mismatch. 
@@ -169,8 +169,8 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
     <p>Taking notice of this orthogonality, logback ships with the <a
     href="../xref/ch/qos/logback/core/filter/AbstractMatcherFilter.html">
     <code>AbstractMatcherFilter</code></a> class which provides a
-    useful skeleton for specifiying the appropriate response on match
-    and on mistmatch, with the help of two properties, named
+    useful skeleton for specifying the appropriate response on match
+    and on mismatch, with the help of two properties, named
     <em>OnMatch</em> and <em>OnMismatch</em>. Most of the regular
     filters included in logback are derived from
     <code>AbstractMatcherFilter</code>.
@@ -189,7 +189,7 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
 		
     <em>Example: Sample LevelFilter configuration
     (logback-examples/src/main/java/chapters/filters/levelFilterConfig.xml)</em>
-    <span class="asGroovy" onclick="return asGroovy('levelFilterConfig');">View as .grovvy</span>
+    <span class="asGroovy" onclick="return asGroovy('levelFilterConfig');">View as .groovy</span>
     <pre id="levelFilterConfig" class="prettyprint source">&lt;configuration>
   &lt;appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <b>&lt;filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -222,7 +222,7 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
 
     <em>Example: Sample ThresholdFilter configuration
     (logback-examples/src/main/java/chapters/filters/thresholdFilterConfig.xml)</em>
-    <span class="asGroovy" onclick="return asGroovy('thresholdFilterConfig');">View as .grovvy</span>
+    <span class="asGroovy" onclick="return asGroovy('thresholdFilterConfig');">View as .groovy</span>
     <pre id="thresholdFilterConfig"  class="prettyprint source">&lt;configuration>
   &lt;appender name="CONSOLE"
     class="ch.qos.logback.core.ConsoleAppender">
@@ -247,18 +247,21 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
 
     <p><a
     href="../xref/ch/qos/logback/core/filter/EvaluatorFilter.html"><code>EvaluatorFilter</code></a>
-    is a generic filter encapsulating an <a
+    is a generic filter encapsulating an
+    <code>EventEvaluator</code>. As the name suggests, an
+    <a
     href="../xref/ch/qos/logback/core/boolex/EventEvaluator.html">
-    <code>EventEvaluator</code></a> which evaluates whether a given
-    criteria is met. On match and respectively on mismatch, the
-    <code>EvaluatorFilter</code> will return the value corresponding
-    to <span class="option">onMatch</span> and respectively to <span
-    class="option">onMismatch</span> properties.
+    <code>EventEvaluator</code></a> evaluates whether a given criteria
+    is met for a given event. On match and on mismatch,
+    the hosting <code>EvaluatorFilter</code> will return the value
+    specified by the <span class="option">onMatch</span>
+    or <span class="option">onMismatch</span> properties respectively.
     </p>
 
-    <p>The <code>EventEvaluator</code> is an abstract class and you
+
+    <p>Note that <code>EventEvaluator</code> is an abstract class. You
     can implement your own event evaluation logic by sub-classing
-    <code>EventEvaluator</code>. 
+    <code>EventEvaluator</code>.
     </p>
     
 
@@ -271,40 +274,42 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
     href="../xref/ch/qos/logback/classic/boolex/GEventEvaluator.html">GEventEvaluator</a>
     is a concrete <a
     href="../xref/ch/qos/logback/core/boolex/EventEvaluator.html"><code>EventEvaluator</code></a>
-    implementation taking artibtrary Groovy language boolean
-    expressions as the evaluation criteria. It admits an arbitrary
-    boolean expression written in Groovy. We refer such groovy
-    language boolean expressions as "groovy evaulation
-    expressions". Groovy evaluation expressions enable hereto
+    implementation taking arbitrary Groovy language boolean
+    expressions as the evaluation criteria.  We refer such Groovy
+    language boolean expressions as "groovy evaluation
+    expressions". Groovy evaluation expressions enable hitherto
     unprecedented flexibility in event
     filtering. <code>GEventEvaluator</code> requires the Groovy
     runtime. Please see the <a
     href="../setup.html#gEventEvaluator">corresponding section</a> of
-    the setup document.
+    the setup document on adding the Groovy runtime to your class
+    path.
     </p>
 
     <p>Evaluation expressions are compiled on-the-fly during the
     interpretation of the configuration file. As a user, you do not
     need to worry about the actual plumbing. However, it is your
-    reponsibility to ensure that the groovy-language expression is
+    responsibility to ensure that the groovy-language expression is
     valid.
     </p>
 
-    <p>The evaluation expression acts on the current logging event,
-    logback automatically inserts the current logging event of type <a
-    href="../apidocs/ch/qos/logback/classic/spi/ILoggingEvent.html">ILoggingEvent.</a>
-    as a variable called 'event' and its shorthand 'e'. The variables
-    TRACE, DEBUG, INFO, WARN and ERROR are also exported into the
-    scope of the expression. Thus, "event.level == DEBUG" is a valid
-    groovy expression which will return <code>true</code> only if the
-    current logging event's level is identical to DEBUG. For other
-    comparison operators, the level field should be converter to
-    integer with the <code>toInt()</code> operator.
+    <p>The evaluation expression acts on the current logging event.
+    Logback automatically inserts the current logging event of type <a
+    href="../apidocs/ch/qos/logback/classic/spi/ILoggingEvent.html">ILoggingEvent</a>
+    as a variable referred to as '<em>event</em>' as well as its
+    shorthand referred to as '<em>e</em>'. The variables TRACE, DEBUG,
+    INFO, WARN and ERROR are also exported into the scope of the
+    expression. Thus, "event.level == DEBUG" and "e.level == DEBUG"
+    are equivalent and valid groovy expressions which will return
+    <code>true</code> only if the current logging event's level is
+    identical to DEBUG. For other comparison operators on levels, the
+    level field should be converted to integer with the
+    <code>toInt()</code> operator.
     </p>
 
     <p>Here is a more complete example.</p>
 
-    <span class="asGroovy" onclick="return asGroovy('GEventEvaluator');">View as .grovvy</span>
+    <span class="asGroovy" onclick="return asGroovy('GEventEvaluator');">View as .groovy</span>
     <pre id="GEventEvaluator"  class="prettyprint source">&lt;configuration>
     
   &lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -338,10 +343,10 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
     checking whether the MDC associated with the event contains a
     value for "req.userAgent" matching the
     <code>/Googlebot|msnbot|Yahoo/</code> regular expression. Note
-    that since the mdc map can be null, we are also using Groovy's <a
+    that since the MDC map can be null, we are also using Groovy's <a
     href="http://groovy.codehaus.org/Null+Object+Pattern">safe
-    derefencing opeator</a>, that is the .? operator. The equivalent
-    logic would have be much longer to express in Java.
+    dereferencing operator</a>, that is the ?. operator. The equivalent
+    logic would have been much longer if expressed in Java.
     </p>
     
     <p>If you are wondering how the identifier for the user agent was
@@ -361,11 +366,11 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
     <p>Logback-classic ships with another concrete
     <code>EventEvaluator</code> implementation called <a
     href="../xref/ch/qos/logback/classic/boolex/JaninoEventEvaluator.html">JaninoEventEvaluator</a>
-    which taking artibtrary java language boolean expressions as the
-    evaluation criteria. We refer to such java language boolean
-    expressions as "<em>evaulation expressions</em>". Evaluation
+    taking an arbitrary Java language block returning a boolean value
+    as the evaluation criteria. We refer to such Java language boolean
+    expressions as "<em>evaluation expressions</em>". Evaluation
     expressions enable great flexibility in event
-    filtering.<code>JaninoEventEvaluator</code> requires the <a
+    filtering. <code>JaninoEventEvaluator</code> requires the <a
     href="http://docs.codehaus.org/display/JANINO/Home">Janino
     library</a>. Please see the <a
     href="../setup.html#janino">corresponding section</a> of the setup
@@ -379,14 +384,15 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
     <p>Evaluation expressions are compiled on-the-fly during the
     interpretation of the configuration file. As a user, you do not
     need to worry about the actual plumbing. However, it is your
-    reponsibility to ensure that the java-language expression is
-    boolean, that it evaluates to true or false. </p>
+    responsibility to ensure that the Java language expression returns
+    a boolean, i.e. that it evaluates to true or false. </p>
 
 
-    <p>Given that an evaluation expression acts on the current logging
-    event, logback automatically exports various fields of the logging
-    event as variables accessible from the evaluation expression. The
-    case-sensitive names these variables is listed below.
+    <p>The evaluation expression is evaluated on the current logging
+    event. Logback-classic automatically exports various fields of the
+    logging event as variables accessible from the evaluation
+    expression. The case-sensitive names of these exported variables
+    are listed below.
     </p>
 
 		<table class="bodyTable">
@@ -416,7 +422,7 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
         message.</td> </tr>
 		
       <tr>
-				<td>formatedMessage</td>
+				<td>formattedMessage</td>
         <td><code>String</code></td>
         <td>The formatted message in the logging request. For some
         logger <em>l</em>, when you write l.info("Hello {}", name);
@@ -473,11 +479,11 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
 				<td><code>Map</code></td>
 				<td>A map containing all the MDC values at the time of the
 				creation of the logging event. A value can be accessed by
-				using the following expression: <em>mdc.get("myKey")</em>. The
-				'mdc' variable can be null and this possibility should be
-				checked for in evaluator expressions.
+				using the following expression: <em>mdc.get("myKey")</em>. As
+				of logback-classic version 0.9.30, the 'mdc' variable will
+				never be null.
 
-        <p>The <code>java.util.Map</code> type is non-parametirezied
+        <p>The <code>java.util.Map</code> type is non-parameterized
         because Janino does not support generics. It follows that the
         type returned by <code>mdc.get()</code> is <code>Object</code>
         and not <code>String</code>. To invoke <code>String</code>
@@ -495,7 +501,7 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
 				value of the "throwable" variable will be null. Unfortunately,
 				"throwable" does not survive serialization. Thus, on remote
 				systems, its value will always be null. For location
-				independent expresisons, use the <code>throwableProxy</code>
+				independent expressions, use the <code>throwableProxy</code>
 				variable described next.
 				</td>
 			</tr>
@@ -522,13 +528,13 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
     <em>Example: Basic event evaluator usage
     (logback-examples/src/main/java/chapters/filters/basicEventEvaluator.xml)</em>
 
-    <span class="asGroovy" onclick="return asGroovy('basicEventEvaluator');">View as .grovvy</span>
+    <span class="asGroovy" onclick="return asGroovy('basicEventEvaluator');">View as .groovy</span>
     <pre id="basicEventEvaluator" class="prettyprint source longline">&lt;configuration>
 
   &lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <b>&lt;filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
       &lt;evaluator> &lt;!-- defaults to type ch.qos.logback.classic.boolex.JaninoEventEvaluator -->
-        &lt;expression><span class="green">message.contains("billing")</span>&lt;/expression>
+        &lt;expression><span class="green">return message.contains("billing");</span>&lt;/expression>
       &lt;/evaluator>
       &lt;OnMismatch>NEUTRAL&lt;/OnMismatch>
       &lt;OnMatch>DENY&lt;/OnMatch>
@@ -550,8 +556,8 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
 		evaluator of type <code>JaninoEventEvaluator</code> is then
 		injected into the <code>EvaluatorFilter</code>. In the absence of
 		<span class="attr">class</span> attribute in the
-		<code>&lt;evaluator></code> element specified by the user, joran
-		will infer a default type, i.e. <code>JaninoEventEvaluator</code>,
+		<code>&lt;evaluator></code> element specified by the user, Joran
+		will infer a default type of <code>JaninoEventEvaluator</code>
 		for the evaluator. This is one of the <a
 		href="onJoran.html#defaultClassMapping">few occurrences</a> where
 		Joran implicitly infers the type of a component.
@@ -559,14 +565,14 @@ public class SampleFilter extends Filter&gt;ILoggingEvent> {
 
     <p>The <em>expression</em> element corresponds to the evaluation
     expression just discussed. The expression
-    <code>message.contains("billing")</code> returns a boolean
+    <code>return message.contains("billing");</code> returns a boolean
     value. Notice that the <em>message</em> variable is exported
     automatically by <code>JaninoEventEvaluator</code>.
     </p>
 
-		<p>Given that the <span class="option">OnMatch</span> property is
-		set to NEUTRAL and the <span class="option">OnMismatch</span>
-		property set to DENY, this evalutor filter will drop all logging
+		<p>Given that the <span class="option">OnMismatch</span> property is
+		set to NEUTRAL and the <span class="option">OnMatch</span>
+		property set to DENY, this evaluator filter will drop all logging
 		events whose message contains the string "billing".
     </p>
 
@@ -615,6 +621,31 @@ java chapters.filters.FilterEvents src/main/java/chapters/filters/basicConfigura
 0    [main] INFO  chapters.filters.FilterEvents - logging statement 8
 0    [main] INFO  chapters.filters.FilterEvents - logging statement 9</p>
 		
+
+    <p>Evaluation expressions can be Java blocks. For example, the
+    following is a valid expression.</p>
+
+    <pre class="prettyprint source">&lt;evaluator>
+  &lt;expression>
+    if(logger.startsWith("org.apache.http"))
+      return true;
+
+    if(mdc == null || mdc.get("entity") == null)
+      return false;
+
+    String payee = (String) mdc.get("entity");
+
+    if(logger.equals("org.apache.http.wire") &amp;amp;&amp;amp; &lt;!-- &amp; encoded as &amp;amp; -->
+        payee.contains("someSpecialValue") &amp;amp;&amp;amp;
+        !message.contains("someSecret")) {
+      return true;
+    }
+
+    return false;
+  &lt;/expression>
+&lt;/evaluator></pre>
+
+
  	  <h2><a name="matcher" href="#matcher">Matchers</a></h2>
 
     <p>While it is possible to do pattern matching by invoking the <a
@@ -630,7 +661,7 @@ java chapters.filters.FilterEvents src/main/java/chapters/filters/basicConfigura
     <p>An example should clarify the point:</p>
 
     <em>Example: Defining matchers in an event evaluator (logback-examples/src/main/java/chapters/filters/evaluatorWithMatcher.xml)</em>
-    <span class="asGroovy" onclick="return asGroovy('evaluatorWithMatcher');">View as .grovvy</span>
+    <span class="asGroovy" onclick="return asGroovy('evaluatorWithMatcher');">View as .groovy</span>
 
     <pre id="evaluatorWithMatcher" class="prettyprint source">&lt;configuration debug="true">
 
@@ -669,7 +700,7 @@ java chapters.filters.FilterEvents src/main/java/chapters/filters/basicConfigura
 266  [main] ERROR chapters.filters.FilterEvents - billing statement 6
 266  [main] INFO  chapters.filters.FilterEvents - logging statement 8</p>
 
-    <p>In case you need to define additional matchers, you can do so by
+    <p>If you need to define additional matchers, you can do so by
     adding further <code>&lt;matcher></code> elements.</p>
 
 
@@ -705,7 +736,7 @@ java chapters.filters.FilterEvents src/main/java/chapters/filters/basicConfigura
    	<code>TurboFilter</code> objects do not require the instantiation
    	of a logging event to filter a logging request. As such, turbo
    	filters are intended for high performance filtering of logging
-   	events, even before they are created.
+	events, even before the events are created.
     </p>
 
    	
@@ -770,11 +801,11 @@ public class SampleTurboFilter extends TurboFilter {
 
 		<p>The <code>TurboFilter</code> above accepts events that contain
 		a specific marker.  If said marker is not found, then the filter
-		passes the responsability to the next filter in the chain.
+		passes the responsibility to the next filter in the chain.
 		</p>
 		
 		<p>To allow more flexibility, the marker that will be tested can
-		be specified in the configuration file. Hence the getter and
+		be specified in the configuration file, hence the getter and
 		setter methods. We also implemented the <code>start()</code>
 		method, to check that the option has been specified during the
 		configuration process.
@@ -787,7 +818,7 @@ public class SampleTurboFilter extends TurboFilter {
     <em>Example: Basic custom <code>TurboFilter</code> configuration
     (logback-examples/src/main/java/chapters/filters/sampleTurboFilterConfig.xml)</em>
 
-    <span class="asGroovy" onclick="return asGroovy('sampleTurboFilterConfig');">View as .grovvy</span>
+    <span class="asGroovy" onclick="return asGroovy('sampleTurboFilterConfig');">View as .groovy</span>
 
     <pre id="sampleTurboFilterConfig"  class="prettyprint source">&lt;configuration>
   <b>&lt;turboFilter class="chapters.filters.SampleTurboFilter">
@@ -827,7 +858,7 @@ public class SampleTurboFilter extends TurboFilter {
     configuration
     (logback-examples/src/main/java/chapters/filters/turboFilters.xml)</em>
 
-    <span class="asGroovy" onclick="return asGroovy('turboFilters');">View as .grovvy</span>
+    <span class="asGroovy" onclick="return asGroovy('turboFilters');">View as .groovy</span>
     <pre id="turboFilters" class="prettyprint source">&lt;configuration>
 
   &lt;turboFilter class="ch.qos.logback.classic.turbo.MDCFilter">
@@ -939,9 +970,9 @@ logger.debug("Hello {}.", name1);</pre>
   
     <p>The number of allowed repetitions can be specified by the <span
     class="option">AllowedRepetitions</span> property. For example, if
-    the said property is set to 1, then the 2nd and subsequent
+    the property is set to 1, then the 2nd and subsequent
     occurrences of the same message will be dropped. Similarly, if the
-    said property is set to 2, then the 3rd and subsequent occurrences
+    property is set to 2, then the 3rd and subsequent occurrences
     of the same message will be dropped. By default, the <span
     class="option">AllowedRepetitions</span> property is set to 5.
     </p>
@@ -956,7 +987,7 @@ logger.debug("Hello {}.", name1);</pre>
     <em>Example: <code>DuplicateMessageFilter</code> 
     configuration (logback-examples/src/main/java/chapters/filters/duplicateMessage.xml)</em>
 
-    <span class="asGroovy" onclick="return asGroovy('duplicateMessage');">View as .grovvy</span>
+    <span class="asGroovy" onclick="return asGroovy('duplicateMessage');">View as .groovy</span>
     <pre id="duplicateMessage" class="prettyprint source">&lt;configuration>
 
   <b>&lt;turboFilter class="ch.qos.logback.classic.turbo.DuplicateMessageFilter"/></b>
@@ -1000,85 +1031,158 @@ logger.debug("Hello {}.", name1);</pre>
     because only 5 repetitions are allowed by default.
     </p>
 
-    <h2>In logback-access</h2>
+    <h1><a name="logbac-access" href="#logback-access">In logback-access</a></h1>
     
     <p>Logback-access offers most of the features available with
-    logback-classic. <code>Filter</code> objects are available and
-    work in the same way as their logback-classic counterparts. They
-    handle access' implementation of logging events:
-    <code>AccessEvent</code>.  Thus, a customized filter for logback
-    access follows strictly the same rules as those for
-    logback-classic, except for the event type received as parameter.
-    On the other hand, <code>TurboFilter</code> objects are supported
-    by logback-access.
+    logback-classic. In particular, <code>Filter</code> objects are
+    available and work in the same way as their logback-classic
+    counterparts, with one notable difference. Instead of
+    <code>LoggingEvent</code> instances logback-access filters act
+    upon <a
+    href="../xref/ch/qos/logback/access/spi/AccessEvent.html"><code>AccessEvent</code></a>
+    instances. At present time, logback-access ships with a limited
+    number of filters described below. If you would like to suggest
+    additional filters, please contact the logback-dev mailing list.
     </p>
-    
-    <h3>Filters</h3>
-    
-    <p><code>EvaluatorFilter</code> objects with java expressions
-    supplied in in <code>evaluator</code> configuration elements are
-    supported by logback-access. However, list implicit variables
-    available for constructing an expression are different. Only the
-    <code>AccessEvent</code> object can be used by inserting the
-    <em>event</em> variable in the expression. Nevertheless the access
-    <code>evaluator</code> is just as powerfull. All the request and
-    response components are reachable from the <em>event</em>
-    variable.
-    </p>    
-    
-    <p>Here is a sample configuration that will ensure that any 404
-    error will be logged:
-    </p>
-   	
-<em>Example: Access Evaluator (logback-examples/src/main/java/chapters/filters/accessEventEvaluator.xml)</em>
-<pre class="prettyprint source">&lt;configuration>
+
+		<h2><a name="countingFilter"
+		href="#countingFilter"><code>CountingFilter</code></a></h2>
+		
+		<p>With the help of <a
+		href="xref/ch/qos/logback/access/filter/CountingFilter.html"><code>CountingFilter</code></a>
+		class, logback-access can provide statistical data about access to
+		the web-server. Upon initialization, <code>CountingFilter</code>
+		registers itself as an MBean onto the platform's JMX server. You
+		can then interrogate that MBean for statistical data,
+		e.g. averages by minute, hour, day, week, or month. Other
+		statistics such the count for the preceding week, day, hour or
+		month as well as the total count are also available.
+		</p>
+		
+		<p>The following <em>logback-access.xml</em> configuration file
+		declares a <code>CountingFilter</code>.  </p>
+
+    <pre class="prettyprint source">&lt;configuration>
+  &lt;statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+
+  <b>&lt;filter class="ch.qos.logback.access.filter.CountingFilter">
+    &lt;name>countingFilter&lt;/name>
+  &lt;/filter></b>
 
   &lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <b>&lt;filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-      &lt;evaluator name="myEval">
-        &lt;expression>event.getStatusCode() == 404&lt;/expression>
-      &lt;/evaluator>
-      &lt;onMismatch>NEUTRAL&lt;/onMismatch>
-      &lt;onMatch>ACCEPT&lt;/onMatch>
-    &lt;/filter></b>
-   &lt;encoder>
-      &lt;pattern>
-        %h %l %u %t %r %s %b
-      &lt;/pattern>
+    &lt;encoder>
+      &lt;pattern>%h %l %u %t \"%r\" %s %b&lt;/pattern>
     &lt;/encoder>
   &lt;/appender>
 
   &lt;appender-ref ref="STDOUT" />
 &lt;/configuration></pre>
 
-		<p>We might imagine a slightly more complex use of filters to
-		ensure logging of 404 errors, except those returned on access to
-		CSS resources. Here is what such a configuration would look like:
-		</p>	
+    <p>You can examine the various statistics maintained by
+    <code>CountingFilter</code> on your platform's JMX server via the
+    <code>jconsole</code> application. </p>
 
-    <em>Example 6.10: Access Evaluator (logback-examples/src/main/java/chapters/filters/accessEventEvaluator2.xml)</em>
-    <pre class="prettyprint source">&lt;configuration>
+
+    <img alt="CountingFilter via jconsole" src="images/chapters/filters/countingFilter.png" />
+	
+    <h3><a name="access_EvalutorFilter"
+    href="#access_EvalutorFilter"><code>EvaluatorFilter</code></a></h3>
+
+    
+    <p><a
+    href="../xref/ch/qos/logback/core/filter/EvaluatorFilter.html"><code>EvaluatorFilter</code></a>
+    is a generic filter encapsulating an
+    <code>EventEvaluator</code>. As the name suggests, an
+    <a
+    href="../xref/ch/qos/logback/core/boolex/EventEvaluator.html">
+    <code>EventEvaluator</code></a> evaluates whether a given criteria
+    is met for a given event. On match and on mismatch,
+    the hosting <code>EvaluatorFilter</code> will return the value
+    specified by the <span class="option">onMatch</span> or
+    <span class="option">onMismatch</span> properties respectively. Note that
+    <code>EvaluatorFilter</code> has been previously discussed in the
+    context of logback-classic (<a href="#evalutatorFilter">see
+    above</a>). The present text is mostly a repetition of the
+    previous discussion.</p>
+
+
+    <p>Note that <code>EventEvaluator</code> is an abstract class. You
+    can implement your own event evaluation logic by sub-classing
+    <code>EventEvaluator</code>. Logback-access ships with a concrete
+    implementation named <a
+    href="../xref/ch/qos/logback/access/boolex/JaninoEventEvaluator.html">JaninoEventEvaluator</a>.
+    It takes arbitrary Java language boolean expressions as the
+    evaluation criteria. We refer to such Java language blocks as
+    "<em>evaluation expressions</em>". Evaluation expressions enable
+    great flexibility in event
+    filtering. <code>JaninoEventEvaluator</code> requires the <a
+    href="http://docs.codehaus.org/display/JANINO/Home">Janino
+    library</a>. Please see the <a
+    href="../setup.html#janino">corresponding section</a> of the setup
+    document.
+    </p>
+
+    <p>Evaluation expressions are compiled on-the-fly during the
+    interpretation of the configuration file. As a user, you do not
+    need to worry about the actual plumbing. However, it is your
+    responsibility to ensure that the Java language expression returns
+    a boolean, i.e. that it evaluates to true or false. </p>
+
+
+    <p>The evaluation expression is evaluated on the current access
+    event. Logback-access automatically exports the current
+    <code>AccessEvent</code> instance under the variable name
+    <b><code>event</code></b>. You can read the various data
+    associated with the HTTP request as well as the HTTP response via
+    the <code>event</code> variable. Please refer to the <a
+    href="../xref/ch/qos/logback/access/spi/AccessEvent.html"><code>AccessEvent</code>
+    class source code</a> for the exact list.
+    </p>
+    
+    <p>The next logback-access configuration file illustrates
+    filtering based on the <a
+    href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">404
+    (Not Found)</a> HTTP response code. Every request resulting in a
+    404 will be printed on the console.</p>
+   	
+<em>Example: Access Evaluator (logback-examples/src/main/java/chapters/filters/accessEventEvaluator.xml)</em>
+<pre class="prettyprint source">&lt;configuration>
+  &lt;statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
 
   &lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <b>&lt;filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-      &lt;evaluator name="Eval404">
+      &lt;evaluator>
         &lt;expression>event.getStatusCode() == 404&lt;/expression>
       &lt;/evaluator>
-      &lt;onMismatch>NEUTRAL&lt;/onMismatch>
-      &lt;onMatch>ACCEPT&lt;/onMatch>
-    &lt;/filter>
-    &lt;filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-      &lt;evaluator name="EvalCSS">
-        &lt;expression>event.getRequestURI().contains("css")&lt;/expression>
-      &lt;/evaluator>
-      &lt;onMismatch>NEUTRAL&lt;/onMismatch>
-      &lt;onMatch>DENY&lt;/onMatch>
+      &lt;onMismatch>DENY&lt;/onMismatch>
     &lt;/filter></b>
-   &lt;encoder>
-      &lt;pattern>
-        %h %l %u %t %r %s %b
-      &lt;/pattern>
-    &lt;/encoder>
+   &lt;encoder>&lt;pattern>%h %l %u %t %r %s %b&lt;/pattern>&lt;/encoder>
+  &lt;/appender>
+
+  &lt;appender-ref ref="STDOUT" />
+&lt;/configuration></pre>
+
+		<p>In the next example, we still log requests resulting in 404 errors,
+		except those requests asking for CSS files.
+		</p>	
+
+
+    <em>Example 6.10: Access Evaluator (logback-examples/src/main/java/chapters/filters/accessEventEvaluator2.xml)</em>
+    <pre class="prettyprint source">&lt;configuration>
+  &lt;statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+  &lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    &lt;filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+      &lt;evaluator name="Eval404">
+        &lt;expression>
+         <b>(event.getStatusCode() == 404)</b>
+           <b>&amp;amp;&amp;amp;</b>  &lt;!-- ampersand characters need to be escaped -->
+         <b>!(event.getRequestURI().contains(".css"))</b>
+        &lt;/expression>
+      &lt;/evaluator>
+      &lt;onMismatch>DENY&lt;/onMismatch>
+    &lt;/filter>
+
+   &lt;encoder>&lt;pattern>%h %l %u %t %r %s %b&lt;/pattern>&lt;/encoder>
   &lt;/appender>
 
   &lt;appender-ref ref="STDOUT" />

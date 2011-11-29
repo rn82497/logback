@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -46,6 +46,15 @@ public class CyclicBuffer<E> {
           + ") is not a positive integer.");
     }
     init(maxSize);
+  }
+
+  public CyclicBuffer(CyclicBuffer<E> other) {
+   this.maxSize = other.maxSize;
+   ea = (E[]) new Object[maxSize];
+   System.arraycopy(other.ea, 0, this.ea, 0, maxSize);
+   this.last = other.last;
+   this.first = other.first;
+   this.numElems = other.numElems;
   }
 
   @SuppressWarnings("unchecked")

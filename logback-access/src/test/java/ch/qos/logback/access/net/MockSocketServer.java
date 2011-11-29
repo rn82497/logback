@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -20,7 +20,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.qos.logback.access.spi.AccessEvent;
+//import ch.qos.logback.access.spi.AccessEvent;
+import ch.qos.logback.access.spi.IAccessEvent;
 
 
 /**
@@ -32,7 +33,7 @@ public class MockSocketServer extends Thread {
 
   final int loopLen;
 
-  List<AccessEvent> accessEventList = new ArrayList<AccessEvent>();
+  List<IAccessEvent> accessEventList = new ArrayList<IAccessEvent>();
   boolean finished = false;
 
   MockSocketServer(int loopLen) {
@@ -45,14 +46,13 @@ public class MockSocketServer extends Thread {
     ObjectInputStream ois = null;
     ServerSocket serverSocket = null;
     // Object readObject;
-    AccessEvent event;
     try {
       serverSocket = new ServerSocket(PORT);
       Socket socket = serverSocket.accept();
       ois = new ObjectInputStream(new BufferedInputStream(socket
           .getInputStream()));
       for (int i = 0; i < loopLen; i++) {
-        event = (AccessEvent) ois.readObject();
+        IAccessEvent event = (IAccessEvent) ois.readObject();
         accessEventList.add(event);
       }
     } catch (Exception se) {

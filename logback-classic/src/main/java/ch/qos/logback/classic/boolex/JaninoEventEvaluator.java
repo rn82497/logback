@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -73,12 +73,15 @@ public class JaninoEventEvaluator extends
     DEFAULT_PARAM_TYPE_LIST.add(Throwable.class);
   }
 
-  public JaninoEventEvaluator() {
-
-  }
-
   protected String getDecoratedExpression() {
-    return IMPORT_LEVEL + getExpression();
+    String expression = getExpression();
+    if(!expression.contains("return")) {
+      expression = "return "+expression +";";
+      addInfo("Adding [return] prefix and a semicolon suffix. Expression becomes ["+expression+"]");
+      addInfo("See also "+CoreConstants.CODES_URL+"#block");
+
+    }
+    return IMPORT_LEVEL + expression;
   }
 
   protected String[] getParameterNames() {
@@ -120,7 +123,7 @@ public class JaninoEventEvaluator extends
     values[i++] = loggingEvent.getLoggerName();
     values[i++] = loggingEvent.getLoggerContextVO();
     values[i++] = loggingEvent.getLevel().toInteger();
-    values[i++] = new Long(loggingEvent.getTimeStamp());
+    values[i++] = loggingEvent.getTimeStamp();
     // In order to avoid NullPointerException, we could push a dummy marker if
     // the event's marker is null. However, this would surprise user who
     // expect to see a null marker instead of a dummy one.

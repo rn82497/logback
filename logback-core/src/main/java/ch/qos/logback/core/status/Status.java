@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -18,9 +18,9 @@ import java.util.Iterator;
 
 public interface Status  {
 
-  public final int INFO = 0;
-  public final int WARN = 1;
-  public final int ERROR = 2;
+  int INFO = 0;
+  int WARN = 1;
+  int ERROR = 2;
   
   int getLevel();
   int getEffectiveLevel();
@@ -29,9 +29,9 @@ public interface Status  {
   Throwable getThrowable();
   Long getDate();
   
-  public boolean hasChildren();
-  public void add(Status child);
-  public boolean remove(Status child);
-  public Iterator<Status> iterator();
+  boolean hasChildren();
+  void add(Status child);
+  boolean remove(Status child);
+  Iterator<Status> iterator();
 
 }

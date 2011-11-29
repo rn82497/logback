@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -40,7 +40,7 @@ public class LoggerAction extends Action {
     
     LoggerContext loggerContext = (LoggerContext) this.context;
 
-    String loggerName = attributes.getValue(NAME_ATTRIBUTE);
+    String loggerName = ec.subst(attributes.getValue(NAME_ATTRIBUTE));
 
     if (OptionHelper.isEmpty(loggerName)) {
       inError = true;
@@ -67,9 +67,9 @@ public class LoggerAction extends Action {
       }
     }
 
-    if (!OptionHelper.isEmpty(ActionConst.ADDITIVITY_ATTRIBUTE)) {
-      boolean additive = OptionHelper.toBoolean(attributes
-          .getValue(ActionConst.ADDITIVITY_ATTRIBUTE), true);
+    String additivityStr =  ec.subst(attributes.getValue(ActionConst.ADDITIVITY_ATTRIBUTE));
+    if (!OptionHelper.isEmpty(additivityStr)) {
+      boolean additive = OptionHelper.toBoolean(additivityStr, true);
       addInfo("Setting additivity of logger [" + loggerName + "] to "
           + additive);
       logger.setAdditive(additive);

@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -44,7 +44,13 @@ public class LoggerContextVO implements Serializable {
   public LoggerContextVO(LoggerContext lc) {
     this.name = lc.getName();
     this.propertyMap = lc.getCopyOfPropertyMap();
-    this.birthTime = lc.getBithTime();
+    this.birthTime = lc.getBirthTime();
+  }
+
+  public LoggerContextVO(String name, Map<String,String> propertyMap, long birthTime) {
+    this.name = name;
+    this.propertyMap = propertyMap;
+    this.birthTime = birthTime;
   }
 
   public String getName() {

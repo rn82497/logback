@@ -1,3 +1,16 @@
+/**
+ * Logback: the reliable, generic, fast and flexible logging framework.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
+ *
+ * This program and the accompanying materials are dual-licensed under
+ * either the terms of the Eclipse Public License v1.0 as published by
+ * the Eclipse Foundation
+ *
+ *   or (per the licensee's choosing)
+ *
+ * under the terms of the GNU Lesser General Public License version 2.1
+ * as published by the Free Software Foundation.
+ */
 package ch.qos.logback.classic.boolex;
 
 
@@ -10,6 +23,7 @@ import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.boolex.EvaluationException;
 import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.util.StatusPrinter;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
@@ -32,6 +46,13 @@ public class GEventEvaluatorTest {
   Logger logger = context.getLogger(this.getClass());
   Marker markerA = MarkerFactory.getMarker("A");
 
+  GEventEvaluator gee = new GEventEvaluator();
+
+  @Before
+  public void setUp() {
+    gee.setContext(context);
+  }
+
   LoggingEvent makeEvent(String msg) {
     return makeEvent(Level.DEBUG, msg, null, null);
   }
@@ -41,13 +62,11 @@ public class GEventEvaluatorTest {
   }
 
   void doEvaluateAndCheck(String expression, ILoggingEvent event, boolean expected) throws EvaluationException {
-    GEventEvaluator gee = new GEventEvaluator();
-    gee.setContext(context);
     gee.setExpression(expression);
     gee.start();
 
     StatusPrinter.printInCaseOfErrorsOrWarnings(context);
-    assertTrue(statusChecker.isErrorFree());
+    assertTrue(statusChecker.isErrorFree(0));
 
 
     boolean result = gee.evaluate(event);
@@ -127,10 +146,16 @@ public class GEventEvaluatorTest {
     return (end - start) / LEN;
   }
 
+
+  @Test
+  public void startMakesIsStartedReturnTrue() {
+    gee.setExpression("return true");
+    gee.start();
+    assertTrue(gee.isStarted());
+  }
+
   @Test
   public void perfTest() throws EvaluationException {
-    GEventEvaluator gee = new GEventEvaluator();
-    gee.setContext(context);
     gee.setExpression("event.timeStamp < 100 && event.message != 'xx' ");
     gee.start();
 

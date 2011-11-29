@@ -60,7 +60,7 @@
   String getContentType();
 }</pre>
 
-		<p>This interface is rather simple and yet is sufficent for many
+		<p>This interface is rather simple and yet is sufficient for many
 		formatting needs. The Texan developer from Texas, whom you might
 		know from Joseph Heller's <em>Catch-22</em>, might exclaim: it
 		just takes five methods to implement a layout!!?
@@ -68,7 +68,7 @@
 
 		<h2>Logback-classic</h2>
 
-		<p>Logback-classic is wired to processes only events of type
+		<p>Logback-classic is wired to process only events of type
 		<a href="../xref/ch/qos/logback/classic/spi/ILoggingEvent.html">
       <code>ch.qos.logback.classic.spi.ILoggingEvent</code></a>.  This
 			fact will be apparent throughout this section.</p>
@@ -132,7 +132,7 @@ public class MySampleLayout extends LayoutBase&lt;ILoggingEvent> {
 		instantiating a <code>StringBuffer</code>. It proceeds by adding
 		various fields of the event parameter. The Texan from Texas was
 		careful to print the formatted form of the message. This is
-		significant in case one or more parameters were passed along with
+		significant if one or more parameters were passed along with
 		the logging request.
 		</p>
 		
@@ -160,7 +160,7 @@ public class MySampleLayout extends LayoutBase&lt;ILoggingEvent> {
 		
 		<em>Example: Configuration of MySampleLayout
 		(logback-examples/src/main/java/chapters/layouts/sampleLayoutConfig.xml)</em>
-    <span class="asGroovy" onclick="return asGroovy('sampleLayoutConfig');">View as .grovvy</span>
+    <span class="asGroovy" onclick="return asGroovy('sampleLayoutConfig');">View as .groovy</span>
 <pre id="sampleLayoutConfig" class="prettyprint source">&lt;configuration>
 
   &lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -260,15 +260,15 @@ public class MySampleLayout2 extends LayoutBase&lt;ILoggingEvent> {
     needed to enable the configuration of a property.  Note that the
     <code>PrintThreadName</code> property is a boolean and not a
     <code>String</code>. Configuration of logback components was
-    covered in detail in the chapter on <a
-    href="configuration.html">configuration</a>. The chapter <a
-    href="onJoran.html">on joran</a> provides further detail. Here is
+    covered in detail in the <a
+    href="configuration.html">chapter on configuration</a>. The <a
+    href="onJoran.html">chapter on Joran</a> provides further detail. Here is
     the configuration file tailor made for
     <code>MySampleLayout2</code>.
     </p> 
 
 
-    <span class="asGroovy" onclick="return asGroovy('MySampleLayout2');">View as .grovvy</span>
+    <span class="asGroovy" onclick="return asGroovy('MySampleLayout2');">View as .groovy</span>
     <pre id="MySampleLayout2" class="prettyprint source">&lt;configuration>
 
   &lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -297,7 +297,7 @@ public class MySampleLayout2 extends LayoutBase&lt;ILoggingEvent> {
 		<code>PatternLayout</code></a>.  As all layouts,
 		<code>PatternLayout</code> takes a logging event and returns a
 		<code>String</code>. However, this <code>String</code> can be
-		customized at will by tweaking <code>PatternLayout</code>'s
+		customized by tweaking <code>PatternLayout</code>'s
 		conversion pattern.
 		</p>   
 
@@ -317,7 +317,7 @@ public class MySampleLayout2 extends LayoutBase&lt;ILoggingEvent> {
 
     <p>As already mentioned on several occasions,
     <code>FileAppender</code> and sub-classes expect an
-    encoder. Consequently, when used in conjuction with
+    encoder. Consequently, when used in conjunction with
     <code>FileAppender</code> or its subclasses a
     <code>PatternLayout</code> must be wrapped within an
     encoder. Given that the
@@ -371,7 +371,7 @@ public class PatternSample {
 }</pre>
 
 		<p>In the above example, the conversion pattern is set to be
-		<b>"%-5level [%thread]: %message%n"</b>. A synopssis of conversion
+		<b>"%-5level [%thread]: %message%n"</b>. A synopsis of conversion
 		word included in logback will be given shortly. Running
 		<code>PatternSample</code> application as:
 		</p>
@@ -491,7 +491,7 @@ WARN  [main]: Message 2</p>
 						</tr>
 					</table>
 
-          <p>Please note that the right most segment in a logger name
+          <p>Please note that the rightmost segment in a logger name
           is never abbreviated, even if its length is longer than the
           <em>length</em> option. Other segments may be shortened to
           at most a single character but are never removed.</p>
@@ -511,14 +511,14 @@ WARN  [main]: Message 2</p>
 					</p>
 
 					<p>Just like the <em>%logger</em> conversion word above,
-					this conversion admits an integer as an option to shorten
+					this conversion takes an integer as an option to shorten
 					the class name. Zero carries special meaning and will cause
 					the simple class name to be printed without the package name
 					prefix. By default the class name is printed in full.
 					</p>
 
           <p>Generating the caller class information is not
-          particularly fast.  Thus, it's use should be avoided unless
+          particularly fast.  Thus, its use should be avoided unless
           execution speed is not an issue.
 					</p>
 				</td>
@@ -583,7 +583,7 @@ WARN  [main]: Message 2</p>
           <p>In addition to the date pattern, this converter admits a
           second option as the timezone. Thus, the
           '%date{HH:mm:ss.SSS,Australia/Perth} would print the time in
-          the time zone of Perth Australia, the worlds most isolated
+          the time zone of Perth, Australia, the world's most isolated
           city.
           </p>
 
@@ -706,7 +706,7 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
 					</p>
 					<p>
 						Generating the method name is not particularly fast.
-						Thus, it's use should be avoided unless
+						Thus, its use should be avoided unless
 						execution speed is not an issue.
 					</p>
 				</td>
@@ -780,7 +780,7 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
 						generated the logging event.
 					</p>
 
-					<p>If <b>mdc</b> conversion word is followed by a key
+					<p>If the <b>mdc</b> conversion word is followed by a key
 					between braces, as in <b>%mdc{clientNumber}</b>, then the
 					value in the MDC corresponding to the key will be output.
 					</p>
@@ -797,13 +797,13 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
 			</tr>
 			<tr>
 				<td align="center">
-					<b>ex</b>{<em>length</em>} <br /> 
-          	<b>exception</b>{<em>length</em>} <br /> 
-					<b>throwable</b>{<em>length</em>} <br />
+					<b>ex</b>{<em>depth</em>} <br /> 
+          	<b>exception</b>{<em>depth</em>} <br /> 
+					<b>throwable</b>{<em>depth</em>} <br />
           <br />
-					<b>ex</b>{length, evaluator-1, ..., evaluator-n} <br />
-					<b>exception</b>{length, evaluator-1, ..., evaluator-n} <br />
-					<b>throwable</b>{length, evaluator-1, ..., evaluator-n}
+					<b>ex</b>{depth, evaluator-1, ..., evaluator-n} <br />
+					<b>exception</b>{depth, evaluator-1, ..., evaluator-n} <br />
+					<b>throwable</b>{depth, evaluator-1, ..., evaluator-n}
 				</td>
 
 				<td>
@@ -858,7 +858,7 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
 					<p>This conversion word can also use evaluators to test
 					logging events against a given criterion before creating the
 					output. For example, using <b>%ex{full, EX_DISPLAY_EVAL}</b>
-					will display the full stack trace of the exception, only if
+					will display the full stack trace of the exception only if
 					the evaluator called <em>EX_DISPLAY_EVAL</em> returns a
 					<b>negative</b> answer. Evaluators are described further
 					down in this document.
@@ -869,13 +869,13 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
       <tr class="alt">
 				<td align="center">
           <a name="xThrowable" href="#xThrowable">
-					<b>xEx</b>{<em>length</em>} <br /> 
-          <b>xException</b>{<em>length</em>} <br /> 
-					<b>xThrowable</b>{<em>length</em>} <br />
+					<b>xEx</b>{<em>depth</em>} <br /> 
+          <b>xException</b>{<em>depth</em>} <br /> 
+					<b>xThrowable</b>{<em>depth</em>} <br />
           <br />
-					<b>xEx</b>{length, evaluator-1, ..., evaluator-n} <br />
-					<b>xException</b>{length, evaluator-1, ..., evaluator-n} <br />
-					<b>xThrowable</b>{length, evaluator-1, ..., evaluator-n}
+					<b>xEx</b>{depth, evaluator-1, ..., evaluator-n} <br />
+					<b>xException</b>{depth, evaluator-1, ..., evaluator-n} <br />
+					<b>xThrowable</b>{depth, evaluator-1, ..., evaluator-n}
           </a>
 				</td>
 
@@ -888,8 +888,8 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
           <code>PatternLayout</code> will automatically add it as the
           last conversion word, on account of the importance of stack
           trace information. The $nopex conversion word can be
-          substituted for %xThrowable, in case you do not wish stack
-          trace information to be displayed. See also %nopex
+          substituted for %xThrowable, if you do not wish stack
+          trace information to be displayed. See also the %nopex
           conversion word.
          </p>
 
@@ -919,17 +919,26 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
 
           <p>Logback goes to great lengths to ensure that the class
           packaging information it displays is correct, even in
-          arbirarily complex class loader hierarchies.  However, when
+          arbitrarily complex class loader hierarchies.  However, when
           it is unable to guarantee the absolute correctness of the
           information, then it will prefix the data with a tilde, i.e.
           the '~' character. Thus, it is theoretically possible for
           the printed class packaging information to differ from the
           real class packaging information. So, in the above example,
           given that packaging data for the Wombat class is preceded
-          by a tilde, it possible that the correct packaging data is
+          by a tilde, it is possible that the correct packaging data is
           in reality [wombat.jar:1.7].
           </p>
           
+          <p><a
+          href="http://jira.qos.ch/browse/LBCLASSIC-212">Feedback from
+          users</a> indicates that Netbeans chokes on packaging
+          information. If you are a Netbeans user, then you should
+          disable packaging information in stack traces by adding
+          "%ex" at the end of of your conversion pattern. For example,
+          "%d %logger - %m%n" should be rewritten as "%d %logger -
+          %m%n<b>%ex</b>"
+          </p>
         </td>
 
       </tr>
@@ -941,7 +950,7 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
         </td>
 
         <td>
-          <p>Altough it <em>pretends</em> to handle stack trace data,
+          <p>Although it <em>pretends</em> to handle stack trace data,
           this conversion word does not output any data, thus,
           effectively ignoring exceptions.
           </p>
@@ -980,7 +989,7 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
         </td>
         
         <td>
-          <p >Outputs the value associated with a context
+          <p>Outputs the value associated with a context
           property named <em>key</em>. If <em>key</em> is not a
           property of the logger context, then <em>key</em> will be
           looked up in the System properties. </p>
@@ -990,13 +999,76 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
           omitted, the returned value will be "Property_HAS_NO_KEY",
           expliciting the error condition.</p>
           
-          <p>
+        </td>
+      </tr>
+
+      <tr class="alt">
+        <td align="center">
+          <a name="replace" href="#replace"><b>replace(<em>p</em>){r, t}</b></a>
+        </td>
+        
+        <td>
+          <p>Replaces occurrences of 'r', a regex, with its
+          replacement 't' in the string produces by the sub-pattern
+          'p'. For example, "%replace(%msg){'\s', ''}" will remove all
+          spaces contained in the event message. 
+          </p>
+
+          <p>The pattern 'p' can be arbitrarily complex and in
+          particular can contain multiple conversion keywords. For
+          instance, "%replace(%logger %msg){'\.', '/'}" will replace
+          all dots in the logger or the message of the event with a
+          forward slash.
           </p>
           
         </td>
       </tr>
 
+
+      <tr>
+        <td align="center">
+          <a name="rootException" href="#rootException">		
+          <b>rEx</b>{<em>depth</em>} <br /> 
+          <b>rootException</b>{<em>depth</em>} <br /> 
+          <br />
+					<b>rEx</b>{depth, evaluator-1, ..., evaluator-n} <br />
+					<b>rootException</b>{depth, evaluator-1, ..., evaluator-n}</a>
+        </td>
+        
+        <td>
+          <p>Outputs the stack trace of the exception associated with
+          the logging event, if any. The root cause will be output
+          first instead of the standard "root cause last". Here is a
+          sample output (edited for space):
+          </p>
+
+         <pre class="small">java.lang.NullPointerException
+  at com.xyz.Wombat(Wombat.java:57) ~[wombat-1.3.jar:1.3]
+  at com.xyz.Wombat(Wombat.java:76) ~[wombat-1.3.jar:1.3]
+Wrapped by: org.springframework.BeanCreationException: Error creating bean with name 'wombat': 
+  at org.springframework.AbstractBeanFactory.getBean(AbstractBeanFactory.java:248) [spring-2.0.jar:2.0]
+  at org.springframework.AbstractBeanFactory.getBean(AbstractBeanFactory.java:170) [spring-2.0.jar:2.0]
+  at org.apache.catalina.StandardContext.listenerStart(StandardContext.java:3934) [tomcat-6.0.26.jar:6.0.26]
+</pre>          
+
+         <p>The %rootException converter admits the same optional
+         parameters as the %xException converter described above,
+         including depth and eveluators. It outputs also packaging
+         information. In short, %rootException is very similar to
+         %xException, only the order of exception output is reversed.
+         </p>
+
+         <p>Tomasz Nurkiewicz, the author of %rootException converter,
+         documents his contribution in a blog entry entitled <a
+         href="http://nurkiewicz.blogspot.com/2011/09/logging-exceptions-root-cause-first.html">"Logging
+         exceptions root cause first"</a>.</p>
+        </td>
+      </tr>
+
 		</table>
+
+
+    <h4>% character has special meaning</h4>
 
     <p>Given that in the context of conversion patterns the percent
     sign carries special meaning, in order to include it as a literal,
@@ -1004,11 +1076,32 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
     %m%n".
     </p>
 
+    <h4>Restrictions on literals immediately following conversion
+    words</h4>
+
+    <p>In most cases literals naturally contain spaces or other
+    delimiting characters so that they are not confused with
+    conversion words. For example, the pattern
+    "%level&nbsp;[%thread]&nbsp;-&nbsp;%message%n" contains the string
+    literals <code>"&nbsp;["</code> and
+    <code>"]&nbsp;-&nbsp;"</code>. However, if a character which can
+    be part of a java identifier immediately follows a conversion
+    word, logback's pattern parser will be fooled into thinking that
+    the literal is part of the conversion word. For example, the
+    pattern "%date<b>%nHello</b>" will be interpreted as two
+    conversion words %date and %nHello and since %nHello is not a
+    known conversion word, logback will output %PARSER_ERROR[nHello]
+    for %nHello. If you wish the string literal "Hello" to immediately
+    separate %n and Hello, pass an empty argument list to %n. For
+    example, "%date<b>%n{}</b>Hello" will be interpreted as %date
+    followed by %n followed by the literal "Hello".
+
+    </p>
 
     <h2><a name="formatModifiers" href="#formatModifiers">Format
     modifiers</a></h2>
 
-		<p>By default the relevant information is output as is.  However,
+		<p>By default the relevant information is output as-is.  However,
 		with the aid of format modifiers it is possible to change the
 		minimum and maximum width and the justifications of each data
 		field.
@@ -1127,7 +1220,7 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
 		</table>
 				
 		<p>The table below list examples for format modifier
-		truncation. Please note that the brackets, i.e the pair of "[]"
+		truncation. Please note that the square brackets, i.e the pair of "[]"
 		characters, are not part of the output. They are used to delimit
 		the width of output.</p>
 
@@ -1172,14 +1265,47 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
     "<code>%.-1level</code>".
     </p>
     
+		<h2><a name="cwOptions" href="#cwOptions">Conversion word
+		options</a></h2>
+
+		<p>A conversion specifier can be followed by options. The are
+		always declared between braces. We have already seen some of the
+		possibilities offered by options, for instance in conjunction with
+		the MDC conversion specifier, as in: <em>%mdc{someKey}</em>.
+		</p>
+
+    <p>A conversion specifier might have more than one option. For
+    example, a conversion specifier that makes use of evaluators,
+    which will be covered soon, may add evaluator names to the option
+    list, as shown below:</p>
+
+		<pre class="prettyprint source">&lt;pattern>%-4relative [%thread] %-5level - %msg%n \
+  <b>%caller{2, DISP_CALLER_EVAL, OTHER_EVAL_NAME, THIRD_EVAL_NAME}</b>&lt;/pattern></pre>
     
+    <p>If the option includes special characters such as a braces, spaces or
+    commas, you can enclose it between single or double quotes. For
+    example, consider the next pattern.</p>
+
+		<pre class="prettyprint source">&lt;pattern>%-5level - %replace(%msg)<b>{'\d{14,16}', 'XXXX'}</b>%n&lt;/pattern></pre>
+
+
+    <p>We pass the options <code>\d{16}</code> and <code>XXXX</code>
+    to the <code>replace</code> conversion word. It replaces any
+    sequence of 14, 15 or 16 digits contained in the message with XXXX
+    effectively obfuscating credit card numbers. Note that "\d" which
+    is a shorthand for a single digit in regular expressions. The
+    "{14,16\}" is interpreted as "{14, 16}", that is, repeat the
+    previous item at least 14 but at most 16 times.
+    </p>
 
 		<h2><a name="Parentheses" href="#Parentheses">Parentheses are
 		special</a></h2>
 
     <p>In logback, parentheses within the pattern string are treated
     as grouping tokens. Thus, it is possible to group a sub-pattern
-    and apply formatting directives on that sub-pattern.
+    and apply formatting directives on that sub-pattern. As of version
+    0.9.27, logback supports composite conversion words such as <a
+    href="#replace">%replace</a> which can transform sub-patterns.
     </p>
 
     <p>For example, the pattern</p> 
@@ -1216,44 +1342,14 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
     </p>
 
     
-    <p>The latter form is more comfortable to read, especially for
-    long log files.</p>
+    <p>The latter form is more comfortable to read.</p>
     
     <p>If you need to treat the parenthesis character as a literal, it
     needs to be escaped by preceding each parenthesis with a
     backslash. As in, <b>\(</b>%d{HH:mm:ss.SSS}
-    [%thread]<b>\)</b>. Strictly speaking, only the closing parenthesis
-    needs to be escaped. Thus, "<b>(</b>%d&nbsp;[%thread]<b>\)</b>" is
-    equivalent to "<b>\(</b>%d&nbsp;[%thread]<b>\)</b>". But since it
-    is not easy to recall which parenthesis needs escaping and which
-    doesn't necessarily, you can escape both so that they are
-    interpreted as literals.
+    [%thread]<b>\)</b>. 
     </p>
 
-		<h3><a name="cwOptions" href="#cwOptions">Options</a></h3>
-
-		<p>
-			A conversion specifier can be followed by options. The are
-			always declared between braces. We have already seen some of the
-			possibilities offered by options, for instance in conjunction
-			with the MDC conversion specifier, as in:
-			<em>%mdc{someKey}</em>.
-		</p>
-
-    <p>A conversion specifier might have more than one option. For
-    example, a conversion specifier that makes use of evaluators,
-    which will be covered soon, may add evaluator names to the option
-    list, as shown below:</p>
-
-		<pre class="prettyprint source">
-  &lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender"> 
-    &lt;layout class="ch.qos.logback.classic.PatternLayout"> 
-      &lt;param name="Pattern" value="%-4relative [%thread] %-5level - %msg%n \
-        <b>%caller{2, DISP_CALLER_EVAL, OTHER_EVAL_NAME, THIRD_EVAL_NAME}</b>" /> 
-    &lt;/layout>
-  &lt;/appender></pre>
-
-		
 		<h2><a name="Evaluators" href="#Evaluators">Evaluators</a></h2>
 
 		<p>As mentioned above, option lists come in handy when a
@@ -1271,8 +1367,8 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
     the logging events to the console, displaying date, thread, level,
     message and caller data. Given that extracting the caller data of
     a logging event is on the expensive side, we will do so only when
-    the logging request originates from a specific logger, and whose
-    message contains a certain string. Thus, we make sure that only
+    the logging request originates from a specific logger, and when
+    the message contains a certain string. Thus, we make sure that only
     specific logging requests will have their caller information
     generated and displayed. In other cases, where the caller data is
     superfluous, we will not penalize application performance.
@@ -1281,8 +1377,8 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
     <p>Evaluators and in particular <em>evaluation expressions</em>
     are presented in a <a
     href="filters.html#evalutatorFilter">dedicated section of the
-    chapter on filters</a> which you MUST read if you want use
-    evaluators in any meaninful way. Also note that the examples below
+    chapter on filters</a> which you MUST read if you want to use
+    evaluators in any meaningful way. Also note that the examples below
     are implicitly based on <code>JaninoEventEvaluator</code> which
     requires the <a
     href="http://docs.codehaus.org/display/JANINO/Home">Janino
@@ -1295,7 +1391,7 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
 			(logback-examples/src/main/java/chapters/layouts/callerEvaluatorConfig.xml)
 		</em>
 
-    <span class="asGroovy" onclick="return asGroovy('callerEvaluatorConfig');">View as .grovvy</span>
+    <span class="asGroovy" onclick="return asGroovy('callerEvaluatorConfig');">View as .groovy</span>
 
 
 		<pre id="callerEvaluatorConfig" class="prettyprint source">&lt;configuration>
@@ -1318,8 +1414,8 @@ Caller+2   at mainPackage.ConfigTester.main(ConfigTester.java:38)</pre>
 &lt;/configuration></pre>
 
 		<p>The above evaluation expression matches events which emanate
-		from logger with a name containing the string "chapters.layouts"
-		and the message containing the string "who calls thee". Due to XML
+		from a logger with a name containing the string "chapters.layouts"
+		and the message contains the string "who calls thee". Due to XML
 		encoding rules, the &amp; character cannot be written as is, and
 		needs to be escaped as &amp;amp;.</p>
 
@@ -1369,7 +1465,7 @@ public class CallerEvaluatorExample {
 
 		<p>The above application does nothing particularly fancy. Five
 		logging requests are issued, the third one emitting the message
-		"who calls theee?"
+		"who calls thee?"
 		</p>
 
 		<p>The command</p>
@@ -1408,16 +1504,15 @@ Caller+0   at chapters.layouts.CallerEvaluatorExample.main(CallerEvaluatorExampl
 
 		<p>Let us consider at a different situation. When exceptions are
 		included in a logging request, their stack trace is also
-		output. However, one might want to supress the stack trace for
+		output. However, one might want to suppress the stack trace for
 		some specific exceptions.
 		</p>
 
-		<p>The java code shown below creates three log requests, each with
-		an exception. The second exception different from the others
-		contains the string "do not display this" and conttrary to the
-		others it is of type
+		<p>The Java code shown below creates three log requests, each with
+		an exception. The second exception is different from the others:
+		it contains the string "do not display this" and it is of type
 		<code>chapters.layouts.TestException</code>. As its message
-		commands, let us now prevent the third exception from being
+		commands, let us now prevent the second exception from being
 		printed.</p>
 
    <p><em>
@@ -1466,7 +1561,7 @@ public class ExceptionEvaluatorExample {
 		<p>In the next configuration file, the evaluation expression
 		matches events containing a throwable of type
 		<code>chapters.layouts.TextException</code>, precisely the type of
-		exceptions we wish to supress.
+		exceptions we wish to suppress.
     </p>
 
 		<em>
@@ -1512,7 +1607,7 @@ java.lang.Exception: display
 
 
     <p>Notice how the second log statement has no stack trace. We
-    effectively supressed the stack trace for the
+    effectively suppressed the stack trace for the
     <code>TextException</code>. The text between square brackets at
     the end of each stack trace line is <a
     href="#xThrowable">packaging information</a> discussed
@@ -1540,7 +1635,7 @@ java.lang.Exception: display
 		href="../xref/ch/qos/logback/classic/pattern/ClassicConverter.html">
 		<code>ClassicConverter</code></a> objects are responsible for
 		extracting information out of <code>ILoggingEvent</code> instances
-		and producing a String. For example, the
+		and producing a String. For example,
 		<a href="../xref/ch/qos/logback/classic/pattern/LoggerConverter.html">
 		<code>LoggerConverter</code></a>, the converter underlying the
 		%logger conversion word, extracts the name of the logger from 
@@ -1605,7 +1700,7 @@ public class MySampleConverter extends ClassicConverter {
 		new conversion word in the configuration file, as shown below:</p>
 		
 <em> Example: Sample Converter Example (src/main/java/chapters/layouts/mySampleConverterConfig.xml)</em>
- <span class="asGroovy" onclick="return asGroovy('mySampleConverterConfig');">View as .grovvy</span>
+ <span class="asGroovy" onclick="return asGroovy('mySampleConverterConfig');">View as .groovy</span>
 <pre id="mySampleConverterConfig" class="prettyprint source">&lt;configuration>
 
   <b>&lt;conversionRule conversionWord="sample" 
@@ -1681,7 +1776,7 @@ public class MySampleConverter extends ClassicConverter {
 		or more generally by literal text. Each specifier found in the
 		pattern will result in a separate column.  Likewise a separate
 		column will be generated for each block of literal text found in
-		the pattern potentially wasting valuable real estate on your
+		the pattern, potentially wasting valuable real-estate on your
 		screen.</p>
      
     <p>Here is simple but functional configuration file illustrating
@@ -1689,7 +1784,7 @@ public class MySampleConverter extends ClassicConverter {
     </p>
 
 <em> Example: HTMLLayout Example (src/main/java/chapters/layouts/htmlLayoutConfig1.xml)</em>
-<span class="asGroovy" onclick="return asGroovy('htmlLayoutConfig1');">View as .grovvy</span>
+<span class="asGroovy" onclick="return asGroovy('htmlLayoutConfig1');">View as .groovy</span>
 <pre id="htmlLayoutConfig1" class="prettyprint source">&lt;configuration debug="true"&gt;
   &lt;appender name="FILE" class="ch.qos.logback.core.FileAppender"&gt;
     &lt;encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
@@ -1709,7 +1804,7 @@ public class MySampleConverter extends ClassicConverter {
    <p>The <a
    href="../xref/chapters/layouts/TrivialMain.html">TrivialMain</a>
    application logs a few messages finishing with an exception. The
-   commmand:</p>
+   command:</p>
 
    <p class="source">java chapters.layouts.TrivialMain src/main/java/chapters/layouts/htmlLayoutConfig1.xml</p>
 
@@ -1754,7 +1849,7 @@ public class MySampleConverter extends ClassicConverter {
     <p>The presentation of the HTML created by <code>HTMLLayout</code>
     is controlled through a Cascading Style Sheet (CSS). In the
     absence of specific instructions, <code>HTMLLayout</code> will
-    default to its internal CSS. However, your can instruct
+    default to its internal CSS. However, you can instruct
     <code>HTMLLayout</code> to use an external CSS file. For this
     purpose a <code>cssBuilder</code> element can be nested within a
     <code>&lt;layout&gt;</code> element, as shown below.
@@ -1762,7 +1857,7 @@ public class MySampleConverter extends ClassicConverter {
 
 <pre class="prettyprint source">&lt;layout class="ch.qos.logback.classic.html.HTMLLayout">
   &lt;pattern>%relative...%msg&lt;/pattern>
-  &lt;cssBuilder class="ch.qos.logback.core.html.UrlCssBuilder">
+  &lt;cssBuilder class="ch.qos.logback.classic.html.UrlCssBuilder">
     &lt;!-- url where the css file is located --&gt;
     &lt;url>http://...&lt;/url>
   &lt;/cssBuilder>	
@@ -1790,7 +1885,7 @@ public class MySampleConverter extends ClassicConverter {
 
 
     <p>As the original XMLLayout in log4j version 1.2.15, XMLLayout in
-    logback-classic admits two boolean properties, <span
+    logback-classic takes two boolean properties, <span
     class="option">locationInfo</span> and <span
     class="option">properties</span>. Setting <span
     class="option">locationInfo</span> to true enables the inclusion
@@ -1802,7 +1897,7 @@ public class MySampleConverter extends ClassicConverter {
     <p>Here is a sample configuration</p>
 
 <em> Example: Log4jXMLLayout Example (src/main/java/chapters/layouts/log4jXMLLayout.xml)</em>
-<span class="asGroovy" onclick="return asGroovy('log4jXMLLayout');">View as .grovvy</span>
+<span class="asGroovy" onclick="return asGroovy('log4jXMLLayout');">View as .groovy</span>
     <pre id="log4jXMLLayout" class="prettyprint source">&lt;configuration>
   &lt;appender name="FILE" class="ch.qos.logback.core.FileAppender">
     &lt;file>test.xml&lt;/file>
@@ -1828,7 +1923,7 @@ public class MySampleConverter extends ClassicConverter {
 		<h2>Writing your own Layout</h2>
 
 		<p>Writing a custom <code>Layout</code> for logback access is
-		nearly identical to its sibling<code>Layout</code> in
+		nearly identical to its sibling <code>Layout</code> in
 		logback-classic.</p>
 		
 
@@ -1838,9 +1933,9 @@ public class MySampleConverter extends ClassicConverter {
 
 		<p><a href="../xref/ch/qos/logback/access/PatternLayout.html">
 		<code>PatternLayout</code></a> in logback-access can be configured
-		much in the same way as its classic counterpart. However it
+		in much the same way as its classic counterpart. However it
 		features additional conversion specifiers suited for logging
-		particular bits of information availalbe only in HTTP servlet
+		particular bits of information available only in HTTP servlet
 		requests and HTTP servlet responses.
     </p>
 
@@ -2063,7 +2158,7 @@ public class MySampleConverter extends ClassicConverter {
           <code>HttpServletResponse</code> by a <a
           href="../xref/ch/qos/logback/access/servlet/TeeHttpServletResponse.html">
           <code>TeeHttpServletResponse</code></a>. The latter object
-          allows access to the requet's <code>InputStream</code>
+          allows access to the request's <code>InputStream</code>
           multiple times without any loss of data.
           </p>
         </td>
@@ -2072,14 +2167,14 @@ public class MySampleConverter extends ClassicConverter {
         <td align="center"><b>fullResponse</b></td>
         <td>
           <p>This conversion word takes all the available data
-          associated with the response, inclusing all headers of the
+          associated with the response, including all headers of the
           response and response contents.
           </p>
         </td>
       </tr>
     </table>
 		
-		<p>Logback access' <code>PatternLayout</code> also recognize three keywords, which
+		<p>Logback access' <code>PatternLayout</code> also recognizes three keywords, which
 		act like shortcuts to a certain pattern.</p>
 
     <table  class="bodyTable">
@@ -2135,7 +2230,7 @@ public class MySampleConverter extends ClassicConverter {
 		<p>What can be better than a real world example? Our own log4j
 		properties for logback <a
 		href="http://logback.qos.ch/translator/">translator</a> makes use
-		of logback-access to demonstrate live ouput from
+		of logback-access to demonstrate live output from
 		<code>RollingFileAppender</code> with <code>HTMLLayout</code>.</p>
 
 

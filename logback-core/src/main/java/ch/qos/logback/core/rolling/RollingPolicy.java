@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -36,7 +36,7 @@ public interface RollingPolicy extends LifeCycle {
    * @throws RolloverFailure
    *                 Thrown if the rollover operation fails for any reason.
    */
-  public void rollover() throws RolloverFailure;
+  void rollover() throws RolloverFailure;
 
   /**
    * Get the name of the active log file.
@@ -47,14 +47,14 @@ public interface RollingPolicy extends LifeCycle {
    * <p>On other implementations, this method might return the FileAppender's
    * file property.
    */
-  public String getActiveFileName();
+  String getActiveFileName();
 
   /**
    * The compression mode for this policy.
    * 
    * @return
    */
-  public CompressionMode getCompressionMode();
+  CompressionMode getCompressionMode();
   
   /**
    * This method allows RollingPolicy implementations to be aware of their
@@ -63,5 +63,5 @@ public interface RollingPolicy extends LifeCycle {
    * @param appender
    */
 
-  public void setParent(FileAppender appender);
+  void setParent(FileAppender appender);
 }

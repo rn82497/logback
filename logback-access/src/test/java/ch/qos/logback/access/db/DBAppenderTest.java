@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import ch.qos.logback.access.spi.IAccessEvent;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -88,7 +89,7 @@ public class DBAppenderTest  {
   public void testAppendAccessEvent() throws SQLException {
     setInsertHeadersAndStart(false);
 
-    AccessEvent event = createAccessEvent();
+    IAccessEvent event = createAccessEvent();
     appender.append(event);
     
     Statement stmt = connectionSource.getConnection().createStatement();
@@ -118,7 +119,7 @@ public class DBAppenderTest  {
   public void testCheckNoHeadersAreInserted() throws Exception {
     setInsertHeadersAndStart(false);
     
-    AccessEvent event = createAccessEvent();
+    IAccessEvent event = createAccessEvent();
     appender.append(event);
     StatusPrinter.print(context.getStatusManager());
     
@@ -136,7 +137,7 @@ public class DBAppenderTest  {
   public void testAppendHeaders() throws SQLException {   
     setInsertHeadersAndStart(true);
     
-    AccessEvent event = createAccessEvent();
+    IAccessEvent event = createAccessEvent();
     appender.append(event);
     
     Statement stmt = connectionSource.getConnection().createStatement();
@@ -172,7 +173,7 @@ public class DBAppenderTest  {
     setInsertHeadersAndStart(false);
     String uri = "testAppendMultipleEvents";
     for (int i = 0; i < 10; i++) {
-      AccessEvent event = createAccessEvent(uri);
+      IAccessEvent event = createAccessEvent(uri);
       appender.append(event);
     }
 
@@ -191,17 +192,16 @@ public class DBAppenderTest  {
     stmt.close();
   }
 
-  private AccessEvent createAccessEvent() {
+  private IAccessEvent createAccessEvent() {
      return createAccessEvent(""); 
   }
   
-  private AccessEvent createAccessEvent(String uri) {
+  private IAccessEvent createAccessEvent(String uri) {
     DummyRequest request = new DummyRequest();
     request.setRequestUri(uri);
     DummyResponse response = new DummyResponse();
     DummyServerAdapter adapter = new DummyServerAdapter(request, response);
 
-    AccessEvent ae = new AccessEvent(request, response, adapter);
-    return ae;
+    return new AccessEvent(request, response, adapter);
   }
 }

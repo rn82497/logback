@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -20,6 +20,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
+import ch.qos.logback.core.testUtil.RandomUtil;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
@@ -39,7 +41,11 @@ public class SocketAppenderTest {
   static final int JOIN_OR_WAIT_TIMEOUT = 200;
   static final int SLEEP_AFTER_LOG = 100;
 
-  int port = 4561;
+  int diff = RandomUtil.getPositiveInt();
+
+  int port = 1024+(diff%30000);
+  String mdcKey = "key"+diff;
+
   LoggerContext lc = new LoggerContext();
   LoggerContext serverLC = new LoggerContext();
   ListAppender<ILoggingEvent> la = new ListAppender<ILoggingEvent>();
@@ -47,17 +53,22 @@ public class SocketAppenderTest {
   private boolean includeCallerData = false;
   private SimpleSocketServer simpleSocketServer;
 
+  @Before
+  public void setUp() {
+    System.out.println("SocketAppenderTest, start at "+System.currentTimeMillis()+", port="+port);
+  }
+
   @Test
   public void startFailNoRemoteHost() {
     SocketAppender appender = new SocketAppender();
     appender.setContext(lc);
-    appender.setPort(123);
+    appender.setPort(port);
     appender.start();
     assertEquals(1, lc.getStatusManager().getCount());
   }
 
   @Test
-  public void recieveMessage() throws InterruptedException {
+  public void receiveMessage() throws InterruptedException {
     fireServer();
     waitForServerToStart();
     configureClient();
@@ -79,7 +90,7 @@ public class SocketAppenderTest {
   }
 
   @Test
-  public void recieveWithContext() throws InterruptedException {
+  public void receiveWithContext() throws InterruptedException {
     fireServer();
     waitForServerToStart();
     configureClient();
@@ -114,10 +125,10 @@ public class SocketAppenderTest {
     waitForServerToStart();
     configureClient();
 
-    Logger logger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
+    Logger root = lc.getLogger(Logger.ROOT_LOGGER_NAME);
 
-    MDC.put("key", "testValue");
-    logger.debug("test msg");
+    MDC.put(mdcKey, "testValue");
+    root.debug("test msg");
 
     Thread.sleep(SLEEP_AFTER_LOG);
     simpleSocketServer.close();
@@ -128,7 +139,7 @@ public class SocketAppenderTest {
 
     ILoggingEvent remoteEvent = la.list.get(0);
     Map<String, String> MDCPropertyMap = remoteEvent.getMDCPropertyMap();
-    assertEquals("testValue", MDCPropertyMap.get("key"));
+    assertEquals("testValue", MDCPropertyMap.get(mdcKey));
     assertNull(remoteEvent.getCallerData());
   }
 
@@ -184,13 +195,13 @@ public class SocketAppenderTest {
 
     configureClient();
 
-    Logger logger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
+    Logger root = lc.getLogger(Logger.ROOT_LOGGER_NAME);
 
-    MDC.put("key", "testValue");
-    logger.debug("test msg");
+    MDC.put(mdcKey, "testValue");
+    root.debug("test msg");
 
-    MDC.put("key", "updatedTestValue");
-    logger.debug("test msg 2");
+    MDC.put(mdcKey, "updatedTestValue");
+    root.debug("test msg 2");
     Thread.sleep(SLEEP_AFTER_LOG);
 
     simpleSocketServer.close();
@@ -204,7 +215,7 @@ public class SocketAppenderTest {
     // the updated MDC property.
     ILoggingEvent remoteEvent = la.list.get(1);
     Map<String, String> MDCPropertyMap = remoteEvent.getMDCPropertyMap();
-    assertEquals("updatedTestValue", MDCPropertyMap.get("key"));
+    assertEquals("updatedTestValue", MDCPropertyMap.get(mdcKey));
   }
 
   @Test
@@ -241,6 +252,9 @@ public class SocketAppenderTest {
 
   private void fireServer() throws InterruptedException {
     Logger root = serverLC.getLogger("root");
+    Logger socketNodeLogger = serverLC.getLogger(SocketNode.class);
+    socketNodeLogger.setLevel(Level.WARN);
+
     la.setName(LIST_APPENDER_NAME);
     la.setContext(serverLC);
     la.start();
@@ -248,6 +262,7 @@ public class SocketAppenderTest {
     simpleSocketServer = new SimpleSocketServer(serverLC, port);
     simpleSocketServer.start();
     Thread.yield();
+    Thread.sleep(50);
   }
 
   ListAppender<ILoggingEvent> getListAppender() {

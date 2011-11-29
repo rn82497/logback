@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -79,7 +79,7 @@ public class NumberCruncherServer extends UnicastRemoteObject
 
       if ((n % i) == 0) {
         logger.info("Found factor " + i);
-        factors.addElement(new Integer(i));
+        factors.addElement(i);
 
         do {
           n /= i;
@@ -93,7 +93,7 @@ public class NumberCruncherServer extends UnicastRemoteObject
 
     if (n != 1) {
       logger.info("Found factor " + n);
-      factors.addElement(new Integer(n));
+      factors.addElement(n);
     }
 
     int len = factors.size();

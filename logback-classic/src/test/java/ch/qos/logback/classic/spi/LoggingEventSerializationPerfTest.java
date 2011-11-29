@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -22,6 +22,7 @@ import java.io.ObjectOutputStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.MDC;
 import org.slf4j.helpers.BogoPerf;
 
 import ch.qos.logback.classic.net.NOPOutputStream;
@@ -53,6 +54,7 @@ public class LoggingEventSerializationPerfTest {
 
   @Before
   public void setUp() throws Exception {
+    MDC.clear();
     oos = new ObjectOutputStream(noos);
   }
 
@@ -95,12 +97,12 @@ public class LoggingEventSerializationPerfTest {
     }
     double rt = doLoop(builder, LOOP_LEN);
     System.out
-        .println("avetage time per logging event " + rt + " nanoseconds");
+        .println("average time per logging event " + rt + " nanoseconds");
 
     long averageSize = (long) (noos.size() / (LOOP_LEN));
     System.out.println("noos size " + noos.size() + " average size="
         + averageSize);
-    double averageSizeLimit = 60;
+    double averageSizeLimit = 62.1;
 
     assertTrue("average size " + averageSize + " should be less than "
         + averageSizeLimit, averageSizeLimit > averageSize);

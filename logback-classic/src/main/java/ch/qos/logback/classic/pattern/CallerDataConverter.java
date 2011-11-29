@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -32,8 +32,11 @@ import ch.qos.logback.core.status.ErrorStatus;
  */
 public class CallerDataConverter extends ClassicConverter {
 
+  public static final String DEFAULT_CALLER_LINE_PREFIX = "Caller+";
+
   int depth = 5;
   List<EventEvaluator<ILoggingEvent>> evaluatorList = null;
+
 
   final int MAX_ERROR_COUNT = 4;
   int errorCount = 0;
@@ -118,7 +121,7 @@ public class CallerDataConverter extends ClassicConverter {
       int limit = depth < cda.length ? depth : cda.length;
 
       for (int i = 0; i < limit; i++) {
-        buf.append("Caller+");
+        buf.append(getCallerLinePrefix());
         buf.append(i);
         buf.append("\t at ");
         buf.append(cda[i]);
@@ -128,5 +131,9 @@ public class CallerDataConverter extends ClassicConverter {
     } else {
       return CallerData.CALLER_DATA_NA;
     }
+  }
+
+  protected String getCallerLinePrefix() {
+    return DEFAULT_CALLER_LINE_PREFIX;
   }
 }

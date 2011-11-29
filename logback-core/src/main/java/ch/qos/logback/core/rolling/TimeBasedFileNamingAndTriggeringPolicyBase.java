@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -30,9 +30,7 @@ abstract public class TimeBasedFileNamingAndTriggeringPolicyBase<E> extends
   protected String elapsedPeriodsFileName;
   protected RollingCalendar rc;
 
-  protected long currentTime;
-  // indicate whether the time has been forced or not
-  protected boolean isTimeForced = false;
+  protected long artificialCurrentTime = -1;
   protected Date dateInCurrentPeriod = null;
 
   protected long nextCheck;
@@ -88,10 +86,6 @@ abstract public class TimeBasedFileNamingAndTriggeringPolicyBase<E> extends
     this.dateInCurrentPeriod = _dateInCurrentPeriod;
   }
 
-  public Date getDateInCurrentPeriod() {
-    return dateInCurrentPeriod;
-  }
-
   public String getElapsedPeriodsFileName() {
     return elapsedPeriodsFileName;
   }
@@ -101,14 +95,13 @@ abstract public class TimeBasedFileNamingAndTriggeringPolicyBase<E> extends
   }
 
   public void setCurrentTime(long timeInMillis) {
-    currentTime = timeInMillis;
-    isTimeForced = true;
+    artificialCurrentTime = timeInMillis;
   }
 
   public long getCurrentTime() {
     // if time is forced return the time set by user
-    if (isTimeForced) {
-      return currentTime;
+    if (artificialCurrentTime >= 0) {
+      return artificialCurrentTime;
     } else {
       return System.currentTimeMillis();
     }

@@ -44,7 +44,7 @@
 
     <p>Joran stands for a cold north-west wind which, every now and
     then, blows forcefully on Lake Geneva. Located right in the middle
-    of Europe, the Geneva lake happens to be the continent's largest
+    of Europe, Lake Geneva happens to be the continent's largest
     sweet water reserve.
     </p>
 
@@ -105,10 +105,10 @@
         classpath</a>..</p>
       </li>
       
-      <li><p>In case neither file is found, logback configures itself
+      <li><p>If neither file is found, logback configures itself
       automatically using the <a
       href="../xref/ch/qos/logback/classic/BasicConfigurator.html"><code>BasicConfigurator</code></a>
-      which will cause logging output to be directed on the console.
+      which will cause logging output to be directed to the console.
       </p> 
       </li> 
 
@@ -120,8 +120,8 @@
     </p>
 
 
-    <p>If you are using Maven and assuming the
-    <em>logback-test.xml</em> file is placed under
+    <p>If you are using Maven and if you place the
+    <em>logback-test.xml</em> under the
     <em>src/test/resources</em> folder, Maven will ensure that it
     won't be included in the artifact produced. Thus, you can use a
     different configuration file, namely <em>logback-test.xml</em>
@@ -159,8 +159,9 @@ public class MyApp1 {
   }
 }</pre>
 
-  <p>This class defines a static logger variable. It then
-  instantiates a Foo object. The Foo class is listed below:
+  <p>This class defines a static logger variable. It then instantiates
+  a <code>Foo</code> object. The <code>Foo</code> class is listed
+  below:
   </p>
 
   <p class="example">Example: Small class doing logging 
@@ -195,8 +196,9 @@ public class Foo {
     configuration consists of a <code>ConsoleAppender</code> attached
     to the root logger.  The output is formatted using a
     <code>PatternLayoutEncoder</code> set to the pattern
-    <em>%d{HH:mm:ss.SSS}&nbsp;[%thread]&nbsp;%-5level&nbsp;%logger{36}&nbsp;-&nbsp;%msg%n</em>. Moreover, by default the root logger is assigned the
-    <code>DEBUG</code> level.
+    <em>%d{HH:mm:ss.SSS}&nbsp;[%thread]&nbsp;%-5level&nbsp;%logger{36}&nbsp;-&nbsp;%msg%n</em>. Moreover,
+    by default the root logger is assigned the <code>DEBUG</code>
+    level.
     </p>
 
     <p>Thus, the output of the command <em>java chapters.configuration.MyApp1</em>
@@ -218,15 +220,15 @@ public class Foo {
     </div>   
 
    <p>The <code>MyApp1</code> application links to logback via calls
-   <code>org.slf4j.LoggerFactory</code> and
+   to <code>org.slf4j.LoggerFactory</code> and
    <code>org.slf4j.Logger</code> classes, retrieve the loggers it
    wishes to use, and chugs on.  Note that the only dependencies of
    the <code>Foo</code> class on logback are through
    <code>org.slf4j.LoggerFactory</code> and
    <code>org.slf4j.Logger</code> imports.  Except code that configures
    logback (if such code exists) client code does not need to depend
-   on logback. Given that SLF4J permits the use of any logging
-   framework under its abstraction layer, it is rather easy to migrate
+   on logback. Since SLF4J permits the use of any logging
+   framework under its abstraction layer, it is easy to migrate
    large bodies of code from one logging framework to another.
    </p>
 
@@ -242,7 +244,7 @@ public class Foo {
 
    <p class="example">Example: Basic configuration file
    (logback-examples/src/main/java/chapters/configuration/sample0.xml)</p>
-   <span class="asGroovy" onclick="return asGroovy('sample0');">View as .grovvy</span>
+   <span class="asGroovy" onclick="return asGroovy('sample0');">View as .groovy</span>
 
 
   <pre id="sample0" class="prettyprint source">&lt;configuration>
@@ -282,7 +284,7 @@ public class Foo {
    wish to inspect logback's internal status, then you can instruct
    logback to print status data by invoking the <code>print()</code>
    of the <code>StatusPrinter</code> class. The <em>MyApp2</em>
-   application shown below is identical to <em>MyApp1</em> except the
+   application shown below is identical to <em>MyApp1</em> except for the
    addition of two lines of code for printing internal status
    data.</p>
 
@@ -338,7 +340,7 @@ public class Foo {
    <p class="example">Example: Basic configuration file using debug
    mode
    (logback-examples/src/main/java/chapters/configuration/sample1.xml)</p>
-   <span class="asGroovy" onclick="return asGroovy('sample1');">View as .grovvy</span>
+   <span class="asGroovy" onclick="return asGroovy('sample1');">View as .groovy</span>
 
    <pre id="sample1" class="prettyprint source">
 &lt;configuration <b>debug="true"</b>> 
@@ -357,8 +359,8 @@ public class Foo {
 &lt;/configuration></pre>
   
    <p>Setting the <code>debug</code> attribute within the
-   &lt;configuration&gt; element will output status information, under
-   the assumption that
+   &lt;configuration&gt; element will output status information,
+   assuming that:
    </p>
    <ol>
      <li>the configuration file is found</li>
@@ -366,17 +368,22 @@ public class Foo {
    </ol>
      
    <p>If any of these two conditions is not fulfilled, Joran cannot
-   interpret <code>debug</code> attribute since the configuration file
+   interpret the <code>debug</code> attribute since the configuration file
    cannot be read. If the configuration file is found but is
-   ill-formed, then logback will detect the error condition and
+   malformed, then logback will detect the error condition and
    automatically print its internal status on the console. However, if
-   the configuration file cannot be found, since this is not
-   necessarily an error condition, logback will not automatically
-   print its status data.  Programmatically invoking
-   <code>StatusPrinter.print()</code>, as as in <em>MyApp2</em>
-   application above, ensures that status information is always
+   the configuration file cannot be found, logback will not automatically
+   print its status data, since this is not necessarily an error condition. Programmatically invoking
+   <code>StatusPrinter.print()</code> as in the <em>MyApp2</em>
+   application above ensures that status information is always
    printed.
    </p>
+
+   <p>It is strongly recommended to register a status listener,
+   e.g. <code>OnConsoleStatusListener</code>, so that problems
+   occurring during the lifetime of your application, well after
+   logback is initialized, can be reported. See the section on <a
+   href="#statusListener">status listeners</a> further below.</p>
 
    <h3><a name="configFileProperty"
    href="#configFileProperty">Specifying the location of the default
@@ -384,7 +391,7 @@ public class Foo {
 
    <p>If you wish, you can specify the location of the default
    configuration file with a system property named
-   <code>logback.configurationFile</code>. The value of the this
+   <code>logback.configurationFile</code>. The value of this
    property can be a URL, a resource on the class path or a path to a
    file external to the application.
    </p>
@@ -397,26 +404,26 @@ public class Foo {
 
    <div class="highlight">
      <p>Logback-classic can scan for changes in its configuration file
-     and automatically reconfigure itself when the said configuration
+     and automatically reconfigure itself when the configuration
      file changes.
      </p>
    </div>
 
    <p>If instructed to do so, logback-classic will scan for changes in
    its configuration file and automatically reconfigure itself when
-   the said configuration file changes. In order to instruct
+   the configuration file changes. In order to instruct
    logback-classic to scan for changes in its configuration file and
    to automatically re-configure itself set the <span
-   class="attr">scan</span> atrribute of the
+   class="attr">scan</span> attribute of the
    <code>&lt;configuration></code> element to true, as shown next.
 
    </p>
   
    <p class="example">Example: Scanning for changes in configuration
-   file and automatic re-configuraion
+   file and automatic re-configuration
    (logback-examples/src/main/java/chapters/configuration/scan1.xml)</p>
 
-  <span class="asGroovy" onclick="return asGroovy('scan1');">View as .grovvy</span>
+  <span class="asGroovy" onclick="return asGroovy('scan1');">View as .groovy</span>
 <pre id="scan1" class="prettyprint source">
 &lt;configuration <b>scan="true"</b>> 
   ... 
@@ -432,7 +439,7 @@ public class Foo {
 
   <p class="example">Example: Specifying a different scanning period
   (logback-examples/src/main/java/chapters/configuration/scan2.xml)</p>
-  <span class="asGroovy" onclick="return asGroovy('scan2');">View as .grovvy</span>
+  <span class="asGroovy" onclick="return asGroovy('scan2');">View as .groovy</span>
   <pre id="scan2" class="prettyprint source">
 &lt;configuration scan="true" <b>scanPeriod="30 seconds"</b> > 
   ...
@@ -449,7 +456,7 @@ public class Foo {
    href="../xref/ch/qos/logback/classic/turbo/ReconfigureOnChangeFilter.html">ReconfigureOnChangeFilter</a>
    will be installed. TurboFilters are described in a <a
    href="filters.html#TurboFilter">later chapter</a>. As a
-   consequence, scanning is done "in-thread", that is anytime a
+   consequence, scanning is done "in-thread", that is any time a
    printing method of logger is invoked. For example, for a logger
    named <code>myLogger</code>, when you write
    "myLogger.debug("hello");", and if the scan attribute is set to
@@ -473,12 +480,12 @@ public class Foo {
    <h3><a name="joranDirectly" href="#joranDirectly">Invoking
    <code>JoranConfigurator</code> directly</a></h3>
 
-   <p>Logback relies on a configuration library called Joran which is
-   part of logback-core. Logback's default configuration mechanism
-   invokes <code>JoranConfigurator</code> on the default configuration
-   file it finds on the class path. For whatever reason if you wish to
-   override logback's default configuration mechanism, you can do so
-   by invoking <code>JoranConfigurator</code> directly. The next
+   <p>Logback relies on a configuration library called Joran, part of
+   logback-core. Logback's default configuration mechanism invokes
+   <code>JoranConfigurator</code> on the default configuration file it
+   finds on the class path. If you wish to override logback's default
+   configuration mechanism for whatever reason, you can do so by
+   invoking <code>JoranConfigurator</code> directly. The next
    application, <em>MyApp3</em>, invokes JoranConfigurator on a
    configuration file passed as a parameter.</p>
    
@@ -501,19 +508,19 @@ public class MyApp3 {
 
   public static void main(String[] args) {
     // assume SLF4J is bound to logback in the current environment
-    <b>LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();</b>
+    <b>LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();</b>
     
     <b>try {
       JoranConfigurator configurator = new JoranConfigurator();
-      configurator.setContext(lc);
-      // the context was probably already configured by default configuration 
-      // rules
-      lc.reset(); 
+      configurator.setContext(context);
+      // Call context.reset() to clear any previous configuration, e.g. default 
+      // configuration. For multi-step configuration, omit calling context.reset().
+      context.reset(); 
       configurator.doConfigure(args[0]);
     } catch (JoranException je) {
       // StatusPrinter will handle this
     }
-    StatusPrinter.printInCaseOfErrorsOrWarnings(lc);</b>
+    StatusPrinter.printInCaseOfErrorsOrWarnings(context);</b>
 
     logger.info("Entering application.");
 
@@ -527,10 +534,10 @@ public class MyApp3 {
    currently in effect, creates a new <code>JoranConfigurator</code>,
    sets the context on which it will operate, resets the logger
    context, and then finally asks the configurator to configure the
-   context using configuration file passed as parameter to the
+   context using the configuration file passed as a parameter to the
    application. Internal status data is printed in case of warnings or
-   errors.
-   </p>   
+   errors. Note that for multi-step configuration,
+   <code>context.reset()</code> invocation should be omitted.</p>
 
    <h3><a name="viewingStatusMessages"
    href="#viewingStatusMessages">Viewing status messages</a>
@@ -543,11 +550,11 @@ public class MyApp3 {
    object, accessible via the <code>LoggerContext</code>.
    </p>
 
-   <p>Given a <code>StatusManager</code> you an access all the status
+   <p>Given a <code>StatusManager</code> you can access all the status
    data associated with a logback context. To keep memory usage at
    reasonable levels, the default <code>StatusManager</code>
    implementation stores the status messages in two separate parts:
-   the header part and the tail part. The header part stores the fist
+   the header part and the tail part. The header part stores the first
    <em>H</em> status messages whereas the tail part stores the last
    <em>T</em> messages. At present time <em>H</em>=<em>T</em>=150,
    although these values may change in future releases.</p>
@@ -575,7 +582,7 @@ public class MyApp3 {
     &lt;url-pattern>/lbClassicStatus&lt;/url-pattern>
   &lt;/servlet-mapping></pre>
    
-   <p>The <code>ViewStatusMessages</code> servlet will viewable under
+   <p>The <code>ViewStatusMessages</code> servlet will be viewable at
    the URL <code>http://host/yourWebapp/lbClassicStatus</code>
    </p>
 
@@ -602,9 +609,9 @@ public class MyApp3 {
    </p>
 
    <p>Here is <a
-   href="../xref/chapters/configuration/AddStatusListenerApp.html">sample code</a>
-   to register an OnConsoleStatusListener instance with the
-   StatusManager.
+   href="../xref/chapters/configuration/AddStatusListenerApp.html">sample
+   code</a> to register an <code>OnConsoleStatusListener</code>
+   instance with the StatusManager.
    </p>
 
    <pre class="prettyprint source">   LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory(); 
@@ -612,9 +619,11 @@ public class MyApp3 {
    OnConsoleStatusListener onConsoleListener = new OnConsoleStatusListener();
    statusManager.add(onConsoleListener);</pre>
 
-   <p>Note that the registered status listener will receive status
+   <p>Note that the registered status listener will only receive status
    events subsequent to its registration. It will not receive prior
-   messages.</p>
+   messages. Thus, it is usually a good idea to place status listener
+   registration directives at top of the configuration file before
+   other directives.</p>
 
    <p>It is also possible to register one or more status listeners
    within a configuration file. Here is an example.</p>
@@ -622,7 +631,7 @@ public class MyApp3 {
    <p class="example">Example: Registering a status listener
    (logback-examples/src/main/java/chapters/configuration/onConsoleStatusListener.xml)</p>
 
-   <span class="asGroovy" onclick="return asGroovy('onConsoleStatusListener');">View as .grovvy</span>
+   <span class="asGroovy" onclick="return asGroovy('onConsoleStatusListener');">View as .groovy</span>
    <pre id="onConsoleStatusListener" class="prettyprint source">&lt;configuration>
   <b>&lt;statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" /></b>  
 
@@ -638,7 +647,7 @@ public class MyApp3 {
    
 
    <h2>
-     <a name="syntax" href="#syntax">Configuration file Syntax</a>
+     <a name="syntax" href="#syntax">Configuration file syntax</a>
    </h2>
 
    <p>As you have seen thus far in the manual with plenty of examples
@@ -656,7 +665,7 @@ public class MyApp3 {
    configuration files. 
    </p>
 
-   <p>As shall be demonstrated over and over, the syntax of logback
+   <p>As will be demonstrated over and over, the syntax of logback
    configuration files is extremely flexible. As such, it is not
    possible to specify the allowed syntax with a DTD file or an XML
    schema. Nevertheless, the very basic structure of the configuration
@@ -677,16 +686,15 @@ public class MyApp3 {
     <p>If you are unsure which case to use for a given tag name, just
     follow the <a
     href="http://en.wikipedia.org/wiki/CamelCase">camelCase
-    convention</a> which is almost always the corrrect convention.</p>
+    convention</a> which is almost always the correct convention.</p>
     </div>
 
     <h4><a name="caseSensitivity" href="#caseSensitivity">Case
     sensitivity of tag names</a></h4>
    
 
-    <p>As of logback version 0.9.17, tag names pertaining to explicit
-    rules are case insensitive.  For example, both
-    <code>&lt;logger></code>, <code>&lt;Logger></code> and
+    <p>Since logback version 0.9.17, tag names pertaining to explicit
+    rules are case insensitive.  For example, <code>&lt;logger></code>, <code>&lt;Logger></code> and
     <code>&lt;LOGGER></code> are valid configuration elements and will
     be interpreted in the same way. Note that XML well-formedness
     rules still apply, if you open a tag as <code>&lt;xyz></code> you
@@ -695,9 +703,9 @@ public class MyApp3 {
     rules</a>, tag names are case sensitive except for the first
     letter.  Thus, <code>&lt;xyz></code> and <code>&lt;Xyz></code> are
     equivalent but not <code>&lt;xYz></code>.  Implicit rules usually
-    follow the <a href="http://en.wikipedia.org/wiki/CamelCase">camel
-    case</a> convention, common in the Java world. Since it is not
-    easy tell when a tag is associated with an explicit action and
+    follow the <a href="http://en.wikipedia.org/wiki/CamelCase">camelCase</a>
+    convention, common in the Java world. Since it is not
+    easy to tell when a tag is associated with an explicit action and
     when it is associated with an implicit action, it is not trivial
     to say whether an XML tag is case-sensitive or insensitive with
     respect to the first letter. If you are unsure which case to use
@@ -709,12 +717,12 @@ public class MyApp3 {
     href="#loggerElement">Configuring loggers, or the
     <code>&lt;logger></code> element</a></h4>
 
-    <p>At this point should have at least some understanding of <a
-    href="architecture.html#effectiveLevel">level inherirance</a> and
+    <p>At this point you should have at least some understanding of <a
+    href="architecture.html#effectiveLevel">level inheritance</a> and
     the <a href="architecture.html#basic_selection">basic selection
-    rule</a>. Otherwise, and unless you are an egyptologist, logback
-    configuration will be no more meaningful to you than
-    are hieroglyphics.
+    rule</a>. Otherwise, and unless you are an Egyptologist, logback
+    configuration will be no more meaningful to you than are
+    hieroglyphics.
     </p>
 
     <p>A logger is configured using the <code>&lt;logger></code>
@@ -723,18 +731,18 @@ public class MyApp3 {
     <span class="attr">level</span> attribute, and an optional <span
     class="attr">additivity</span> attribute, admitting the values
     <em>true</em> or <em>false</em>. The value of the <span
-    class="attr">level</span> attribute admitting the one of the
+    class="attr">level</span> attribute admitting one of the
     case-insensitive string values TRACE, DEBUG, INFO, WARN, ERROR,
     ALL or OFF. The special case-insensitive value <em>INHERITED</em>,
     or its synonym <em>NULL</em>, will force the level of the logger
     to be inherited from higher up in the hierarchy. This comes in
-    handy in case you set the level of a logger and later decide that
+    handy if you set the level of a logger and later decide that
     it should inherit its level.
     </p>
 
     <p>The <code>&lt;logger></code> element may contain zero or more
     <code>&lt;appender-ref></code> elements; each appender thus
-    referenced is added to the named logger. Note that contrary to
+    referenced is added to the named logger. Note that unlike
     log4j, logback-classic does <em>not</em> close or remove any
     previously referenced appenders before adding the new appender
     reference.
@@ -746,23 +754,22 @@ public class MyApp3 {
    logger, or the <code>&lt;root></code> element</a></h4>
 
    <p>The <code>&lt;root></code> element configures the root
-   logger. It admits a single attribute, namely the <span
-   class="attr">level</span> attribute. It does not admit any other
+   logger. It supports a single attribute, namely the <span
+   class="attr">level</span> attribute. It does not allow any other
    attributes because the additivity flag does not apply to the root
    logger.  Moreover, since the root logger is already named as
-   "ROOT", it does not admit a name attribute either. The value of the
+   "ROOT", it does not allow a name attribute either. The value of the
    level attribute can be one of the case-insensitive strings TRACE,
    DEBUG, INFO, WARN, ERROR, ALL or OFF. Note that the level of the
    root logger cannot be set to INHERITED or NULL.
    </p>
 
 
-   <p>The <code>&lt;root></code> element admits zero or more
-   <code>&lt;appender-ref></code> elements.  Similar to the
+   <p> Similarly to the
    <code>&lt;logger></code> element, the <code>&lt;root></code>
    element may contain zero or more <code>&lt;appender-ref></code>
    elements; each appender thus referenced is added to the root
-   logger. Note that contrary to log4j, logback-classic does
+   logger. Note that unlike log4j, logback-classic does
    <em>not</em> close or remove any previously referenced appenders
    before adding the new appender reference to the root logger.
    </p>
@@ -780,7 +787,7 @@ public class MyApp3 {
    <p class="example">Example: Setting the level of a logger
    (logback-examples/src/main/java/chapters/configuration/sample2.xml)</p>
 
-   <span class="asGroovy" onclick="return asGroovy('sample2');">View as .grovvy</span>
+   <span class="asGroovy" onclick="return asGroovy('sample2');">View as .groovy</span>
    <pre id="sample2" class="prettyprint source">&lt;configuration>
 
   &lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -810,7 +817,7 @@ public class MyApp3 {
 
   <p>Note that the message of level DEBUG generated by the <a
   href="../xref/chapters/configuration/Foo.html">"chapters.configuration.Foo"</a>
-  logger has been supressed. See also the Foo class.</p>
+  logger has been suppressed. See also the Foo class.</p>
 
   <p>You can configure the levels of as many loggers as you wish.  In
   the next configuration file, we set the level of the
@@ -821,7 +828,7 @@ public class MyApp3 {
   <p class="example">Example: Setting the level of multiple loggers
   (logback-examples/src/main/java/chapters/configuration/sample3.xml)</p>
   
-  <span class="asGroovy" onclick="return asGroovy('sample3');">View as .grovvy</span>
+  <span class="asGroovy" onclick="return asGroovy('sample3');">View as .groovy</span>
   <pre id="sample3" class="source prettyprint">&lt;configuration>
 
   &lt;appender name="STDOUT"
@@ -893,8 +900,8 @@ public class MyApp3 {
   <p>Let us note that the <a
   href="architecture.html#basic_selection">basic-selection rule</a>
   depends on the effective level of the logger being invoked, not the
-  level of the logger where appenders are attached. Loback will first
-  determine wheteher a logging statement is enabled or not, and if
+  level of the logger where appenders are attached. Logback will first
+  determine whether a logging statement is enabled or not, and if
   enabled, it will invoke the appenders found in the logger hierarchy,
   regardless of their level. The configuration file
   <em>sample4.xml</em> is a case in point:
@@ -902,7 +909,7 @@ public class MyApp3 {
 
   <p class="example">Example: Logger level sample
   (logback-examples/src/main/java/chapters/configuration/sample4.xml)</p>
-  <span class="asGroovy" onclick="return asGroovy('sample4');">View as .grovvy</span>
+  <span class="asGroovy" onclick="return asGroovy('sample4');">View as .groovy</span>
   <pre id="sample4" class="prettyprint source">&lt;configuration>
 
   &lt;appender name="STDOUT"
@@ -976,8 +983,8 @@ public class MyApp3 {
   <h4><a name="configuringAppenders"
   href="#configuringAppenders">Configuring Appenders</a></h4>
 
-  <p>An appenders is configured with the <code>&lt;appender></code>
-  element, which takes two mandatroy attributes <span
+  <p>An appender is configured with the <code>&lt;appender></code>
+  element, which takes two mandatory attributes <span
   class="attr">name</span> and <span class="attr">class</span>.  The
   <span class="attr">name</span> attribute specifies the name of the
   appender whereas the <span class="attr">class</span> attribute
@@ -985,9 +992,9 @@ public class MyApp3 {
   instantiate. The <code>&lt;appender></code> element may contain zero
   or one <code>&lt;layout></code> elements, zero or more
   <code>&lt;encoder></code> elements and zero or more
-  <code>&lt;filter></code> elements. Appart from these three common
+  <code>&lt;filter></code> elements. Apart from these three common
   elements, <code>&lt;appender></code> elements may contain any number
-  of elements corresponding to javabean properties of the appender
+  of elements corresponding to JavaBean properties of the appender
   class. Seamlessly supporting any property of a given logback
   component is one of the major strengths of <a
   href="onJoran.html">Joran</a> as discussed in a later chapter. The
@@ -1002,7 +1009,7 @@ public class MyApp3 {
 
   <p>The <code>&lt;layout></code> element takes a mandatory class
   attribute specifying the fully qualified name of the layout class to
-  instantiate.  As with the the <code>&lt;appender></code> element,
+  instantiate.  As with the <code>&lt;appender></code> element,
   <code>&lt;layout></code> may contain other elements corresponding to
   properties of the layout instance. Since it's such a common case, if
   the layout class is <code>PatternLayout</code>, then the class
@@ -1028,7 +1035,7 @@ public class MyApp3 {
   <p class="example">Example: Multiple loggers
   (logback-examples/src/main/java/chapters/configuration/multiple.xml)</p>
 
-  <span class="asGroovy" onclick="return asGroovy('multiple');">View as .grovvy</span>
+  <span class="asGroovy" onclick="return asGroovy('multiple');">View as .groovy</span>
   <pre id="multiple" class="prettyprint source">&lt;configuration>
 
   &lt;appender name="<b>FILE</b>" class="ch.qos.logback.core.FileAppender">
@@ -1051,7 +1058,7 @@ public class MyApp3 {
   &lt;/root>
 &lt;/configuration></pre>
 
-  <p>This configuration scripts defines two appenders called
+  <p>These configuration scripts define two appenders called
   <em>FILE</em> and <em>STDOUT</em>.  The <em>FILE</em> appender logs
   to a file called <em>myApp.log</em>. The encoder for this appender
   is a <code>PatternLayoutEncoder</code> that outputs the date, level,
@@ -1083,7 +1090,7 @@ public class MyApp3 {
   <p class="example">Example: Duplicate appender
   (logback-examples/src/main/java/chapters/configuration/duplicate.xml)</p>
 
-  <span class="asGroovy" onclick="return asGroovy('duplicate');">View as .grovvy</span>
+  <span class="asGroovy" onclick="return asGroovy('duplicate');">View as .groovy</span>
   <pre id="duplicate" class="prettyprint source">&lt;configuration>
 
   &lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -1113,16 +1120,18 @@ public class MyApp3 {
 14:25:36.359 [main] INFO  chapters.configuration.MyApp3 - Exiting application.</p>
 
   <p>Notice the duplicated output. The appender named <em>STDOUT</em>
-  is attached to two loggers, to root and to <em>chapters.configuration</em>. Since
-  the root logger is the ancestor of all loggers and <em>chapters.configuration</em>
-  is the parent of <em>chapters.configuration.MyApp3</em> and <em>chapters.configuration.Foo</em>,
-  logging request made with these two loggers will be output twice,
-  once because <em>STDOUT</em> is attached to <em>chapters.configuration</em> and
-  once because it is attached to <em>root</em>.
+  is attached to two loggers, to root and to
+  <em>chapters.configuration</em>. Since the root logger is the
+  ancestor of all loggers and <em>chapters.configuration</em> is the
+  parent of both <em>chapters.configuration.MyApp3</em> and
+  <em>chapters.configuration.Foo</em>, each logging request made with
+  these two loggers will be output twice, once because <em>STDOUT</em>
+  is attached to <em>chapters.configuration</em> and once because it
+  is attached to <em>root</em>.
   </p>
 
   <p>Appender additivity is not intended as a trap for new users.  It
-  is a quite convenient logback feature. For instance, you can
+  is quite a convenient logback feature. For instance, you can
   configure logging such that log messages appear on the console (for
   all loggers in the system) while messages only from some specific
   set of loggers flow into a specific appender.
@@ -1130,7 +1139,7 @@ public class MyApp3 {
 
   <p class="example">Example: Multiple appender
   (logback-examples/src/main/java/chapters/configuration/restricted.xml)</p>
-  <span class="asGroovy" onclick="return asGroovy('restricted');">View as .grovvy</span>
+  <span class="asGroovy" onclick="return asGroovy('restricted');">View as .groovy</span>
   <pre id="restricted" class="prettyprint source">&lt;configuration>
 
   &lt;appender name="FILE" class="ch.qos.logback.core.FileAppender">
@@ -1170,14 +1179,14 @@ public class MyApp3 {
   <p>In case the default cumulative behavior turns out to be
   unsuitable for your needs, you can override it by setting the
   additivity flag to false.  Thus, a branch in your logger tree may
-  direct output to a set of appenders different than those of the rest
+  direct output to a set of appenders different from those of the rest
   of the tree.
   </p>
 
   <p class="example">Example: Additivity flag
   (logback-examples/src/main/java/chapters/configuration/additivityFlag.xml)</p>
 
-  <span class="asGroovy" onclick="return asGroovy('additivityFlag');">View as .grovvy</span>
+  <span class="asGroovy" onclick="return asGroovy('additivityFlag');">View as .groovy</span>
   <pre id="additivityFlag" class="prettyprint source">&lt;configuration>
 
   &lt;appender name="FILE" class="ch.qos.logback.core.FileAppender">
@@ -1219,10 +1228,10 @@ public class MyApp3 {
   <h3><a name="contextName" href="#contextName">Setting the context name</a></h3>
 
   <p>As mentioned <a href="architecture.html#LoggerContext">in an
-  earlier chapter</a>, every logger is attached to logger context. By
-  default, the logger context is called "default". However, you can
-  set a different name with the help of the
-  <code>&lt;contextName></code> configuration directive. Note that
+  earlier chapter</a>, every logger is attached to a logger
+  context. By default, the logger context is called
+  "default". However, you can set a different name with the help of
+  the <code>&lt;contextName></code> configuration directive. Note that
   once set, the logger context name <a
   href="../apidocs/ch/qos/logback/core/ContextBase.html#setName(java.lang.String)">cannot
   be changed</a>. Setting the context name is a simple and
@@ -1233,7 +1242,7 @@ public class MyApp3 {
   <p class="example">Example: Set the context name and display it
   (logback-examples/src/main/java/chapters/configuration/contextName.xml)</p>
 
-  <span class="asGroovy" onclick="return asGroovy('contextName');">View as .grovvy</span>
+  <span class="asGroovy" onclick="return asGroovy('contextName');">View as .groovy</span>
   <pre id="contextName" class="prettyprint source">&lt;configuration>
   <b>&lt;contextName>myAppName&lt;/contextName></b>
   &lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -1247,40 +1256,70 @@ public class MyApp3 {
   &lt;/root>
 &lt;/configuration></pre>
 
-  <p>This last examples illustrates naming of the logger
-  context. Adding the the <a
+  <p>This last example illustrates naming of the logger
+  context. Adding the <a
   href="layouts.html#conversionWord">contextName conversion word</a>
   in layout's pattern will output the said name.</p>
   
   <!-- =============================================================== -->
  
 
-  <h4><a name="variableSubstitution"
-  href="#variableSubstitution">Variable substitution</a></h4>
+  <h3><a name="variableSubstitution"
+  href="#variableSubstitution">Property substitution</a></h3>
 
-  <p>In principle, variable substitution can occur at any point where
-  a value can be specified. The syntax of variable substitution is
-  similar to that of Unix shells. The string between an opening
-  <em>${</em> and closing <em>}</em> is interpreted as a key.  The
-  value of the substituted variable can be defined in the
-  configuration file itself, in an external properties file or as a
-  system property.  The corresponding value replaces <em>${aKey}</em>
-  sequence. For example, if <em>java.home.dir</em> system property is
-  set to <em>/home/xyz</em>, then every occurrence of the sequence
-  <em>${java.home.dir}</em> will be interpreted as <em>/home/xyz</em>.
-  As it often comes in handy, the variable ${HOSTNAME} is
-  automatically defined.</p>
+  <p>As in many scripting languages, logback configuration files support
+  definition and substitution of properties. Properties can be defined
+  within the configuration file itself, in an external file, in an
+  external resource or even computed and <a
+  href="#definingPropsOnTheFly">defined on the fly</a>.
+  </p>
 
-  <h4>Properties are inserted into the logger context</h4>
+  <p>Property substitution can occur at any point where a value can be
+  specified. The syntax of property substitution is similar to that of
+  Unix shells. The string between an opening <em>${</em> and closing
+  <em>}</em> is interpreted as a reference to the <em>value</em> of
+  the property.  For property <em>aKey</em>, the string "${aKey}" will
+  be replaced the value held by the <em>aKey</em> property.
+  </p>
 
-  <p>Note that the values defined via <code>&lt;property></code>
-  element are actually inserted into the logger context. In other
-  words, they become properties of the logger context.  Consequently,
-  they will be available in all logging events, including those sent
-  to remote hosts via serialization.</p>
+  <p>A property can be defined in <em>local scope</em> (the default),
+  in <em>context scope</em>, or in <em>system scope</em>. Local scope
+  is the default.  A property with local scope exists from the point
+  of its definition until the end of configuration. A property with
+  context scope is inserted into the context and lasts as long as the
+  context or until it is cleared.  Once defined, a property in
+  context scope is part of the context. As such, it is available in
+  all logging events, including those sent to remote hosts via
+  serialization. A property with system scope is inserted into the
+  JVM's system properties and lasts as long as the JVM or until it is
+  cleared.
+  </p>
+
+  <p>As they often come in handy, the HOSTNAME and CONTEXT_NAME
+  properties are automatically defined and have context scope.</p>
+
+  <p class="highlight">Properties are looked up in the the local
+  scope first, in the context scope second, in the system properties
+  scope third, and in the OS environment last.
+  </p>
+
+  <p>During substitution, properties are looked up in the local scope
+  first, in the context scope second, in the system properties scope
+  third, and in the <a
+  href="http://download.oracle.com/javase/tutorial/essential/environment/env.html">OS
+  environment</a> fourth and last.
+  </p>
+
+ 
+  <h4><a name="definingProps" href="#definingProps">Defining
+  properties</a></h4>
+
+  <p>Properties can be defined one at a time in the configuration file
+  itself or loaded wholesale from an external properties file or an
+  external resource.</p>
 
   <p>The next example shows a variable, a.k.a. a substitution
-  property, declared the beginning of the configuration file. It is
+  property, declared at the beginning of the configuration file. It is
   then used further down the file to specify the location of the
   output file.
   </p>
@@ -1289,8 +1328,7 @@ public class MyApp3 {
   (logback-examples/src/main/java/chapters/configuration/variableSubstitution1.xml)
   </p>
 
-  <span class="asGroovy" onclick="return
-  asGroovy('variableSubstitution1');">View as .grovvy</span>
+  <span class="asGroovy" onclick="return asGroovy('variableSubstitution1');">View as .groovy</span>
   <pre id="variableSubstitution1" class="prettyprint source">&lt;configuration>
 
   <b>&lt;property name="USER_HOME" value="/home/sebastien" /></b>
@@ -1307,7 +1345,6 @@ public class MyApp3 {
   &lt;/root>
 &lt;/configuration></pre>
 
-
   <p>The next example shows the use of a System property to achieve
   the same result. The property is not declared in the configuration
   file, thus logback will look for it in the System properties. Java
@@ -1319,7 +1356,7 @@ public class MyApp3 {
   <p class="example">Example: System Variable substitution
   (logback-examples/src/main/java/chapters/configuration/variableSubstitution2.xml)
   </p>
-  <span class="asGroovy" onclick="return asGroovy('variableSubstitution2');">View as .grovvy</span>
+  <span class="asGroovy" onclick="return asGroovy('variableSubstitution2');">View as .groovy</span>
   <pre id="variableSubstitution2" class="prettyprint source">&lt;configuration>
 
   &lt;appender name="FILE" class="ch.qos.logback.core.FileAppender">
@@ -1344,8 +1381,8 @@ public class MyApp3 {
   separate file
   (logback-examples/src/main/java/chapters/configuration/variableSubstitution3.xml)
   </p>
-
-  <pre class="prettyprint source">&lt;configuration>
+  <span class="asGroovy" onclick="return asGroovy('variableSubstitution3');">View as .groovy</span>
+  <pre id="variableSubstitution3" class="prettyprint source">&lt;configuration>
 
   <b>&lt;property file="src/main/java/chapters/configuration/variables1.properties" /></b>
 
@@ -1363,9 +1400,9 @@ public class MyApp3 {
 
    <p>This configuration file contains a reference to a file named
    <em>variables1.properties</em>.  The variables contained in that
-   file will be read defined within the context of the logback
-   configuration file. Here is what the <em>variable.properties</em>
-   file might look like.
+   file will be read and then defined within the context of the
+   logback configuration file. Here is what the
+   <em>variable.properties</em> file might look like.
    </p>
 
    <em>Example: Variable file
@@ -1392,9 +1429,44 @@ public class MyApp3 {
    &lt;/root>
 &lt;/configuration></pre>
 
+
+   <h4>Scopes</h4>
+
+   <p>The <span class="attr">scope</span> attribute of the
+   <code>&lt;property></code> element can be used to set the scope of
+   properties. The <span class="attr">scope</span> attribute admit the
+   "local", "context" and "system" strings as possible values.
+   </p>
+
+  <p class="example">Example: Simple Variable substitution
+  (logback-examples/src/main/java/chapters/configuration/variableSubstitution4.xml)
+  </p>
+
+  <span class="asGroovy" onclick="return
+  asGroovy('variableSubstitution4');">View as .groovy</span>
+  <pre id="variableSubstitution4" class="prettyprint source">&lt;configuration>
+
+  &lt;property <b class="big">scope="context"</b> name="nodeId" value="node1" />
+
+  &lt;appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <b>&lt;file>/opt/${noteId}/myApp.log&lt;/file></b>
+    &lt;encoder>
+      &lt;pattern>%msg%n&lt;/pattern>
+    &lt;/encoder>
+  &lt;/appender>
+
+  &lt;root level="debug">
+    &lt;appender-ref ref="FILE" />
+  &lt;/root>
+&lt;/configuration></pre>
+
+   <p>In the above example, given that the <em>nodeId</em> property is
+   defined in the context scope, it will be available in every logging
+   event, even those sent to remote hosts via serialization.</p>
+
    <h4>Nested variable substitution</h4>
 
-   <p>Nested variabled subsitution is also supported. By nested, we
+   <p>Nested variable substitution is also supported. By nested, we
    mean that the value definition of a variable contains references to
    other variables. Suppose you wish to use variables to specify not
    only the destination directory but also the file name, and combine
@@ -1410,7 +1482,7 @@ fileName=myApp.log
 <b>destination=${USER_HOME}/${fileName}</b></pre>
 
     <p>Note that in the properties file above, "destination" is
-    composed out of two other variables, namely "USER_HOME" and
+    composed from two other variables, namely "USER_HOME" and
     "fileName".
     </p>
     
@@ -1439,7 +1511,7 @@ fileName=myApp.log
   variables</a></h3>
 
   <p>Under certain circumstances, it may be desirable for a variable
-  to have a default value in case it is not declared or its value is
+  to have a default value if it is not declared or its value is
   null. As in the <a
   href="http://tldp.org/LDP/abs/html/parameter-substitution.html">Bash
   shell</a>, default values can be specified using the <b>":-"</b>
@@ -1455,6 +1527,12 @@ fileName=myApp.log
   defined automatically during configuration.</p>
 
   <!-- ============================================================== -->
+  <h3><a name="context_name" href="#context_name">CONTEXT_NAME property</a></h3>
+
+  <p>When a context is asked for a property named
+  <code>CONTEXT_NAME</code> it returns with its own name.</p>
+
+  <!-- ============================================================== -->
   
   <h3><a name="timestamp" href="#timestamp">Setting a timestamp</a></h3>
 
@@ -1468,8 +1546,8 @@ fileName=myApp.log
   href="#definingPropsOnTheFly">Defining properties on the
   fly</a></h3>
 
-  <p>You may define properties from within the configuration file
-  using the <code>&lt;define></code> element. The define element takes
+  <p>You may define properties dynamically using the
+  <code>&lt;define></code> element. The define element takes two
   mandatory attributes: <span class="attr">name</span> and <span
   class="attr">class</span>. The <span class="attr">name</span>
   attribute designates the name of the property to set whereas the
@@ -1477,8 +1555,8 @@ fileName=myApp.log
   implementing the <a
   href="../xref/ch/qos/logback/core/spi/PropertyDefiner.html">PropertyDefiner</a>
   interface. The value returned by the <code>getPropertyValue</code>()
-  method of the <code>PropertyDefiner</code> will be placed into the
-  named property.
+  method of the <code>PropertyDefiner</code> instance will be the
+  value of the named property.
   </p>
 
   <p>Here is an example.</p>
@@ -1492,7 +1570,7 @@ fileName=myApp.log
   &lt;root level="${rootLevel}"/>
 &lt;/configuration></pre>
 
-  <p>At present time, logback does not ship with any classes
+  <p>At the present time, logback does not ship with any classes
   implementing <code>PropertyDefiner</code>. We merely provide an
   extension point so that you may define properties dynamically.
   </p>
@@ -1510,7 +1588,8 @@ fileName=myApp.log
   configuration files with the help of <code>&lt;if></code>,
   <code>&lt;then></code> and <code>&lt;else></code> elements so that a
   single configuration file can adequately target several
-  environments.
+  environments. Note that conditional processing requires the <a
+  href="../setup.html#janino">Janino library</a>.
   </p>
 
   <p>The general format for conditional statements is shown below.</p>
@@ -1533,24 +1612,22 @@ fileName=myApp.log
     &lt;/else>    
   &lt;/if></pre>  
 
-  <p>The condition is a java expression where only context properties
-  or system properties are accessible. For a key passed as argument,
-  the <code>property</code>() or its shorter equivalent
+  <p>The condition is a Java expression in which only context
+  properties or system properties are accessible. For a key passed as
+  argument, the <code>property</code>() or its shorter equivalent
   <code>p</code>() methods return the String value of the property.
-  For example, to access the value a property with key "k", you would
-  write <code>property("k")</code> or equivalently
+  For example, to access the value of a property with key "k", you
+  would write <code>property("k")</code> or equivalently
   <code>p("k")</code>. If the property with key "k" is undefined, the
   property method will return the empty string and not null. This
-  avoids the need to to check for null values. If you need to check
-  whether a property is null, the <code>isNull()</code> method is
-  provided. For example, you can write <code>isNull("k")</code>.</p>
+  avoids the need to check for null values.</p>
 
-  <p>In the next example, the <code>ConsoleAppender</code> will be
-  attached to the root logger, but only if the HOSTNAME is
-  "torino". Note that the <code>FileAppender</code> named "FILE" is
-  attached to the root logger in any case.
-  </p>
-
+  <p>The <code>isDefined()</code> method can be used to check whether
+  a property is defined. For example, to check whether the property
+  "k" is defined you would write <code>isDefined("k")</code>
+  Similarly, if you need to check whether a property is null, the
+  <code>isNull()</code> method is provided. Example:
+  <code>isNull("k")</code>.</p>
 
   <pre class="prettyprint source">&lt;configuration>
 
@@ -1585,7 +1662,7 @@ fileName=myApp.log
   statements are also supported. However, XML syntax is awfully
   cumbersome and is ill suited as the foundation of a general purpose
   programming language.  Consequently, too many conditionals will
-  quickly render your configuration files ungrokable to subsequent
+  quickly render your configuration files incomprehensible to subsequent
   readers, including yourself.
   </p>
 
@@ -1598,7 +1675,7 @@ fileName=myApp.log
    <p>Under certain circumstances, you may want to make use of
    env-entries stored in JNDI. The <code>&lt;insertFromJNDI></code>
    configuration directive extracts an env-entry stored in JNDI and
-   inserts it as variable as specified by the <span
+   inserts it as a variable whose key is as specified by the <span
    class="attr">as</span> attribute.
    </p>
 
@@ -1612,7 +1689,7 @@ fileName=myApp.log
 
   &lt;appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     &lt;encoder>
-      &lt;pattern>%d %contextName %level %msg %logger{50}%n&lt;/pattern>
+      &lt;pattern>%d ${CONTEXT_NAME} %level %msg %logger{50}%n&lt;/pattern>
     &lt;/encoder>
   &lt;/appender>
 
@@ -1667,7 +1744,7 @@ fileName=myApp.log
 
 
   <p>Again, please note the mandatory
-  <code class="big green">&lt;included></code> element if you have not already done so.</p>
+  <code class="big green">&lt;included></code> element.</p>
 
   <p>The contents to include can be referenced as a file, as a
   resource, or as a URL.</p>
@@ -1695,6 +1772,62 @@ fileName=myApp.log
 
     </li>
   </ul>
+
+
+  <!-- ==================== ContextListener =================== -->
+  <h2><a name="contextListener" href="#contextListener">Adding a context listener</a></h2>
+
+  <p>Instances of the <a
+  href="../xref/ch/qos/logback/classic/spi/LoggerContextListener.html">LoggerContextListener</a>
+  interface listen to events pertaining to the lifecycle of a logger
+  context. 
+  </p>
+
+
+  <p><code>JMXConfigurator</code> is one implementation of the
+  <code>LoggerContextListener</code> interface. It is described in a <a
+  href="jmxConfig.html">subsequent chapter</a>.
+  </p>
+
+  <h3><a name="LevelChangePropagator"
+  href="#LevelChangePropagator">LevelChangePropagator</a></h3>
+
+  <p>As of version 0.9.25, logback-classic ships with <a
+  href="../xref/ch/qos/logback/classic/jul/LevelChangePropagator.html">LevelChangePropagator</a>,
+  an implementation of <code>LoggerContextListener</code> which
+  propagates changes made to the level of any logback-classic logger
+  onto the java.util.logging framework. Such propagation eliminates
+  the performance impact of disabled log statements. Instances of <a
+  href="http://download.oracle.com/javase/1.5.0/docs/api/java/util/logging/LogRecord.html?is-external=true">LogRecord</a>
+  will be sent to logback (via SLF4J) only for enabled log
+  statements. This makes it reasonable for real-world applications to
+  use the <a
+  href="http://www.slf4j.org/legacy.html#jul-to-slf4j">jul-to-slf4j</a>
+  bridge.
+  </p>
+
+
+  <p>The contextListener element can be used to install <code>LevelChangePropagator</code> as shown next.</p>
+  
+  <pre class="prettyprint source">&lt;configuration debug="false">
+  <b>&lt;contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/></b>
+  .... 
+&lt;/configuration></pre>
+
+  <p>Setting the <span class="option">resetJUL</span> property of
+  LevelChangePropagator will reset all previous level configurations
+  of all j.u.l. loggers. However, previously installed handlers will be
+  left untouched.</p>
+
+  <pre class="prettyprint source">&lt;configuration debug="false">
+  &lt;contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+    <b>&lt;resetJUL>true&lt;/resetJUL></b>
+  &lt;/contextListener>
+  ....
+&lt;/configuration></pre>
+  <p>
+  </p>
+  
 
 
   <script src="../templates/footer.js" type="text/javascript"></script>

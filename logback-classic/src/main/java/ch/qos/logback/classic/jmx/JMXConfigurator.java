@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -261,12 +261,16 @@ public class JMXConfigurator extends ContextAwareBase implements
     stop();
   }
 
+  public void onLevelChange(Logger logger, Level level) {
+    // nothing to do
+  }
+
   public void onReset(LoggerContext context) {
     addInfo("onReset() method called JMXActivator [" + objectNameAsString + "]");
   }
 
   /**
-   * JMXConfigrator should not be removed subsequent to a LoggerContext reset.
+   * JMXConfigurator should not be removed subsequent to a LoggerContext reset.
    * 
    * @return
    */

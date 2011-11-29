@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -118,6 +119,10 @@ public class SMTPAppender_GreenTest {
     return (MimeMultipart) mm.getContent();
   }
 
+  void waitUntilEmailIsSent() throws InterruptedException {
+    lc.getExecutorService().shutdown();
+    lc.getExecutorService().awaitTermination(1000, TimeUnit.MILLISECONDS);
+  }
   @Test
   public void smoke() throws Exception {
     buildSMTPAppender();
@@ -126,6 +131,11 @@ public class SMTPAppender_GreenTest {
     logger.addAppender(smtpAppender);
     logger.debug("hello");
     logger.error("en error", new Exception("an exception"));
+
+     waitUntilEmailIsSent();
+//    synchronized (smtpAppender) {
+//      smtpAppender.wait();
+//    }
 
     StatusPrinter.print(lc);
     MimeMultipart mp = verify(TEST_SUBJECT);
@@ -145,6 +155,7 @@ public class SMTPAppender_GreenTest {
     MDC.clear();
     logger.error("en error", new Exception("an exception"));
 
+    waitUntilEmailIsSent();
     MimeMultipart mp = verify(TEST_SUBJECT);
     String body = GreenMailUtil.getBody(mp.getBodyPart(0));
     assertTrue(body.startsWith(HEADER.trim()));
@@ -160,6 +171,8 @@ public class SMTPAppender_GreenTest {
     logger.addAppender(smtpAppender);
     logger.debug("hello");
     logger.error("en error", new Exception("an exception"));
+
+    waitUntilEmailIsSent();
     MimeMultipart mp = verify(TEST_SUBJECT);
 
     // verify strict adherence to xhtml1-strict.dtd
@@ -188,6 +201,7 @@ public class SMTPAppender_GreenTest {
     }
     logger.error("en error", new Exception("an exception"));
 
+     waitUntilEmailIsSent();
     MimeMultipart mp = verify(TEST_SUBJECT);
 
     // verify strict adherence to xhtml1-strict.dtd
@@ -214,8 +228,40 @@ public class SMTPAppender_GreenTest {
     String msg2 = "world";
     logger.debug(msg2);
     logger.debug("invisible");
+    waitUntilEmailIsSent();
     MimeMultipart mp = verify(this.getClass().getName() + " - " + msg2);
     String body = GreenMailUtil.getBody(mp.getBodyPart(0));
     assertEquals("helloworld", body);
+  }
+
+  @Test
+  public void testCustomBufferSize() throws Exception {
+    configure(ClassicTestConstants.JORAN_INPUT_PREFIX
+        + "smtp/customBufferSize.xml");
+
+    logger.debug("invisible1");
+    logger.debug("invisible2");
+    String msg = "hello";
+    logger.error(msg);
+    waitUntilEmailIsSent();
+    MimeMultipart mp = verify(this.getClass().getName() + " - " + msg);
+    String body = GreenMailUtil.getBody(mp.getBodyPart(0));
+    assertEquals(msg, body);
+  }
+
+  @Test
+  public void testMultipleTo() throws Exception {
+    buildSMTPAppender();
+    smtpAppender.setLayout(buildPatternLayout(lc));
+    smtpAppender.addTo("Test <test@example.com>, other-test@example.com");
+    smtpAppender.start();
+    logger.addAppender(smtpAppender);
+    logger.debug("hello");
+    logger.error("en error", new Exception("an exception"));
+
+    waitUntilEmailIsSent();
+    MimeMessage[] mma = greenMail.getReceivedMessages();
+    assertNotNull(mma);
+    assertEquals(3, mma.length);
   }
 }

@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -22,22 +22,22 @@ import ch.qos.logback.core.status.Status;
  */
 public interface ContextAware {
 
-  public void setContext(Context context);
+  void setContext(Context context);
 
-  public Context getContext();
+  Context getContext();
 
-  public void addStatus(Status status);
+  void addStatus(Status status);
 
-  public void addInfo(String msg);
+  void addInfo(String msg);
 
-  public void addInfo(String msg, Throwable ex);
+  void addInfo(String msg, Throwable ex);
 
-  public void addWarn(String msg);
+  void addWarn(String msg);
 
-  public void addWarn(String msg, Throwable ex);
+  void addWarn(String msg, Throwable ex);
 
-  public void addError(String msg);
+  void addError(String msg);
 
-  public void addError(String msg, Throwable ex);
+  void addError(String msg, Throwable ex);
 
 }

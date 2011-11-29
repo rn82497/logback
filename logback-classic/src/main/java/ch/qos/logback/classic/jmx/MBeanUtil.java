@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -28,9 +28,8 @@ public class MBeanUtil {
   static final String DOMAIN = "ch.qos.logback.classic";
 
   static public String getObjectNameFor(String contextName, Class type) {
-    String objectNameAsStr = DOMAIN + ":Name=" + contextName + ",Type="
+    return DOMAIN + ":Name=" + contextName + ",Type="
         + type.getName();
-    return objectNameAsStr;
   }
 
   public static ObjectName string2ObjectName(Context context, Object caller,

@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -15,23 +15,26 @@ package ch.qos.logback.core.pattern.parser;
 
 class Token {
 
+
   static final int PERCENT = 37;
-  static final int LEFT_PARENTHESIS = 40;
+  //static final int LEFT_PARENTHESIS = 40;
   static final int RIGHT_PARENTHESIS = 41;
   static final int MINUS = 45;
   static final int DOT = 46;
   static final int CURLY_LEFT = 123;
   static final int CURLY_RIGHT = 125;
+
   static final int LITERAL = 1000;
   static final int FORMAT_MODIFIER = 1002;
-  static final int KEYWORD = 1004;
+  static final int SIMPLE_KEYWORD = 1004;
+  static final int COMPOSITE_KEYWORD = 1005;
   static final int OPTION = 1006;
 
   static final int EOF = Integer.MAX_VALUE;
 
   static Token EOF_TOKEN = new Token(EOF, "EOF");
   static Token RIGHT_PARENTHESIS_TOKEN = new Token(RIGHT_PARENTHESIS);
-  static Token LEFT_PARENTHESIS_TOKEN = new Token(LEFT_PARENTHESIS);
+  static Token BARE_COMPOSITE_KEYWORD_TOKEN = new Token(COMPOSITE_KEYWORD, "BARE");
   static Token PERCENT_TOKEN = new Token(PERCENT);
 
   private final int type;
@@ -72,14 +75,14 @@ class Token {
       case OPTION:
         typeStr = "OPTION";
         break;
-      case KEYWORD:
-        typeStr = "KEYWORD";
+      case SIMPLE_KEYWORD:
+        typeStr = "SIMPLE_KEYWORD";
         break;
+      case COMPOSITE_KEYWORD:
+          typeStr = "COMPOSITE_KEYWORD";
+          break;
       case RIGHT_PARENTHESIS:
         typeStr = "RIGHT_PARENTHESIS";
-        break;
-      case LEFT_PARENTHESIS:
-        typeStr = "LEFT_PARENTHESIS";
         break;
      default:
         typeStr = "UNKNOWN";

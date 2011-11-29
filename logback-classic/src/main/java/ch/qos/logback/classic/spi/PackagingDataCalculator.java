@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -20,11 +20,10 @@ import java.security.PrivilegedAction;
 import java.util.HashMap;
 
 import sun.reflect.Reflection;
-
+// import java.security.AccessControlException; import java.security.AccessController;import java.security.PrivilegedAction;
 /**
- * 
  * Given a classname locate associated PackageInfo (jar name, version name).
- * 
+ *
  * @author James Strachan
  * @Ceki G&uuml;lc&uuml;
  */
@@ -34,7 +33,7 @@ public class PackagingDataCalculator {
 
   HashMap<String, ClassPackagingData> cache = new HashMap<String, ClassPackagingData>();
 
-  private static boolean GET_CALLER_CLASS_METHOD_AVAILABLE = false;
+  private static boolean GET_CALLER_CLASS_METHOD_AVAILABLE = false; //private static boolean HAS_GET_CLASS_LOADER_PERMISSION = false;
 
   static {
     // if either the Reflection class or the getCallerClass method
@@ -53,8 +52,6 @@ public class PackagingDataCalculator {
     }
   }
 
-  public PackagingDataCalculator() {
-  }
 
   public void calculate(final IThrowableProxy tp) {
     if (System.getSecurityManager() != null) {
@@ -73,6 +70,12 @@ public class PackagingDataCalculator {
   private void doCalculate(IThrowableProxy tp) {
     while (tp != null) {
       populateFrames(tp.getStackTraceElementProxyArray());
+      IThrowableProxy[] suppressed = tp.getSuppressed();
+      if(suppressed != null) {
+        for(IThrowableProxy current:suppressed) {
+          populateFrames(current.getStackTraceElementProxyArray());
+        }
+      }
       tp = tp.getCause();
     }
   }
@@ -83,7 +86,7 @@ public class PackagingDataCalculator {
     final Throwable t = new Throwable("local stack reference");
     final StackTraceElement[] localteSTEArray = t.getStackTrace();
     final int commonFrames = STEUtil.findNumberOfCommonFrames(localteSTEArray,
-        stepArray);
+            stepArray);
     final int localFirstCommon = localteSTEArray.length - commonFrames;
     final int stepFirstCommon = stepArray.length - commonFrames;
 
@@ -95,15 +98,16 @@ public class PackagingDataCalculator {
       Class callerClass = null;
       if (GET_CALLER_CLASS_METHOD_AVAILABLE) {
         callerClass = Reflection.getCallerClass(localFirstCommon + i
-            - missfireCount + 1);
+                - missfireCount + 1);
       }
       StackTraceElementProxy step = stepArray[stepFirstCommon + i];
       String stepClassname = step.ste.getClassName();
 
       if (callerClass != null && stepClassname.equals(callerClass.getName())) {
+        // see also LBCLASSIC-263
         lastExactClassLoader = callerClass.getClassLoader();
         if (firsExactClassLoader == null) {
-          firsExactClassLoader = callerClass.getClassLoader();
+          firsExactClassLoader = lastExactClassLoader;
         }
         ClassPackagingData pi = calculateByExactType(callerClass);
         step.setClassPackagingData(pi);
@@ -117,7 +121,7 @@ public class PackagingDataCalculator {
   }
 
   void populateUncommonFrames(int commonFrames,
-      StackTraceElementProxy[] stepArray, ClassLoader firstExactClassLoader) {
+                              StackTraceElementProxy[] stepArray, ClassLoader firstExactClassLoader) {
     int uncommonFrames = stepArray.length - commonFrames;
     for (int i = 0; i < uncommonFrames; i++) {
       StackTraceElementProxy step = stepArray[i];
@@ -140,7 +144,7 @@ public class PackagingDataCalculator {
   }
 
   private ClassPackagingData computeBySTEP(StackTraceElementProxy step,
-      ClassLoader lastExactClassLoader) {
+                                           ClassLoader lastExactClassLoader) {
     String className = step.ste.getClassName();
     ClassPackagingData cpd = cache.get(className);
     if (cpd != null) {
@@ -236,15 +240,12 @@ public class PackagingDataCalculator {
   }
 
   /**
-   * 
-   * @param lastGuaranteedClassLoader
-   *                may be null
-   * 
+   * @param lastGuaranteedClassLoader may be null
    * @param className
    * @return
    */
   private Class bestEffortLoadClass(ClassLoader lastGuaranteedClassLoader,
-      String className) {
+                                    String className) {
     Class result = loadClass(lastGuaranteedClassLoader, className);
     if (result != null) {
       return result;

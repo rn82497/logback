@@ -1,15 +1,15 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2010, QOS.ch. All rights reserved.
- * 
- * This program and the accompanying materials are dual-licensed under either
- * the terms of the Eclipse Public License v1.0 as published by the Eclipse
- * Foundation
- * 
- * or (per the licensee's choosing)
- * 
- * under the terms of the GNU Lesser General Public License version 2.1 as
- * published by the Free Software Foundation.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
+ *
+ * This program and the accompanying materials are dual-licensed under
+ * either the terms of the Eclipse Public License v1.0 as published by
+ * the Eclipse Foundation
+ *
+ *   or (per the licensee's choosing)
+ *
+ * under the terms of the GNU Lesser General Public License version 2.1
+ * as published by the Free Software Foundation.
  */
 package ch.qos.logback.core.joran.conditional;
 
@@ -32,6 +32,9 @@ abstract public class ThenOrElseActionBase extends Action {
   @Override
   public void begin(InterpretationContext ic, String name, Attributes attributes)
       throws ActionException {
+
+    if(!weAreActive(ic)) return;
+
     ThenActionState state = new ThenActionState();
     if (ic.isListenerListEmpty()) {
       ic.addInPlayListener(state);
@@ -40,8 +43,17 @@ abstract public class ThenOrElseActionBase extends Action {
     stateStack.push(state);
   }
 
+  boolean weAreActive(InterpretationContext ic) {
+    Object o = ic.peekObject();
+    if(!(o instanceof IfAction)) return false;
+    IfAction ifAction = (IfAction) o;
+    return ifAction.isActive();
+  }
+
   @Override
   public void end(InterpretationContext ic, String name) throws ActionException {
+    if(!weAreActive(ic)) return;
+
     ThenActionState state = stateStack.pop();
     if (state.isRegistered) {
       ic.removeInPlayListener(state);

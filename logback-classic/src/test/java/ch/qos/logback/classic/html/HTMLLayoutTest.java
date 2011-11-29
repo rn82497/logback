@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -158,6 +158,7 @@ public class HTMLLayoutTest {
     {
       Element tdElement = (Element) trElement.elements().get(1);
       String regex = ClassicTestConstants.NAKED_MAIN_REGEX;
+      System.out.println(tdElement.getText());
       assertTrue(tdElement.getText().matches(regex));
     }
     {
@@ -214,9 +215,8 @@ public class HTMLLayoutTest {
   }
 
   private LoggingEvent createLoggingEvent() {
-    LoggingEvent le = new LoggingEvent(this.getClass().getName(), root,
+    return new LoggingEvent(this.getClass().getName(), root,
         Level.DEBUG, "test message", null, null);
-    return le;
   }
 
   Document parseOutput(String output) throws Exception {

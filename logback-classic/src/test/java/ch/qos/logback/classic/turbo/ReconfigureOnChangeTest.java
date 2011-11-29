@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -13,18 +13,23 @@
  */
 package ch.qos.logback.classic.turbo;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import ch.qos.logback.classic.gaffer.GafferConfigurator;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import ch.qos.logback.core.contention.AbstractMultiThreadedHarness;
+import ch.qos.logback.core.contention.MultiThreadedHarness;
+import ch.qos.logback.core.contention.WaitOnExecutionMultiThreadedHarness;
+import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
+import ch.qos.logback.core.testUtil.FileTestUtil;
+import ch.qos.logback.core.testUtil.RandomUtil;
+import ch.qos.logback.core.util.CoreTestConstants;
+import org.junit.*;
 import org.slf4j.helpers.BogoPerf;
 
 import ch.qos.logback.classic.ClassicTestConstants;
@@ -34,7 +39,6 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.issue.lbclassic135.LoggingRunnable;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.CoreConstants;
-import ch.qos.logback.core.contention.MultiThreadedHarness;
 import ch.qos.logback.core.contention.RunnableWithCounterAndDone;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.status.InfoStatus;
@@ -46,46 +50,73 @@ public class ReconfigureOnChangeTest {
   final static int THREAD_COUNT = 5;
   final static int LOOP_LEN = 1000 * 1000;
 
+  static final boolean MUST_BE_ERROR_FREE = true;
+  static final boolean ERRORS_EXPECTED = false;
+
+  static final boolean REGULAR_RECONFIGURATION = false;
+  static final boolean FORCED_RECONFIGURATION_SKIP = true;
+
+
+  int diff = RandomUtil.getPositiveInt();
+
   // the space in the file name mandated by
   // http://jira.qos.ch/browse/LBCORE-119
   final static String SCAN1_FILE_AS_STR = ClassicTestConstants.INPUT_PREFIX
-      + "turbo/scan 1.xml";
+          + "turbo/scan 1.xml";
 
-    final static String G_SCAN1_FILE_AS_STR = ClassicTestConstants.INPUT_PREFIX
-      + "turbo/scan 1.groovy";
+  final static String G_SCAN1_FILE_AS_STR = ClassicTestConstants.INPUT_PREFIX
+          + "turbo/scan 1.groovy";
 
   final static String SCAN_LBCLASSIC_154_FILE_AS_STR = ClassicTestConstants.INPUT_PREFIX
-      + "turbo/scan_lbclassic154.xml";
+          + "turbo/scan_lbclassic154.xml";
+
+  final static String INCLUSION_SCAN_TOPLEVEL0_AS_STR = ClassicTestConstants.INPUT_PREFIX
+          + "turbo/inclusion/topLevel0.xml";
+
+  final static String INCLUSION_SCAN_TOPLEVEL2_AS_STR = ClassicTestConstants.INPUT_PREFIX
+          + "turbo/inclusion/topLevel2.xml";
+
+  final static String INCLUSION_SCAN_TOP_BY_RESOURCE_AS_STR = ClassicTestConstants.INPUT_PREFIX
+          + "turbo/inclusion/topByResource.xml";
+
+
+  final static String INCLUSION_SCAN_INNER0_AS_STR = ClassicTestConstants.INPUT_PREFIX
+          + "turbo/inclusion/inner0.xml";
+  final static String INCLUSION_SCAN_INNER2_AS_STR = ClassicTestConstants.INPUT_PREFIX
+          + "turbo/inclusion/inner2.xml";
+
+
+  final static String INCLUSION_SCAN_INNER1_AS_STR = "target/test-classes/asResource/inner1.xml";
 
   // it actually takes time for Windows to propagate file modification changes
   // values below 100 milliseconds can be problematic the same propagation
   // latency occurs in Linux but is even larger (>600 ms)
-  final static int DEFAULT_SLEEP_BETWEEN_UPDATES = 110;
+  final static int DEFAULT_SLEEP_BETWEEN_UPDATES = 60;
 
-  int sleepBetweenUpdates = DEFAULT_SLEEP_BETWEEN_UPDATES;
+  int sleepBetweenUpdates = 100;//DEFAULT_SLEEP_BETWEEN_UPDATES;
 
-  static int totalTestDuration;
+//  static int totalTestDuration;
 
   LoggerContext loggerContext = new LoggerContext();
   Logger logger = loggerContext.getLogger(this.getClass());
-  MultiThreadedHarness harness;
+  AbstractMultiThreadedHarness harness;
+
+  ThreadPoolExecutor executor = (ThreadPoolExecutor) loggerContext.getExecutorService();
+
+  int expectedResets = 2;
+
+  @BeforeClass
+  static public void classSetup() {
+    FileTestUtil.makeTestOutputDir();
+  }
 
   @Before
   public void setUp() {
-    System.out.println("======== TEST START");
-    // take into account propagation latency occurs on Linux or Mac
-    if (Env.isLinux() || Env.isMac()) {
-      sleepBetweenUpdates = 950;
-      totalTestDuration = sleepBetweenUpdates * 5;
-    } else {
-      totalTestDuration = sleepBetweenUpdates * 10;
-    }
-    harness = new MultiThreadedHarness(totalTestDuration);
+    harness = new WaitOnExecutionMultiThreadedHarness(executor, expectedResets);
   }
 
   @After
   public void tearDown() {
-    System.out.println("======= TEST STOP");
   }
 
   void configure(File file) throws JoranException {
@@ -94,101 +125,157 @@ public class ReconfigureOnChangeTest {
     jc.doConfigure(file);
   }
 
+  void configure(InputStream is) throws JoranException {
+    JoranConfigurator jc = new JoranConfigurator();
+    jc.setContext(loggerContext);
+    jc.doConfigure(is);
+  }
+
   void gConfigure(File file) throws JoranException {
     GafferConfigurator gc = new GafferConfigurator(loggerContext);
     gc.run(file);
   }
 
-  RunnableWithCounterAndDone[] buildRunnableArray(File configFile) {
+  RunnableWithCounterAndDone[] buildRunnableArray(File configFile, UpdateType updateType) {
     RunnableWithCounterAndDone[] rArray = new RunnableWithCounterAndDone[THREAD_COUNT];
-    rArray[0] = new Updater(configFile);
+    rArray[0] = new Updater(configFile, updateType);
     for (int i = 1; i < THREAD_COUNT; i++) {
       rArray[i] = new LoggingRunnable(logger);
     }
     return rArray;
   }
 
-  @Test
-  // See http://jira.qos.ch/browse/LBCORE-119
-  public void fileToURLAndBack() throws MalformedURLException {
-    File file = new File("a b.xml");
-    URL url = file.toURI().toURL();
-    ReconfigureOnChangeFilter rocf = new ReconfigureOnChangeFilter();
-    File back = rocf.convertToFile(url);
-    assertEquals(file.getName(), back.getName());
+
+  void doScanTest(File fileToTouch) throws JoranException, IOException, InterruptedException {
+    doScanTest(fileToTouch, UpdateType.TOUCH, REGULAR_RECONFIGURATION, MUST_BE_ERROR_FREE);
+  }
+
+  void doScanTest(File fileToTouch, UpdateType updateType, boolean forcedReconfigurationSkip, boolean mustBeErrorFree) throws JoranException, IOException, InterruptedException {
+    RunnableWithCounterAndDone[] runnableArray = buildRunnableArray(fileToTouch, updateType);
+    harness.execute(runnableArray);
+
+    loggerContext.getStatusManager().add(
+            new InfoStatus("end of execution ", this));
+
+    int expected = expectedResets;
+    if (forcedReconfigurationSkip)
+      expected = 0;
+
+    verify(expected, mustBeErrorFree);
   }
 
   // Tests whether ConfigurationAction is installing ReconfigureOnChangeFilter
-  @Test
+  @Test(timeout = 4000L)
   public void scan1() throws JoranException, IOException, InterruptedException {
     File file = new File(SCAN1_FILE_AS_STR);
     configure(file);
-    RunnableWithCounterAndDone[] runnableArray = buildRunnableArray(file);
-    harness.execute(runnableArray);
-
-    loggerContext.getStatusManager().add(
-        new InfoStatus("end of execution ", this));
-
-    long expectedRreconfigurations = runnableArray[0].getCounter();
-    verify(expectedRreconfigurations);
+    doScanTest(file);
   }
 
-  @Test
+  @Test(timeout = 4000L)
+  public void scanWithFileInclusion() throws JoranException, IOException, InterruptedException {
+    File topLevelFile = new File(INCLUSION_SCAN_TOPLEVEL0_AS_STR);
+    File innerFile = new File(INCLUSION_SCAN_INNER0_AS_STR);
+    configure(topLevelFile);
+    doScanTest(innerFile);
+  }
+
+  @Test(timeout = 4000L)
+  public void scanWithResourceInclusion() throws JoranException, IOException, InterruptedException {
+    File topLevelFile = new File(INCLUSION_SCAN_TOP_BY_RESOURCE_AS_STR);
+    File innerFile = new File(INCLUSION_SCAN_INNER1_AS_STR);
+    configure(topLevelFile);
+    doScanTest(innerFile);
+  }
+
+  // See also http://jira.qos.ch/browse/LBCLASSIC-247
+  @Test(timeout = 4000L)
+  public void includeScanViaInputStreamSuppliedConfigFile() throws IOException, JoranException, InterruptedException {
+    harness = new MultiThreadedHarness(1000);
+    String configurationStr = "<configuration scan=\"true\" scanPeriod=\"50 millisecond\"><include resource=\"asResource/inner1.xml\"/></configuration>";
+    configure(new ByteArrayInputStream(configurationStr.getBytes("UTF-8")));
+    File innerFile = new File(INCLUSION_SCAN_INNER1_AS_STR);
+    doScanTest(innerFile, UpdateType.TOUCH, FORCED_RECONFIGURATION_SKIP, MUST_BE_ERROR_FREE);
+  }
+
+  @Test(timeout = 4000L)
+  public void fallbackToSafe() throws IOException, JoranException, InterruptedException {
+    String path = CoreTestConstants.OUTPUT_DIR_PREFIX + "reconfigureOnChangeConfig_fallbackToSafe-" + diff + ".xml";
+    File file = new File(path);
+    writeToFile(file, "<configuration scan=\"true\" scanPeriod=\"50 millisecond\"><root level=\"ERROR\"/></configuration> ");
+    configure(file);
+    doScanTest(file, UpdateType.MALFORMED, REGULAR_RECONFIGURATION, ERRORS_EXPECTED);
+  }
+
+  @Test(timeout = 4000L)
+  public void fallbackToSafeWithIncludedFile() throws IOException, JoranException, InterruptedException {
+    String topLevelFileAsStr = CoreTestConstants.OUTPUT_DIR_PREFIX + "reconfigureOnChangeConfig_top-" + diff + ".xml";
+    String innerFileAsStr = CoreTestConstants.OUTPUT_DIR_PREFIX + "reconfigureOnChangeConfig_inner-" + diff + ".xml";
+    File topLevelFile = new File(topLevelFileAsStr);
+    writeToFile(topLevelFile, "<configuration scan=\"true\" scanPeriod=\"50 millisecond\"><include file=\""+innerFileAsStr+"\"/></configuration> ");
+
+    File innerFile = new File(innerFileAsStr);
+    writeToFile(innerFile, "<included><root level=\"ERROR\"/></included> ");
+    configure(topLevelFile);
+    doScanTest(innerFile, UpdateType.MALFORMED_INNER, REGULAR_RECONFIGURATION, ERRORS_EXPECTED);
+  }
+
+
+  @Test(timeout = 4000L)
   public void gscan1() throws JoranException, IOException, InterruptedException {
     File file = new File(G_SCAN1_FILE_AS_STR);
     gConfigure(file);
-    RunnableWithCounterAndDone[] runnableArray = buildRunnableArray(file);
+    RunnableWithCounterAndDone[] runnableArray = buildRunnableArray(file, UpdateType.TOUCH);
     harness.execute(runnableArray);
 
     loggerContext.getStatusManager().add(
-        new InfoStatus("end of execution ", this));
+            new InfoStatus("end of execution ", this));
 
-    long expectedRreconfigurations = runnableArray[0].getCounter();
-    verify(expectedRreconfigurations);
+    verify(expectedResets, MUST_BE_ERROR_FREE);
   }
 
   // check for deadlocks
-  @Test(timeout = 20000)
+  @Test(timeout = 4000L)
   public void scan_lbclassic154() throws JoranException, IOException,
-      InterruptedException {
+          InterruptedException {
     File file = new File(SCAN_LBCLASSIC_154_FILE_AS_STR);
     configure(file);
-    RunnableWithCounterAndDone[] runnableArray = buildRunnableArray(file);
+    RunnableWithCounterAndDone[] runnableArray = buildRunnableArray(file, UpdateType.TOUCH);
     harness.execute(runnableArray);
 
     loggerContext.getStatusManager().add(
-        new InfoStatus("end of execution ", this));
+            new InfoStatus("end of execution ", this));
 
-    long expectedRreconfigurations = runnableArray[0].getCounter();
-    verify(expectedRreconfigurations);
+    verify(expectedResets, MUST_BE_ERROR_FREE);
   }
 
-  void verify(long expectedReconfigurations) {
+
+  void verify(int expected, boolean errorFreeness) {
     StatusChecker checker = new StatusChecker(loggerContext);
     StatusPrinter.print(loggerContext);
-    assertTrue(checker.isErrorFree());
-    int effectiveResets = checker
-        .matchCount("Resetting and reconfiguring context");
-    // the number of effective resets must be equal or less than
-    // expectedRreconfigurations
-    assertTrue(effectiveResets <= expectedReconfigurations);
-    // however, there should be some effective resets
-    String failMsg = "effective=" + effectiveResets + ", expected="
-        + expectedReconfigurations;
-
-    // we can't have the test succeed under JDK 1.5, punt and require 1.6+
-    if (Env.isJDK6OrHigher()) {
-      assertTrue(failMsg,
-          (effectiveResets * 1.3) >= (expectedReconfigurations * 1.0));
+    if (errorFreeness == MUST_BE_ERROR_FREE) {
+      assertTrue(checker.isErrorFree(0));
+    } else {
+      assertFalse(checker.isErrorFree(0));
     }
+
+    int effectiveResets = checker
+            .matchCount(CoreConstants.RESET_MSG_PREFIX);
+
+    String failMsg = "effective=" + effectiveResets + ", expected="
+            + expected;
+
+    // there might be more effective resets than the expected amount
+    // since the harness may be sleeping while a reset occurs
+    assertTrue(failMsg, expected <= effectiveResets && (expected +2) >= effectiveResets);
+
   }
 
   ReconfigureOnChangeFilter initROCF() throws MalformedURLException {
     ReconfigureOnChangeFilter rocf = new ReconfigureOnChangeFilter();
     rocf.setContext(loggerContext);
     File file = new File(SCAN1_FILE_AS_STR);
-    loggerContext.putObject(CoreConstants.URL_OF_LAST_CONFIGURATION_VIA_JORAN,
-        file.toURI().toURL());
+    ConfigurationWatchListUtil.setMainWatchURL(loggerContext, file.toURI().toURL());
     rocf.start();
     return rocf;
   }
@@ -258,11 +345,25 @@ public class ReconfigureOnChangeTest {
     return (end - start) / (1.0d * LOOP_LEN);
   }
 
+  enum UpdateType {TOUCH, MALFORMED, MALFORMED_INNER}
+
+  void writeToFile(File file, String contents) throws IOException {
+    FileWriter fw = new FileWriter(file);
+    fw.write(contents);
+    fw.close();
+  }
+
   class Updater extends RunnableWithCounterAndDone {
     File configFile;
+    UpdateType updateType;
+
+    Updater(File configFile, UpdateType updateType) {
+      this.configFile = configFile;
+      this.updateType = updateType;
+    }
 
     Updater(File configFile) {
-      this.configFile = configFile;
+      this(configFile, UpdateType.TOUCH);
     }
 
     public void run() {
@@ -276,9 +377,45 @@ public class ReconfigureOnChangeTest {
         }
         counter++;
         ReconfigureOnChangeTest.this.addInfo("***settting last modified", this);
-        configFile.setLastModified(System.currentTimeMillis());
+        switch (updateType) {
+          case TOUCH:
+            touchFile();
+            break;
+          case MALFORMED:
+            try {
+              malformedUpdate(counter);
+            } catch (IOException e) {
+              e.printStackTrace();
+              fail("malformedUpdate failed");
+            }
+            break;
+          case MALFORMED_INNER:
+            try {
+              malformedInnerUpdate(counter);
+            } catch (IOException e) {
+              e.printStackTrace();
+              fail("malformedInnerUpdate failed");
+            }
+        }
       }
     }
+
+    private void malformedUpdate(long counter) throws IOException {
+      writeToFile(configFile, "<configuration scan=\"true\" scanPeriod=\"50 millisecond\">\n" +
+              "  <root level=\"ERROR\">\n" +
+              "</configuration>");
+    }
+
+    private void malformedInnerUpdate(long counter)  throws IOException {
+      writeToFile(configFile, "<included>\n" +
+              "  <root>\n" +
+              "</included>");
+    }
+
+    void touchFile() {
+      configFile.setLastModified(System.currentTimeMillis());
+    }
   }
+
 
 }

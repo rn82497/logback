@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -15,12 +15,12 @@ package ch.qos.logback.access.sift;
 
 import java.util.List;
 
-import ch.qos.logback.access.spi.AccessEvent;
+import ch.qos.logback.access.spi.IAccessEvent;
 import ch.qos.logback.core.joran.event.SaxEvent;
 import ch.qos.logback.core.sift.AppenderFactoryBase;
 import ch.qos.logback.core.sift.SiftingJoranConfiguratorBase;
 
-public class AppenderFactory extends AppenderFactoryBase<AccessEvent> {
+public class AppenderFactory extends AppenderFactoryBase<IAccessEvent> {
 
   String keyName;
 
@@ -29,7 +29,7 @@ public class AppenderFactory extends AppenderFactoryBase<AccessEvent> {
     this.keyName = keyName;
   }
 
-  public SiftingJoranConfiguratorBase<AccessEvent> getSiftingJoranConfigurator(
+  public SiftingJoranConfiguratorBase<IAccessEvent> getSiftingJoranConfigurator(
       String keyValue) {
     return new SiftingJoranConfigurator(keyName, keyValue);
   }

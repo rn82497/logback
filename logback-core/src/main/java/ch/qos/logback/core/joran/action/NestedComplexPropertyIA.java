@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -126,9 +126,8 @@ public class NestedComplexPropertyIA extends ImplicitAction {
         ((ContextAware) actionData.getNestedComplexProperty())
             .setContext(this.context);
       }
-      // getLogger().debug(
-      addInfo("Pushing component [" + localName
-          + "] on top of the object stack.");
+      //addInfo("Pushing component [" + localName
+      //    + "] on top of the object stack.");
       ec.pushObject(actionData.getNestedComplexProperty());
 
     } catch (Exception oops) {

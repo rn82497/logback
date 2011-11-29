@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -15,6 +15,7 @@ package ch.qos.logback.access.net;
 
 import static org.junit.Assert.*;
 
+import ch.qos.logback.access.spi.IAccessEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,14 +62,14 @@ public class URLEvaluatorTest  {
   @Test
   public void testExpectFalse() throws EvaluationException {
     request.setRequestUri("test");
-    AccessEvent ae = new AccessEvent(request, response, serverAdapter);
+    IAccessEvent ae = new AccessEvent(request, response, serverAdapter);
     assertFalse(evaluator.evaluate(ae));
   }
   
   @Test
   public void testExpectTrue() throws EvaluationException {
     request.setRequestUri(expectedURL1);   
-    AccessEvent ae = new AccessEvent(request, response, serverAdapter);
+    IAccessEvent ae = new AccessEvent(request, response, serverAdapter);
     assertTrue(evaluator.evaluate(ae));    
   }
   
@@ -76,7 +77,7 @@ public class URLEvaluatorTest  {
   public void testExpectTrueMultiple() throws EvaluationException {
     evaluator.addURL(expectedURL2);
     request.setRequestUri(expectedURL2);    
-    AccessEvent ae = new AccessEvent(request, response, serverAdapter);
+    IAccessEvent ae = new AccessEvent(request, response, serverAdapter);
     assertTrue(evaluator.evaluate(ae));    
   }
 }

@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -43,8 +43,6 @@ public class DilutedSMTPAppenderTest {
   public void setUp() throws Exception {
     LoggerContext lc = new LoggerContext();
     appender = new SMTPAppender();
-    cbTracker = appender.getCyclicBufferTracker();
-    cb = cbTracker.get("", 0);
     appender.setContext(lc);
     appender.setName("smtp");
     appender.setFrom("user@host.dom");
@@ -53,6 +51,9 @@ public class DilutedSMTPAppenderTest {
     appender.setSubject("logging report");
     appender.addTo("sebastien.nospam@qos.ch");
     appender.start();
+    cbTracker = appender.getCyclicBufferTracker();
+    cb = cbTracker.getOrCreate("", 0);
+
   }
 
   private static Layout<ILoggingEvent> buildLayout(LoggerContext lc) {
@@ -80,9 +81,7 @@ public class DilutedSMTPAppenderTest {
       addressArray = null;
       address = null;
 
-      addressArray = appender.getMessage().getAllRecipients();
-      address = addressArray[0];
-      assertEquals("sebastien.nospam@qos.ch", address.toString());
+      assertEquals("sebastien.nospam@qos.ch%nopex", appender.getToAsListOfString().get(0));
 
       assertEquals("logging report", appender.getSubject());
 

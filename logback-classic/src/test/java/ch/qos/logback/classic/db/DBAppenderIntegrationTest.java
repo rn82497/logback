@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -48,8 +48,8 @@ public class DBAppenderIntegrationTest {
   static String LOCAL_HOST_NAME;
   static String[] CONFORMING_HOST_LIST = new String[] { "Orion" };
   static String[] POSTGRES_CONFORMING_HOST_LIST = new String[] { "haro" };
-  static String[] MYSQL_CONFORMING_HOST_LIST = new String[] { "hetz", "haro" };
-  static String[] ORACLE_CONFORMING_HOST_LIST = new String[] { "haro" };
+  static String[] MYSQL_CONFORMING_HOST_LIST = new String[] { "hetz", "xharo" };
+  static String[] ORACLE_CONFORMING_HOST_LIST = new String[] { "xharo" };
 
   int diff = RandomUtil.getPositiveInt();
   LoggerContext lc = new LoggerContext();
@@ -110,7 +110,7 @@ public class DBAppenderIntegrationTest {
 
     // check that there were no errors
     StatusChecker checker = new StatusChecker(lc);
-    assertTrue(checker.isErrorFree());
+    assertTrue(checker.isErrorFree(0));
    
   }
 

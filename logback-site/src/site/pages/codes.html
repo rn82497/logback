@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -136,7 +137,7 @@
   which are only possible using encoders. <b>During a transition
   period, layouts passed as parameter will be automatically wrapped by
   an encoder so that configuration files in the old format (using a
-  layout instead of encoder) will continue to work unmodifed.</b>
+  layout instead of encoder) will continue to work unmodified.</b>
   </p>
 
   <hr/>
@@ -193,7 +194,7 @@
   </p>
 
   <p>A <code>Layout</code> is mandatory for
-  <code>SMTPAppender</code>. It allows SMPTPAppender to format logging
+  <code>SMTPAppender</code>. It allows SMTPAppender to format logging
   events before sending an email.
   </p>
       
@@ -352,6 +353,59 @@
 
   <hr/>
 
+  <p><a name="renamingError" href="#renamingError">Failed to rename file [x] to [y].</a>
+  </p>
+
+  <p>A log file cannot be renamed if there are handles referencing
+  that file. For example, when the file is read by another process
+  such as <code>less</code>, <code>tail</code>, etc. During
+  application hot-redeployment, the old instance of the application
+  will have open references to log files until the old instance is
+  completely shutdown or until the <code>stop()</code> method on its
+  <a
+  href="apidocs/ch/qos/logback/classic/LoggerContext.html"><code>LoggerContext</code></a>
+  is invoked.
+  </p>
+
+  <p>On the Windows platform, <a
+  href="http://technet.microsoft.com/en-us/sysinternals/bb896653">Process
+  Explorer</a> can help you locate the processes which reference a
+  given file (Find -&gt; Find Handle or DLL). On Linux, you can use
+  the <code><a href="http://www.manpagez.com/man/8/lsof/">lsof </a>
+  <em>pathToFile</em></code> command to find which process has the
+  file given by <em>pathToFile</em> open. </p>
+
+  <p>In practice, it can be hard to ensure that there are no file
+  handle references to log files. It can be easier to avoid file
+  renaming altogether. As a first step, let us note that for
+  <code>TimeBasedRollingPolicy</code>, the <span
+  class="option">file</span> option can be omitted. If omitted, no
+  file renaming will be performed during roll over. Thus, in order to
+  avoid file renaming errors just leave blank the <span
+  class="option">file</span> option of
+  <code>RollingFileAppender</code>, as shown in the next configuration
+  snippet.
+  </p>
+
+  <pre class="prettyprint source">&lt;appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  &lt;!-- <span class="option">file</span> option left unset/blank -->
+  &lt;rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+    &lt;fileNamePattern>mylog.%d{yyyy-MM-dd}.log&lt;/fileNamePattern>
+  &lt;/rollingPolicy>
+
+  &lt;encoder>
+    &lt;pattern>%relative [%thread] %level %logger - %msg%n&lt;/pattern>
+  &lt;/encoder>
+&lt;/appender></pre>
+
+   <p>Note that for <code>FixedWindowRollingPolicy</code>, the <span
+   class="option">file</span> property is mandatory.
+   </p>
+ 
+  
+  <hr/>
+
+
   <p>
     <a name="fwrp_parentFileName_not_set" href="#fwrp_parentFileName_not_set">
       The <span class="option">File</span> property must be set before
@@ -378,9 +432,9 @@
   </p>
 
   <p>Given that <code>FixedWindowRollingPolicy</code> performs
-  multiple file rename operations suring roll over, and that these
+  multiple file rename operations during roll over, and that these
   operations cannot be guaranteed to be safe in a multi-JVM context,
-  prudent mode is not allowed in conjuction with a
+  prudent mode is not allowed in conjunction with a
   <code>FixedWindowRollingPolicy</code>.
   </p>
 
@@ -399,7 +453,7 @@
   contents of the message sent to the syslog daemon.
   </p>
   
-  <p>For more information on SyslogAppeder please refer to the <a
+  <p>For more information on SyslogAppender please refer to the <a
   href="manual/appenders.html#SyslogAppender">its documentation.</a>
   </p>
 
@@ -415,7 +469,126 @@
   </p>
   
   <hr/>
+
+  <!-- ============================================================= -->
+  <p><a name="block" href="#block">As of logback version 0.9.28,
+  JaninoEventEvaluator expects Java blocks.</a>
+  </p>
+
+  <p>As of logback version 0.9.28, JaninoEvaluator expects Java
+  "block", i.e. the body of a method. In previous versions only
+  boolean expressions were allowed. For backward compatibility
+  reasons, whenever logback sees a boolean expression it will attempt
+  to convert it to a block by prefixing the expression with "return"
+  and suffixing it with a semicolon.
+  </p>
+
+  <p>Boolean expressions can quickly become hairy. For example, the
+  following boolean expression is rather difficult to grok.
+</p>
+
+  <pre class="prettyprint source"> !logger.startsWith("org.apache.http")
+  ||
+  ( logger.equals("org.apache.http.wire")  &amp;&amp;
+       (mdc != null &amp;&amp; mdc.get("entity") != null
+         &amp;&amp;
+       ((String) mdc.get("entity")).contains("someSpecialValue"))
+       &amp;&amp;
+     !message.contains("someSecret")
+  )</pre>
+
+  <p>whereas as its Java block equivalent is considerably easier to
+  follow.</p>
+
+<pre class="prettyprint source">if(logger.startsWith("org.apache.http"))
+  return true;
+
+if(mdc == null || mdc.get("entity") == null)
+  return false;
+
+String payee = (String) mdc.get("entity");
+
+if(logger.equals("org.apache.http.wire") &amp;&amp;
+  payee.contains("someSpecialValue") &amp;&amp;
+  !message.contains("someSecret")) {
+  return true;
+}
+
+return false;</pre>
+
+   <p>
+   </p>
+   <hr/>
+   <!-- ============================================================= -->
+   <p><a name="missingRightParenthesis"
+   href="#missingRightParenthesis">In a conversion pattern, opened
+   parenthesis must be closed.</a>
+   </p>
+   
+   <p>In conversion patterns, <a
+   href="manual/layouts.html#Parentheses">parentheses are special</a>
+   because they are treated as grouping tokens. If a parenthesis
+   character needs to be viewed as a literal, it needs to be escaped
+   by preceding each parenthesis with a backslash. As in,
+   <b>\(</b>%d{HH:mm:ss.SSS} [%thread]<b>\) </b>.
+   </p>
   
+
+  <p>
+   </p>
+   <hr/>
+   <!-- ============================================================= -->
+   <p><a name="appender_order" href="#appender_order">Appenders must
+   be definied before they are referenced.</a>
+   </p>
+   
+   <p>In a configuration file, at the point where an appender is
+   referenced by name, it must be defined earlier in the configuration
+   file. Referencing an appender defined later in the file is not
+   allowed. Below are examples of correct and incorrect order of
+   definition and referece.
+   </p>
+
+
+  <p>Below is an example of a correct ordering, where appender
+  definition precedes references made to it.
+  </p>
+
+  <p class="green bold">CORRECT ORDER</p>
+  <pre class="prettyprint source">&lt;configuration>
+  <b>&lt;!-- definition of appender STDOUT --></b>
+  &lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    &lt;encoder>
+      &lt;pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n&lt;/pattern>
+    &lt;/encoder>
+  &lt;/appender>
+
+  &lt;root level="DEBUG">
+    &lt;!-- appender referenced after it is defined -->
+    <b class="big">&lt;appender-ref ref="STDOUT"/></b>
+  &lt;/root> 
+&lt;/configuration></pre>
+
+  <p>Below is an example of an incorrect ordering, where appender
+  definition follows references made to it.
+  </p>
+
+   <p class="red bold">INCORRECT ORDER</p>
+   <pre class="prettyprint source">&lt;configuration>
+  &lt;root level="DEBUG">
+    &lt;!-- appender INCORRECTLY referenced before it is defined -->
+    <b class="big">&lt;appender-ref ref="STDOUT"/></b>
+  &lt;/root>
+
+  <b>&lt;!-- definition of appender STDOUT --></b>
+  &lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    &lt;encoder>
+      &lt;pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n&lt;/pattern>
+    &lt;/encoder>
+  &lt;/appender>
+&lt;/configuration>
+   </pre>
+
   <script src="templates/footer.js" type="text/javascript"></script>
   </div>
 </body>

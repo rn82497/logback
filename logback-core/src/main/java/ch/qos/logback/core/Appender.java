@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -23,7 +23,7 @@ public interface Appender<E> extends LifeCycle, ContextAware, FilterAttachable<E
   /**
    * Get the name of this appender. The name uniquely identifies the appender.
    */
-  public String getName();
+  String getName();
 
   /**
    * This is where an appender accomplishes its work. Note that the argument 
@@ -37,6 +37,6 @@ public interface Appender<E> extends LifeCycle, ContextAware, FilterAttachable<E
    * identify this appender.
    * 
    */
-  public void setName(String name);
+  void setName(String name);
   
 }

@@ -1,9 +1,20 @@
+/**
+ * Logback: the reliable, generic, fast and flexible logging framework.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
+ *
+ * This program and the accompanying materials are dual-licensed under
+ * either the terms of the Eclipse Public License v1.0 as published by
+ * the Eclipse Foundation
+ *
+ *   or (per the licensee's choosing)
+ *
+ * under the terms of the GNU Lesser General Public License version 2.1
+ * as published by the Free Software Foundation.
+ */
 package ch.qos.logback.core.spi;
 
-import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.helpers.CyclicBuffer;
-import ch.qos.logback.core.sift.tracker.TEntry;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -16,8 +27,6 @@ public class CyclicBufferTracker_TImpl<E> implements CyclicBufferTracker<E> {
 
   int bufferSize = DEFAULT_BUFFER_SIZE;
   int maxNumBuffers = DEFAULT_NUMBER_OF_BUFFERS;
-  int bufferCount = 0;
-
 
   List<TEntry> entryList = new LinkedList<TEntry>();
   long lastCheck = 0;
@@ -47,12 +56,27 @@ public class CyclicBufferTracker_TImpl<E> implements CyclicBufferTracker<E> {
     return null;
   }
 
-  public CyclicBuffer<E> get(String key, long timestamp) {
+  List<String> keyList() {
+    Collections.sort(entryList);
+
+    List<String> result = new LinkedList<String>();
+    for (int i = 0; i < entryList.size(); i++) {
+      TEntry te = entryList.get(i);
+      result.add(te.key);
+    }
+    return result;
+  }
+
+
+  public CyclicBuffer<E> getOrCreate(String key, long timestamp) {
     TEntry te = getEntry(key);
     if (te == null) {
       CyclicBuffer<E> cb = new CyclicBuffer<E>(bufferSize);
       te = new TEntry<E>(key, cb, timestamp);
       entryList.add(te);
+      if (entryList.size() >= maxNumBuffers) {
+        entryList.remove(0);
+      }
       return cb;
     } else {
       te.timestamp = timestamp;
@@ -62,7 +86,17 @@ public class CyclicBufferTracker_TImpl<E> implements CyclicBufferTracker<E> {
 
   }
 
-  final private boolean isEntryStale(TEntry entry, long now) {
+  public void removeBuffer(String k) {
+    for (int i = 0; i < entryList.size(); i++) {
+      TEntry te = entryList.get(i);
+      if (te.key.equals(k)) {
+        entryList.remove(i);
+        return;
+      }
+    }
+  }
+
+  private boolean isEntryStale(TEntry entry, long now) {
     return ((entry.timestamp + THRESHOLD) < now);
   }
 

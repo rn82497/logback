@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -35,11 +35,13 @@ import ch.qos.logback.classic.pattern.MessageConverter;
 import ch.qos.logback.classic.pattern.MethodOfCallerConverter;
 import ch.qos.logback.classic.pattern.NopThrowableInformationConverter;
 import ch.qos.logback.classic.pattern.RelativeTimeConverter;
+import ch.qos.logback.classic.pattern.RootCauseFirstThrowableProxyConverter;
 import ch.qos.logback.classic.pattern.ThreadConverter;
 import ch.qos.logback.classic.pattern.ThrowableProxyConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.pattern.PatternLayoutBase;
+import ch.qos.logback.core.pattern.parser.Parser;
 
 /**
  * <p>
@@ -58,6 +60,7 @@ public class PatternLayout extends PatternLayoutBase<ILoggingEvent> {
   public static final Map<String, String> defaultConverterMap = new HashMap<String, String>();
 
   static {
+    defaultConverterMap.putAll(Parser.DEFAULT_COMPOSITE_CONVERTER_MAP);
 
     defaultConverterMap.put("d", DateConverter.class.getName());
     defaultConverterMap.put("date", DateConverter.class.getName());
@@ -97,6 +100,9 @@ public class PatternLayout extends PatternLayoutBase<ILoggingEvent> {
 
     defaultConverterMap.put("ex", ThrowableProxyConverter.class.getName());
     defaultConverterMap.put("exception", ThrowableProxyConverter.class
+        .getName());
+    defaultConverterMap.put("rEx", RootCauseFirstThrowableProxyConverter.class.getName());
+    defaultConverterMap.put("rootException", RootCauseFirstThrowableProxyConverter.class
         .getName());
     defaultConverterMap.put("throwable", ThrowableProxyConverter.class
         .getName());
@@ -139,5 +145,4 @@ public class PatternLayout extends PatternLayoutBase<ILoggingEvent> {
     }
     return writeLoopOnConverters(event);
   }
-
 }

@@ -1,24 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>ch.qos.logback</groupId>
     <artifactId>logback-parent</artifactId>
-    <version>0.9.25-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
   </parent>
 
-  <modelVersion>4.0.0</modelVersion>
-
-  <groupId>ch.qos.logback</groupId>
   <artifactId>logback-core</artifactId>
-  <version>${parent.version}</version>
   <packaging>jar</packaging>
   <name>Logback Core Module</name>
 
   <url>http://logback.qos.ch</url>
   <description>
-    <!-- 
+    <!--
       Never _never_ let Eclipse's auto format function add
       a line return in the description.
       The generated jar will contain a corrupt MANIFEST file.
@@ -40,7 +38,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>janino</groupId>
+       <groupId>org.codehaus.janino</groupId>
       <artifactId>janino</artifactId>
       <scope>compile</scope>
       <optional>true</optional>
@@ -80,6 +78,13 @@
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
+
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
 
@@ -95,13 +100,22 @@
       </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
+        <groupId>org.scala-tools</groupId>
+        <artifactId>maven-scala-plugin</artifactId>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <testSourceDir>src/test/scala</testSourceDir>
         </configuration>
+        <executions>
+          <execution>
+            <id>scala-test-compile</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
+
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -109,10 +123,13 @@
         <configuration>
           <forkMode>once</forkMode>
           <reportFormat>plain</reportFormat>
+          <parallel>classes</parallel>
           <trimStackTrace>false</trimStackTrace>
           <excludes>
             <exclude>**/All*Test.java</exclude>
             <exclude>**/PackageTest.java</exclude>
+            <exclude>**/ConsoleAppenderTest.java</exclude>
+            <exclude>**/TimeBasedRollingTest.java</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -120,10 +137,11 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <configuration>          
-          <archive>  
-            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-          </archive> 
+        <configuration>
+          <archive>
+            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF
+            </manifestFile>
+          </archive>
         </configuration>
         <executions>
           <execution>
@@ -145,21 +163,22 @@
           <execution>
             <id>bundle-manifest</id>
             <phase>process-classes</phase>
-            <goals>    
+            <goals>
               <goal>manifest</goal>
-            </goals>   
+            </goals>
           </execution>
         </executions>
         <configuration>
           <instructions>
             <Export-Package>ch.qos.logback.core.*</Export-Package>
             <Import-Package>
-              javax.*;resolution:=optional, 
+              javax.*;resolution:=optional,
               org.xml.*;resolution:=optional,
               org.codehaus.janino;resolution:=optional,
               *
             </Import-Package>
-            <Bundle-RequiredExecutionEnvironment>J2SE-1.5</Bundle-RequiredExecutionEnvironment>
+            <Bundle-RequiredExecutionEnvironment>J2SE-1.5
+            </Bundle-RequiredExecutionEnvironment>
           </instructions>
         </configuration>
       </plugin>

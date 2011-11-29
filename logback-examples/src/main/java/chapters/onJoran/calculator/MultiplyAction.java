@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -32,7 +32,7 @@ public class MultiplyAction extends Action {
   public void begin(InterpretationContext ic, String name, Attributes attributes) {
     int first = fetchInteger(ic);
     int second = fetchInteger(ic);
-    ic.pushObject(new Integer(first * second));
+    ic.pushObject(first * second);
   }
 
   /**

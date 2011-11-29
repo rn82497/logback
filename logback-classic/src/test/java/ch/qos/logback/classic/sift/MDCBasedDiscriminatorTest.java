@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2010, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -25,8 +25,9 @@ import org.junit.Test;
 
 import org.slf4j.MDC;
 
+import java.util.HashMap;
+
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -71,7 +72,7 @@ public class MDCBasedDiscriminatorTest {
   @Test
   public void nullMDC() {
     event = new LoggingEvent("a", logger, Level.DEBUG, "", null, null);
-    assertNull(event.getMdc());
+    assertEquals(new HashMap(), event.getMDCPropertyMap());
     String discriminatorValue = discriminator.getDiscriminatingValue(event);
     assertEquals(DEFAULT_VAL, discriminatorValue);
   }

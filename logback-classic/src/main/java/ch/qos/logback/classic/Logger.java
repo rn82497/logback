@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -47,8 +47,6 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
    */
   public static final String FQCN = ch.qos.logback.classic.Logger.class
       .getName();
-
-  static int instanceCount = 0;
 
   /**
    * The name of this logger
@@ -114,10 +112,9 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
     this.parent = parent;
     this.loggerContext = loggerContext;
     buildRemoteView();
-    instanceCount++;
   }
 
-  public final Level getEffectiveLevel() {
+  public Level getEffectiveLevel() {
     return Level.toLevel(effectiveLevelInt);
   }
 
@@ -133,7 +130,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
     return name;
   }
 
-  private final boolean isRootLogger() {
+  private boolean isRootLogger() {
     // only the root logger has a null parent
     return parent == null;
   }
@@ -184,13 +181,15 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
         child.handleParentLevelChange(effectiveLevelInt);
       }
     }
+    // inform listeners
+    loggerContext.fireOnLevelChange(this, newLevel);
   }
 
   /**
    * This method is invoked by parent logger to let this logger know that the
    * prent's levelInt changed.
    * 
-   * @param newParentLevel
+   * @param newParentLevelInt
    */
   private synchronized void handleParentLevelChange(int newParentLevelInt) {
     // changes in the parent levelInt affect children only if their levelInt is
@@ -379,7 +378,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
    * The default size of child list arrays. The JDK 1.5 default is 10. We use a
    * smaller value to save a little space.
    */
-  static private final int DEFAULT_CHILD_ARRAY_SIZE = 5;
+  private static final int DEFAULT_CHILD_ARRAY_SIZE = 5;
 
   Logger createChildByName(final String childName) {
     int i_index = getSeparatorIndexOf(childName, this.name.length() + 1);
@@ -406,7 +405,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
    * logging by about 20 nanoseconds.
    */
 
-  private final void filterAndLog_0_Or3Plus(final String localFQCN,
+  private void filterAndLog_0_Or3Plus(final String localFQCN,
       final Marker marker, final Level level, final String msg,
       final Object[] params, final Throwable t) {
 
@@ -425,7 +424,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
     buildLoggingEventAndAppend(localFQCN, marker, level, msg, params, t);
   }
 
-  private final void filterAndLog_1(final String localFQCN,
+  private void filterAndLog_1(final String localFQCN,
       final Marker marker, final Level level, final String msg,
       final Object param, final Throwable t) {
 
@@ -444,7 +443,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
         new Object[] { param }, t);
   }
 
-  private final void filterAndLog_2(final String localFQCN,
+  private void filterAndLog_2(final String localFQCN,
       final Marker marker, final Level level, final String msg,
       final Object param1, final Object param2, final Throwable t) {
 
@@ -475,7 +474,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
     filterAndLog_0_Or3Plus(FQCN, null, Level.TRACE, msg, null, null);
   }
 
-  public final void trace(String format, Object arg) {
+  public void trace(String format, Object arg) {
     filterAndLog_1(FQCN, null, Level.TRACE, format, arg, null);
   }
 
@@ -491,7 +490,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
     filterAndLog_0_Or3Plus(FQCN, null, Level.TRACE, msg, null, t);
   }
 
-  public final void trace(Marker marker, String msg) {
+  public void trace(Marker marker, String msg) {
     filterAndLog_0_Or3Plus(FQCN, marker, Level.TRACE, msg, null, null);
   }
 
@@ -511,11 +510,11 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
     filterAndLog_0_Or3Plus(FQCN, marker, Level.TRACE, msg, null, t);
   }
 
-  final public boolean isDebugEnabled() {
+  public boolean isDebugEnabled() {
     return isDebugEnabled(null);
   }
 
-  final public boolean isDebugEnabled(Marker marker) {
+  public boolean isDebugEnabled(Marker marker) {
     final FilterReply decision = callTurboFilters(marker, Level.DEBUG);
     if (decision == FilterReply.NEUTRAL) {
       return effectiveLevelInt <= Level.DEBUG_INT;
@@ -528,19 +527,19 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
     }
   }
 
-  final public void debug(String msg) {
+  public void debug(String msg) {
     filterAndLog_0_Or3Plus(FQCN, null, Level.DEBUG, msg, null, null);
   }
 
-  final public void debug(String format, Object arg) {
+  public void debug(String format, Object arg) {
     filterAndLog_1(FQCN, null, Level.DEBUG, format, arg, null);
   }
 
-  final public void debug(String format, Object arg1, Object arg2) {
+  public void debug(String format, Object arg1, Object arg2) {
     filterAndLog_2(FQCN, null, Level.DEBUG, format, arg1, arg2, null);
   }
 
-  final public void debug(String format, Object[] argArray) {
+  public void debug(String format, Object[] argArray) {
     filterAndLog_0_Or3Plus(FQCN, null, Level.DEBUG, format, argArray, null);
   }
 
@@ -548,7 +547,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
     filterAndLog_0_Or3Plus(FQCN, null, Level.DEBUG, msg, null, t);
   }
 
-  public final void debug(Marker marker, String msg) {
+  public void debug(Marker marker, String msg) {
     filterAndLog_0_Or3Plus(FQCN, marker, Level.DEBUG, msg, null, null);
   }
 
@@ -665,7 +664,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
     filterAndLog_0_Or3Plus(FQCN, marker, Level.INFO, msg, null, t);
   }
 
-  public final boolean isTraceEnabled() {
+  public boolean isTraceEnabled() {
     return isTraceEnabled(null);
   }
 
@@ -682,7 +681,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
     }
   }
 
-  public final boolean isErrorEnabled() {
+  public boolean isErrorEnabled() {
     return isErrorEnabled(null);
   }
 
@@ -821,26 +820,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
 
   public void log(Marker marker, String fqcn, int levelInt, String message,
       Object[] argArray, Throwable t) {
-    Level level = null;
-    switch (levelInt) {
-    case LocationAwareLogger.TRACE_INT:
-      level = Level.TRACE;
-      break;
-    case LocationAwareLogger.DEBUG_INT:
-      level = Level.DEBUG;
-      break;
-    case LocationAwareLogger.INFO_INT:
-      level = Level.INFO;
-      break;
-    case LocationAwareLogger.WARN_INT:
-      level = Level.WARN;
-      break;
-    case LocationAwareLogger.ERROR_INT:
-      level = Level.ERROR;
-      break;
-    default:
-      throw new IllegalArgumentException(levelInt + " not a valid level value");
-    }
+    Level level = Level.fromLocationAwareLoggerInteger(levelInt);
     filterAndLog_0_Or3Plus(fqcn, marker, level, message, argArray, t);
   }
 

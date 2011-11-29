@@ -1,15 +1,15 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2010, QOS.ch. All rights reserved.
- * 
- * This program and the accompanying materials are dual-licensed under either
- * the terms of the Eclipse Public License v1.0 as published by the Eclipse
- * Foundation
- * 
- * or (per the licensee's choosing)
- * 
- * under the terms of the GNU Lesser General Public License version 2.1 as
- * published by the Free Software Foundation.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
+ *
+ * This program and the accompanying materials are dual-licensed under
+ * either the terms of the Eclipse Public License v1.0 as published by
+ * the Eclipse Foundation
+ *
+ *   or (per the licensee's choosing)
+ *
+ * under the terms of the GNU Lesser General Public License version 2.1
+ * as published by the Free Software Foundation.
  */
 package ch.qos.logback.core.recovery;
 
@@ -35,7 +35,7 @@ abstract public class ResilientOutputStreamBase extends OutputStream {
   protected OutputStream os;
   protected boolean presumedClean = true;
 
-  final private boolean isPresumedInError() {
+  private boolean isPresumedInError() {
     // existence of recoveryCoordinator indicates failed state
     return (recoveryCoordinator != null && !presumedClean);
   }
@@ -88,7 +88,7 @@ abstract public class ResilientOutputStreamBase extends OutputStream {
 
   abstract OutputStream openNewOutputStream() throws IOException;
 
-  final private void postSuccessfulWrite() {
+  private void postSuccessfulWrite() {
     if (recoveryCoordinator != null) {
       recoveryCoordinator = null;
       statusCount = 0;

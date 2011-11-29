@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -21,11 +21,11 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import ch.qos.logback.access.spi.IAccessEvent;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ch.qos.logback.access.spi.AccessEvent;
 import ch.qos.logback.access.spi.Util;
 import ch.qos.logback.access.testUtil.NotifyingListAppender;
 import ch.qos.logback.core.testUtil.RandomUtil;
@@ -33,21 +33,19 @@ import ch.qos.logback.core.testUtil.RandomUtil;
 public class JettyBasicTest {
 
   static RequestLogImpl REQYEST_LOG_IMPL;
-  static JettyFixture JETTY_FIXTURE;
+  static JettyFixtureWithListAndConsoleAppenders JETTY_FIXTURE;
 
   static int RANDOM_SERVER_PORT = RandomUtil.getRandomServerPort();
   
   @BeforeClass
   static public void startServer() throws Exception {
-    // System.out.println("*** JettyBasicTest.startServer called");
     REQYEST_LOG_IMPL = new RequestLogImpl();
-    JETTY_FIXTURE = new JettyFixture(REQYEST_LOG_IMPL, RANDOM_SERVER_PORT);
+    JETTY_FIXTURE = new JettyFixtureWithListAndConsoleAppenders(REQYEST_LOG_IMPL, RANDOM_SERVER_PORT);
     JETTY_FIXTURE.start();
   }
 
   @AfterClass
   static public void stopServer() throws Exception {
-    // System.out.println("*** JettyBasicTest.stopServer called");
     if (JETTY_FIXTURE != null) {
       JETTY_FIXTURE.stop();
     }
@@ -85,7 +83,7 @@ public class JettyBasicTest {
     }
 
     assertTrue(listAppender.list.size() > 0);
-    AccessEvent event = (AccessEvent) listAppender.list.get(0);
+    IAccessEvent event = listAppender.list.get(0);
     assertEquals("127.0.0.1", event.getRemoteHost());
     assertEquals("localhost", event.getServerName());
     listAppender.list.clear();
@@ -122,7 +120,7 @@ public class JettyBasicTest {
     }
 
     @SuppressWarnings("unused")
-    AccessEvent event = (AccessEvent) listAppender.list.get(0);
+    IAccessEvent event = listAppender.list.get(0);
 
     // we should test the contents of the requests
     // assertEquals(msg, event.getRequestContent());

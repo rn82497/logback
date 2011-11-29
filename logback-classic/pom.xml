@@ -2,17 +2,15 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+  <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>ch.qos.logback</groupId>
     <artifactId>logback-parent</artifactId>
-    <version>0.9.25-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
   </parent>
 
-  <modelVersion>4.0.0</modelVersion>
-
-  <groupId>ch.qos.logback</groupId>
   <artifactId>logback-classic</artifactId>
-  <version>${parent.version}</version>
   <packaging>jar</packaging>
   <name>Logback Classic Module</name>
 
@@ -108,7 +106,7 @@
     </dependency>
 
     <dependency>
-      <groupId>janino</groupId>
+      <groupId>org.codehaus.janino</groupId>
       <artifactId>janino</artifactId>
       <scope>compile</scope>
       <optional>true</optional>
@@ -171,19 +169,36 @@
     </dependency>
 
     <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-      <version>1.6</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.main</artifactId>
       <version>2.0.2</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!--<dependency>-->
+      <!--<groupId>org.apache.zookeeper</groupId>-->
+      <!--<artifactId>zookeeper</artifactId>-->
+      <!--<version>3.4.0-SVN</version>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
+
+    <!--<dependency>-->
+      <!--<groupId>org.apache.zookeeper</groupId>-->
+      <!--<artifactId>zookeeper</artifactId>-->
+      <!--<version>3.4.0-SVN</version>-->
+      <!--<scope>test</scope>-->
+      <!--<classifier>test</classifier>-->
+    <!--</dependency>-->
+
   </dependencies>
+
+
 
   <build>
 
@@ -208,7 +223,7 @@
       </plugin>
 
       <plugin>
-        <groupId>org.codehaus.groovy.maven</groupId>
+      <groupId>org.codehaus.groovy.maven</groupId>
         <artifactId>gmaven-plugin</artifactId>
         <executions>
           <execution>
@@ -219,6 +234,24 @@
               <goal>testCompile</goal>
             </goals>
           </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+         <groupId>org.scala-tools</groupId>
+         <artifactId>maven-scala-plugin</artifactId>
+         <version>2.14.3</version>
+         <configuration>
+           <testSourceDir>src/test/scala</testSourceDir>
+         </configuration>
+         <executions>
+           <execution>
+             <id>scala-test-compile</id>
+             <phase>process-test-resources</phase>
+             <goals>
+               <goal>testCompile</goal>
+             </goals>
+           </execution>
         </executions>
       </plugin>
 
@@ -268,7 +301,7 @@
             <phase>package</phase>
             <configuration>
               <tasks>      
-                <property name="currentVersion" value="${version}" />                            
+                <property name="currentVersion" value="${project.version}" />
                 <property name="slf4j.version" value="${slf4j.version}"/>
                 <property name="basedir" value="${basedir}"/>
                 <ant antfile="${basedir}/osgi-build.xml"/>
@@ -299,21 +332,27 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <!-- once, never, -->
+          <!-- once, never, pertest, always -->
           <forkMode>once</forkMode>
           <reportFormat>plain</reportFormat>
           <trimStackTrace>false</trimStackTrace>
           <excludes>
-            <exclude>**/*.java</exclude>
             <exclude>**/AllClassicTest.java</exclude>
             <exclude>**/PackageTest.java</exclude>
             <exclude>**/TestConstants.java</exclude>
             <exclude>**/test_osgi/BundleTest.java</exclude>
             <exclude>**/ch/qos/logback/classic/util/InitializationIntegrationTest.java</exclude>
+            <!-- next test requires a running simple server -->
             <exclude>**/SerializationPerfTest.java</exclude>
+            <!-- next test is fragile and anyhow will run as part of PackageTest -->
+            <exclude>**/LoggerPerfTest.java</exclude>
+            <!-- next test is fragile and anyhow will run as part of PackageTest -->
+            <exclude>**/LoggingEventSerializationPerfTest.java</exclude>
           </excludes>
         </configuration>
       </plugin>
+
+
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -339,8 +378,11 @@
               sun.reflect;resolution:=optional, 
               javax.*;resolution:=optional,
               org.xml.*;resolution:=optional,
-              org.slf4j, ch.qos.logback.core.rolling, 
+              org.slf4j,
+              ch.qos.logback.core.rolling,
               ch.qos.logback.core.rolling.helper,
+              ch.qos.logback.core.util,
+              ch.qos.logback.core.read,
               org.codehaus.groovy.*;resolution:=optional,
               groovy.lang.*;resolution:=optional,
               *

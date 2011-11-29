@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -21,6 +21,7 @@ import java.util.List;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import static ch.qos.logback.core.CoreConstants.XML_PARSING;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -53,32 +54,37 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
 
   public List<SaxEvent> recordEvents(InputSource inputSource)
       throws JoranException {
-    SAXParser saxParser = null;
+    SAXParser saxParser = buildSaxParser();
+    try {
+      saxParser.parse(inputSource, this);
+      return saxEventList;
+    } catch (IOException ie) {
+      handleError("I/O error occurred while parsing xml file", ie);
+    } catch(SAXException se) {
+      // Exception added into StatusManager via Sax error handling. No need to add it again
+      throw new JoranException("Problem parsing XML document. See previously reported errors.", se);
+    } catch (Exception ex) {
+      handleError("Unexpected exception while parsing XML document.", ex);
+    }
+    throw new IllegalStateException("This point can never be reached");
+  }
+
+  private void handleError(String errMsg, Throwable t) throws JoranException {
+    addError(errMsg, t);
+    throw new JoranException(errMsg, t);
+  }
+
+  private SAXParser buildSaxParser() throws JoranException {
     try {
       SAXParserFactory spf = SAXParserFactory.newInstance();
       spf.setValidating(false);
       spf.setNamespaceAware(true);
-      saxParser = spf.newSAXParser();
+      return spf.newSAXParser();
     } catch (Exception pce) {
-      String errMsg = "Parser configuration error occured";
+      String errMsg = "Parser configuration error occurred";
       addError(errMsg, pce);
       throw new JoranException(errMsg, pce);
     }
-
-    try {
-      saxParser.parse(inputSource, this);
-      return saxEventList;
-
-    } catch (IOException ie) {
-      String errMsg = "I/O error occurred while parsing xml file";
-      addError(errMsg, ie);
-      throw new JoranException(errMsg, ie);
-    } catch (Exception ex) {
-      String errMsg = "Problem parsing XML document. See previously reported errors. Abandoning all further processing.";
-      addError(errMsg, ex);
-      throw new JoranException(errMsg, ex);
-    }
-
   }
 
   public void startDocument() {
@@ -144,17 +150,17 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
   }
 
   public void error(SAXParseException spe) throws SAXException {
-    addError("Parsing error on line " + spe.getLineNumber() + " and column "
+    addError(XML_PARSING +" - Parsing error on line " + spe.getLineNumber() + " and column "
         + spe.getColumnNumber(), spe);
   }
 
   public void fatalError(SAXParseException spe) throws SAXException {
-    addError("Parsing fatal error on line " + spe.getLineNumber()
+    addError(XML_PARSING +" - Parsing fatal error on line " + spe.getLineNumber()
         + " and column " + spe.getColumnNumber(), spe);
   }
 
   public void warning(SAXParseException spe) throws SAXException {
-    addWarn("Parsing warning on line " + spe.getLineNumber() + " and column "
+    addWarn(XML_PARSING +" - Parsing warning on line " + spe.getLineNumber() + " and column "
         + spe.getColumnNumber(), spe);
   }
 

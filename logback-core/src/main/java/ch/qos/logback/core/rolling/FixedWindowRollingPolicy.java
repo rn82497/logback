@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -14,12 +14,10 @@
 package ch.qos.logback.core.rolling;
 
 import java.io.File;
+import java.util.Date;
 
 import ch.qos.logback.core.CoreConstants;
-import ch.qos.logback.core.rolling.helper.Compressor;
-import ch.qos.logback.core.rolling.helper.FileNamePattern;
-import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
-import ch.qos.logback.core.rolling.helper.RenameUtil;
+import ch.qos.logback.core.rolling.helper.*;
 
 /**
  * When rolling over, <code>FixedWindowRollingPolicy</code> renames files
@@ -38,7 +36,9 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
   int minIndex;
   RenameUtil util = new RenameUtil();
   Compressor compressor;
-  
+
+  public static String ZIP_ENTRY_DATE_PATTERN = "yyyy-MM-dd_HHmm";
+
   /**
    * It's almost always a bad idea to have a large window size, say over 12.
    */
@@ -94,11 +94,23 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
           + "] does not contain a valid IntegerToken");
     }
 
+    if(compressionMode == CompressionMode.ZIP) {
+      String zipEntryFileNamePatternStr = transformFileNamePatternFromInt2Date(fileNamePatternStr);
+      zipEntryFileNamePattern = new FileNamePattern(zipEntryFileNamePatternStr, context);
+    }
     compressor = new Compressor(compressionMode);
     compressor.setContext(this.context);
+    super.start();
+  }
+
+  private String transformFileNamePatternFromInt2Date(String fileNamePatternStr) {
+    String slashified = FileFilterUtil.slashify(fileNamePatternStr);
+    String stemOfFileNamePattern = FileFilterUtil.afterLastSlash(slashified);
+    return stemOfFileNamePattern.replace("%i", "%d{"+ZIP_ENTRY_DATE_PATTERN+"}");
   }
 
   public void rollover() throws RolloverFailure {
+
     // Inside this method it is guaranteed that the hereto active log file is
     // closed.
     // If maxIndex <= 0, then there is no file renaming to be done.
@@ -129,17 +141,17 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
             .convertInt(minIndex));
         break;
       case GZ:
+        compressor.compress(getActiveFileName(), fileNamePattern.convertInt(minIndex), null);
+        break;
       case ZIP:
-        compressor.compress(getActiveFileName(), fileNamePattern.convertInt(minIndex));
+        compressor.compress(getActiveFileName(), fileNamePattern.convertInt(minIndex), zipEntryFileNamePattern.convert(new Date()));
         break;
       }
     }
   }
 
   /**
-   * Return the value of the <b>ActiveFile</b> option.
-   * 
-   * @see {@link setActiveFileName}.
+   * Return the value of the parent's RawFile property.
    */
   public String getActiveFileName() {
     return getParentsRawFileProperty();

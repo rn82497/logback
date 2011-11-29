@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -35,31 +35,31 @@ public class RollingCalendarTest extends TestCase {
     {
       RollingCalendar rc = new RollingCalendar();
       assertEquals(PeriodicityType.TOP_OF_SECOND, rc
-          .computePeriodicity("yyyy-MM-dd_HH_mm_ss"));
+          .computePeriodicityType("yyyy-MM-dd_HH_mm_ss"));
     }
 
     {
       RollingCalendar rc = new RollingCalendar();
       assertEquals(PeriodicityType.TOP_OF_MINUTE, rc
-          .computePeriodicity("yyyy-MM-dd_HH_mm"));
+          .computePeriodicityType("yyyy-MM-dd_HH_mm"));
     }
 
     {
       RollingCalendar rc = new RollingCalendar();
       assertEquals(PeriodicityType.TOP_OF_HOUR, rc
-          .computePeriodicity("yyyy-MM-dd_HH"));
+          .computePeriodicityType("yyyy-MM-dd_HH"));
     }
 
     {
       RollingCalendar rc = new RollingCalendar();
       assertEquals(PeriodicityType.TOP_OF_DAY, rc
-          .computePeriodicity("yyyy-MM-dd"));
+          .computePeriodicityType("yyyy-MM-dd"));
     }
 
     {
       RollingCalendar rc = new RollingCalendar();
       assertEquals(PeriodicityType.TOP_OF_MONTH, rc
-          .computePeriodicity("yyyy-MM"));
+          .computePeriodicityType("yyyy-MM"));
     }
   }
 

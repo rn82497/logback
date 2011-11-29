@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -14,6 +14,7 @@
 package ch.qos.logback.access.servlet;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -31,25 +32,40 @@ class TeeServletInputStream extends ServletInputStream {
 
   @Override
   public int read() throws IOException {
-    //System.out.println("zzzzzzzzzz TeeServletInputStream.read called");
     return in.read();
   }
 
   private void duplicateInputStream(HttpServletRequest request) {
+    ServletInputStream originalSIS = null;
     try {
-      int len = request.getContentLength();
-      ServletInputStream originalSIS = request.getInputStream();
-      if (len < 0) {
-        in = originalSIS;
-      } else {
-        inputBuffer = new byte[len];
-        int n = originalSIS.read(inputBuffer, 0, len);
-        assert n == len;
-        this.in = new ByteArrayInputStream(inputBuffer);       
-        originalSIS.close();
-      }
+      originalSIS = request.getInputStream();
+      inputBuffer = consumeBufferAndReturnAsByteArray(originalSIS);
+      this.in = new ByteArrayInputStream(inputBuffer);
     } catch (IOException e) {
       e.printStackTrace();
+    } finally {
+      closeStrean(originalSIS);
+    }
+  }
+
+  byte[] consumeBufferAndReturnAsByteArray(InputStream is) throws IOException {
+    int len = 1024;
+    byte[] temp = new byte[len];
+    int c = -1;
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    while ((c = is.read(temp, 0, len)) != -1) {
+      baos.write(temp, 0, c);
+    }
+    return baos.toByteArray();
+  }
+
+
+  void closeStrean(ServletInputStream is) {
+    if (is != null) {
+      try {
+        is.close();
+      } catch (IOException e) {
+      }
     }
   }
 

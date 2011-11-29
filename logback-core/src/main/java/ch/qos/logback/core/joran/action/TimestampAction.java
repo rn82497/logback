@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -13,9 +13,7 @@
  */
 package ch.qos.logback.core.joran.action;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
+import ch.qos.logback.core.util.CachingDateFormatter;
 import org.xml.sax.Attributes;
 
 import ch.qos.logback.core.joran.spi.ActionException;
@@ -32,6 +30,8 @@ import ch.qos.logback.core.util.OptionHelper;
  */
 public class TimestampAction extends Action {
   static String DATE_PATTERN_ATTRIBUTE = "datePattern";
+  static String TIME_REFERENCE_ATTRIBUTE = "timeReference";
+  static String CONTEXT_BIRTH = "contextBirth";
 
   boolean inError = false;
 
@@ -40,7 +40,7 @@ public class TimestampAction extends Action {
       throws ActionException {
     String keyStr = attributes.getValue(KEY_ATTRIBUTE);
     if (OptionHelper.isEmpty(keyStr)) {
-      addError("Attrubute named [" + KEY_ATTRIBUTE + "] cannot be empty");
+      addError("Attribute named [" + KEY_ATTRIBUTE + "] cannot be empty");
       inError = true;
     }
     String datePatternStr = attributes.getValue(DATE_PATTERN_ATTRIBUTE);
@@ -50,11 +50,22 @@ public class TimestampAction extends Action {
       inError = true;
     }
 
+    String timeReferenceStr = attributes.getValue(TIME_REFERENCE_ATTRIBUTE);
+    long timeReference;
+    if (CONTEXT_BIRTH.equalsIgnoreCase(timeReferenceStr)) {
+      addInfo("Using context birth as time reference.");
+      timeReference = context.getBirthTime();
+    } else {
+      timeReference =  System.currentTimeMillis();
+      addInfo("Using current interpretation time, i.e. now, as time reference.");
+    }
+
+
     if (inError)
       return;
 
-    SimpleDateFormat sdf = new SimpleDateFormat(datePatternStr);
-    String val = sdf.format(new Date());
+    CachingDateFormatter sdf = new CachingDateFormatter(datePatternStr);
+    String val = sdf.format(timeReference);
 
     addInfo("Adding property to the context with key=\"" + keyStr
         + "\" and value=\"" + val + "\" to the context");

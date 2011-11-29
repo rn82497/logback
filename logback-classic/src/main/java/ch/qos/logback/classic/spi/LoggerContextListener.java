@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -13,6 +13,8 @@
  */
 package ch.qos.logback.classic.spi;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 
 public interface LoggerContextListener {
@@ -23,8 +25,9 @@ public interface LoggerContextListener {
    * reset. Such listeners are said to be reset resistant.
    * @return whether this listener is reset resistant or not.
    */
-  public boolean isResetResistant();
-  public void onStart(LoggerContext context);
-  public void onReset(LoggerContext context);
-  public void onStop(LoggerContext context);
+  boolean isResetResistant();
+  void onStart(LoggerContext context);
+  void onReset(LoggerContext context);
+  void onStop(LoggerContext context);
+  void onLevelChange(Logger logger, Level level);
 }

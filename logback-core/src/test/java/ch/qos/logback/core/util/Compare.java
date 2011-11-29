@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -37,8 +37,7 @@ public class Compare {
   static BufferedReader gzFileToBufferedReader(String file) throws IOException {
     FileInputStream fis = new FileInputStream(file);
     GZIPInputStream gzis = new GZIPInputStream(fis);
-    BufferedReader br = new BufferedReader(new InputStreamReader(gzis));
-    return br;
+    return new BufferedReader(new InputStreamReader(gzis));
   }
   
   public static boolean gzFileCompare(String file1, String file2) throws IOException {

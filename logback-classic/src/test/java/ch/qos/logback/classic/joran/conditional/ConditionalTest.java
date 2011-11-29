@@ -1,15 +1,15 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2010, QOS.ch. All rights reserved.
- * 
- * This program and the accompanying materials are dual-licensed under either
- * the terms of the Eclipse Public License v1.0 as published by the Eclipse
- * Foundation
- * 
- * or (per the licensee's choosing)
- * 
- * under the terms of the GNU Lesser General Public License version 2.1 as
- * published by the Free Software Foundation.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
+ *
+ * This program and the accompanying materials are dual-licensed under
+ * either the terms of the Eclipse Public License v1.0 as published by
+ * the Eclipse Foundation
+ *
+ *   or (per the licensee's choosing)
+ *
+ * under the terms of the GNU Lesser General Public License version 2.1
+ * as published by the Free Software Foundation.
  */
 package ch.qos.logback.classic.joran.conditional;
 
@@ -63,14 +63,16 @@ public class ConditionalTest {
     jc.doConfigure(file);
   }
 
+  @SuppressWarnings("rawtypes")
   @Test
   public void conditionalConsoleApp_IF_THEN_True() throws JoranException,
-      IOException, InterruptedException {
+          IOException, InterruptedException {
     InetAddress localhost = InetAddress.getLocalHost();
-    context.putProperty("aHost", localhost.getCanonicalHostName());
+    System.out.println("In conditionalConsoleApp_IF_THEN_True, canonicalHostName=\"" + localhost.getCanonicalHostName() + "] and hostNmae=\"" + localhost.getHostName() + "\"");
+    context.putProperty("aHost", localhost.getHostName());
 
     String configFileAsStr = ClassicTestConstants.JORAN_INPUT_PREFIX
-        + "conditional/conditionalConsoleApp.xml";
+            + "conditional/conditionalConsoleApp.xml";
     configure(configFileAsStr);
     FileAppender fileAppender = (FileAppender) root.getAppender("FILE");
     assertNotNull(fileAppender);
@@ -78,15 +80,16 @@ public class ConditionalTest {
     ConsoleAppender consoleAppender = (ConsoleAppender) root.getAppender("CON");
     assertNotNull(consoleAppender);
     StatusChecker checker = new StatusChecker(context);
-    assertTrue(checker.isErrorFree());
+    assertTrue(checker.isErrorFree(0));
   }
 
+  @SuppressWarnings("rawtypes")
   @Test
   public void conditionalConsoleApp_IF_THEN_False() throws JoranException,
-      IOException, InterruptedException {
+          IOException, InterruptedException {
 
     String configFileAsStr = ClassicTestConstants.JORAN_INPUT_PREFIX
-        + "conditional/conditionalConsoleApp.xml";
+            + "conditional/conditionalConsoleApp.xml";
     configure(configFileAsStr);
     FileAppender fileAppender = (FileAppender) root.getAppender("FILE");
     assertNotNull(fileAppender);
@@ -94,18 +97,19 @@ public class ConditionalTest {
     ConsoleAppender consoleAppender = (ConsoleAppender) root.getAppender("CON");
     assertNull(consoleAppender);
     StatusChecker checker = new StatusChecker(context);
-    assertTrue(checker.isErrorFree());
+    assertTrue(checker.isErrorFree(0));
   }
 
+  @SuppressWarnings("rawtypes")
   @Test
   public void conditionalConsoleApp_IF_THEN_ELSE() throws JoranException,
-      IOException, InterruptedException {
+          IOException, InterruptedException {
 
     String configFileAsStr = ClassicTestConstants.JORAN_INPUT_PREFIX
-        + "conditional/conditionalConsoleApp_ELSE.xml";
+            + "conditional/conditionalConsoleApp_ELSE.xml";
     configure(configFileAsStr);
 
-    FileAppender fileAppender = (FileAppender) root.getAppender("FILE");
+	FileAppender fileAppender = (FileAppender) root.getAppender("FILE");
     assertNotNull(fileAppender);
 
     ConsoleAppender consoleAppender = (ConsoleAppender) root.getAppender("CON");
@@ -116,7 +120,38 @@ public class ConditionalTest {
 
     // StatusPrinter.printIfErrorsOccured(context);
     StatusChecker checker = new StatusChecker(context);
-    assertTrue(checker.isErrorFree());
+    assertTrue(checker.isErrorFree(0));
   }
+
+  @Test
+  public void conditionalInclusionWithExistingFile() throws JoranException,
+           IOException, InterruptedException {
+
+     String configFileAsStr = ClassicTestConstants.JORAN_INPUT_PREFIX
+             + "conditional/conditionalIncludeExistingFile.xml";
+     configure(configFileAsStr);
+
+     StatusPrinter.print(context);
+     ConsoleAppender consoleAppender = (ConsoleAppender) root.getAppender("CON");
+     assertNotNull(consoleAppender);
+     StatusChecker checker = new StatusChecker(context);
+     assertTrue(checker.isErrorFree(0));
+   }
+  @Test
+
+  public void conditionalInclusionWithInexistentFile() throws JoranException,
+           IOException, InterruptedException {
+
+     String configFileAsStr = ClassicTestConstants.JORAN_INPUT_PREFIX
+             + "conditional/conditionalIncludeInexistentFile.xml";
+     configure(configFileAsStr);
+
+     StatusPrinter.print(context);
+     ConsoleAppender consoleAppender = (ConsoleAppender) root.getAppender("CON");
+     assertNull(consoleAppender);
+     StatusChecker checker = new StatusChecker(context);
+     assertTrue(checker.isErrorFree(0));
+   }
+
 
 }

@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -28,7 +28,6 @@ import ch.qos.logback.core.joran.action.Action;
 import ch.qos.logback.core.joran.action.ImplicitAction;
 import ch.qos.logback.core.joran.event.BodyEvent;
 import ch.qos.logback.core.joran.event.EndEvent;
-import ch.qos.logback.core.joran.event.SaxEvent;
 import ch.qos.logback.core.joran.event.StartEvent;
 import ch.qos.logback.core.spi.ContextAwareImpl;
 
@@ -74,7 +73,7 @@ public class Interpreter {
   final private CAI_WithLocatorSupport cai;
   private Pattern pattern;
   Locator locator;
-  EventPlayer player;
+  EventPlayer eventPlayer;
 
   /**
    * The <id>actionListStack</id> contains a list of actions that are executing
@@ -100,7 +99,11 @@ public class Interpreter {
     implicitActions = new ArrayList<ImplicitAction>(3);
     this.pattern = initialPattern;
     actionListStack = new Stack<List>();
-    player = new EventPlayer(this);
+    eventPlayer = new EventPlayer(this);
+  }
+
+  public EventPlayer getEventPlayer() {
+    return eventPlayer;
   }
 
   public void setInterpretationContextPropertiesMap(
@@ -164,14 +167,14 @@ public class Interpreter {
     setDocumentLocator(be.locator);
 
     String body = be.getText();
-    List applicableActionList = (List) actionListStack.peek();
+    List applicableActionList = actionListStack.peek();
 
     if (body != null) {
       body = body.trim();
-    }
-    if (body.length() > 0) {
-      // System.out.println("calling body method with ["+body+ "]");
-      callBodyAction(applicableActionList, body);
+      if (body.length() > 0) {
+        // System.out.println("calling body method with ["+body+ "]");
+        callBodyAction(applicableActionList, body);
+      }
     }
   }
 
@@ -326,16 +329,6 @@ public class Interpreter {
 
   public RuleStore getRuleStore() {
     return ruleStore;
-  }
-
-  public void play(List<SaxEvent> eventList) {
-    player.play(eventList);
-  }
-
-  public void addEventsDynamically(List<SaxEvent> eventList, int offset) {
-    if (player != null) {
-      player.addEventsDynamically(eventList, offset);
-    }
   }
 }
 

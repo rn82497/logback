@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -79,9 +79,6 @@ public class DBAppender extends DBAppenderBase<ILoggingEvent> {
     GET_GENERATED_KEYS_METHOD = getGeneratedKeysMethod;
   }
 
-  public DBAppender() {
-  }
-
   public void setDbNameResolver(DBNameResolver dbNameResolver) {
     this.dbNameResolver = dbNameResolver;
   }
@@ -138,7 +135,7 @@ public class DBAppender extends DBAppenderBase<ILoggingEvent> {
     int arrayLen = argArray != null ? argArray.length : 0;
     
     for(int i = 0; i < arrayLen && i < 4; i++) {
-      stmt.setString(ARG0_INDEX+i, truncateTo254(argArray[i].toString()));
+      stmt.setString(ARG0_INDEX+i, asStringTruncatedTo254(argArray[i]));
     }
     if(arrayLen < 4) {
       for(int i = arrayLen; i < 4; i++) {
@@ -147,7 +144,12 @@ public class DBAppender extends DBAppenderBase<ILoggingEvent> {
     }
   }
 
-  String truncateTo254(String s) {
+  String asStringTruncatedTo254(Object o) {
+     String s = null;
+     if(o != null) {
+         s= o.toString();
+     }
+
     if(s == null) {
       return null;
     }
@@ -173,8 +175,7 @@ public class DBAppender extends DBAppenderBase<ILoggingEvent> {
     Map<String, String> mergedMap = new HashMap<String, String>();
     // we add the context properties first, then the event properties, since
     // we consider that event-specific properties should have priority over
-    // context-wide
-    // properties.
+    // context-wide properties.
     Map<String, String> loggerContextMap = event.getLoggerContextVO()
         .getPropertyMap();
     Map<String, String> mdcMap = event.getMDCPropertyMap();
@@ -225,7 +226,6 @@ public class DBAppender extends DBAppenderBase<ILoggingEvent> {
       }
 
       insertPropertiesStatement.close();
-      insertPropertiesStatement = null;
     }
   }
 
@@ -250,7 +250,7 @@ public class DBAppender extends DBAppenderBase<ILoggingEvent> {
       throws SQLException {
 
     StringBuilder buf = new StringBuilder();
-    ThrowableProxyUtil.printFirstLine(buf, tp);
+    ThrowableProxyUtil.subjoinFirstLine(buf, tp);
     updateExceptionStatement(insertExceptionStatement, buf.toString(),
         baseIndex++, eventId);
 
@@ -259,7 +259,7 @@ public class DBAppender extends DBAppenderBase<ILoggingEvent> {
     for (int i = 0; i < stepArray.length - commonFrames; i++) {
       StringBuilder sb = new StringBuilder();
       sb.append(CoreConstants.TAB);
-      ThrowableProxyUtil.printSTEP(sb, stepArray[i]);
+      ThrowableProxyUtil.subjoinSTEP(sb, stepArray[i]);
       updateExceptionStatement(insertExceptionStatement, sb.toString(),
           baseIndex++, eventId);
     }
@@ -292,7 +292,5 @@ public class DBAppender extends DBAppenderBase<ILoggingEvent> {
       exceptionStatement.executeBatch();
     }
     exceptionStatement.close();
-    exceptionStatement = null;
-
   }
 }

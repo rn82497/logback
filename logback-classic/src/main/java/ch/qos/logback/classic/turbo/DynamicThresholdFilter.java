@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -66,7 +66,7 @@ import java.util.HashMap;
  *   
  *   &lt;turboFilter class=&quot;ch.qos.logback.classic.turbo.DynamicThresholdFilter&quot;&gt;
  *     &lt;Key&gt;userId&lt;/Key&gt;
- *     &lt;DefaultTheshold&gt;ERROR&lt;/DefaultTheshold&gt;
+ *     &lt;DefaultThreshold&gt;ERROR&lt;/DefaultThreshold&gt;
  *     &lt;MDCValueLevelPair&gt;
  *       &lt;value&gt;user1&lt;/value&gt;
  *       &lt;level&gt;DEBUG&lt;/level&gt;
@@ -102,7 +102,7 @@ import java.util.HashMap;
  *   
  *   &lt;turboFilter class=&quot;ch.qos.logback.classic.turbo.DynamicThresholdFilter&quot;&gt;
  *     &lt;Key&gt;userId&lt;/Key&gt;
- *     &lt;DefaultTheshold&gt;ERROR&lt;/DefaultTheshold&gt;
+ *     &lt;DefaultThreshold&gt;ERROR&lt;/DefaultThreshold&gt;
  *     &lt;OnHigherOrEqual&gt;ACCEPT&lt;/OnHigherOrEqual&gt;
  *     &lt;OnLower&gt;DENY&lt;/OnLower&gt;
  *     &lt;MDCValueLevelPair&gt;

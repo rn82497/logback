@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -17,11 +17,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses( { RenameUtilTest.class, SizeBasedRollingTest.class,
-    TimeBasedRollingTest.class, TimeBasedRollingWithArchiveRemovalTest.class,
-    MultiThreadedRollingTest.class,
-    SizeAndTimeBasedFNATP_Test.class,
-    RollingFileAppenderTest.class,
-    ch.qos.logback.core.rolling.helper.PackageTest.class })
+@Suite.SuiteClasses({RenameUtilTest.class, SizeBasedRolling_STest.class,
+	    TimeBasedRolling_STest.class, TimeBasedRollingWithArchiveRemoval_STest.class,
+        MultiThreadedRollingTest.class,
+        SizeAndTimeBasedFNATP_STest.class,
+        RollingFileAppenderTest.class,
+        ch.qos.logback.core.rolling.helper.PackageTest.class})
 public class PackageTest {
 }

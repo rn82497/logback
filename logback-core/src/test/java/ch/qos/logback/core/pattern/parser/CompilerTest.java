@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -30,7 +30,6 @@ import ch.qos.logback.core.pattern.ConverterHello;
 import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.util.StatusPrinter;
 
-
 public class CompilerTest  {
 
   Map<String, String> converterMap = new HashMap<String, String>();
@@ -39,6 +38,7 @@ public class CompilerTest  {
   @Before public void setUp() {
     converterMap.put("OTT", Converter123.class.getName());
     converterMap.put("hello", ConverterHello.class.getName());
+    converterMap.putAll(Parser.DEFAULT_COMPOSITE_CONVERTER_MAP);
   }
 
 

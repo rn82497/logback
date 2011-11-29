@@ -1,8 +1,22 @@
+/**
+ * Logback: the reliable, generic, fast and flexible logging framework.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
+ *
+ * This program and the accompanying materials are dual-licensed under
+ * either the terms of the Eclipse Public License v1.0 as published by
+ * the Eclipse Foundation
+ *
+ *   or (per the licensee's choosing)
+ *
+ * under the terms of the GNU Lesser General Public License version 2.1
+ * as published by the Free Software Foundation.
+ */
 package ch.qos.logback.core.joran.conditional;
 
 import java.util.List;
 import java.util.Stack;
 
+import ch.qos.logback.core.util.EnvUtil;
 import org.xml.sax.Attributes;
 
 import ch.qos.logback.core.joran.action.Action;
@@ -14,7 +28,8 @@ import ch.qos.logback.core.util.OptionHelper;
 
 public class IfAction extends Action {
   private static final String CONDITION_ATTR = "condition";
-  
+
+  public static String MISSING_JANINO_MSG = "Could not find Janino library on the class path. Skipping conditional processing.";
 
   Stack<IfState> stack = new Stack<IfState>();
   
@@ -30,19 +45,25 @@ public class IfAction extends Action {
       return;
     }
     
-    state.active = true;
     ic.pushObject(this);
-    
+    if(!EnvUtil.isJaninoAvailable()) {
+       addError(MISSING_JANINO_MSG);
+       return;
+     }
+
+    state.active = true;
     Condition condition = null;
     String conditionAttribute = attributes.getValue(CONDITION_ATTR);
+
+
     if (!OptionHelper.isEmpty(conditionAttribute)) {
-      conditionAttribute = OptionHelper.substVars(conditionAttribute, context);
-      PropertyEvalScriptBuilder pesb = new PropertyEvalScriptBuilder();
+      conditionAttribute = OptionHelper.substVars(conditionAttribute, ic, context);
+      PropertyEvalScriptBuilder pesb = new PropertyEvalScriptBuilder(ic);
       pesb.setContext(context);
       try {
         condition = pesb.build(conditionAttribute);
       } catch (Exception e) {
-        addError("Faield to parse condition ["+conditionAttribute+"]", e);
+        addError("Failed to parse condition ["+conditionAttribute+"]", e);
       }
      
       if(condition!=null) {
@@ -91,7 +112,7 @@ public class IfAction extends Action {
     // if boolResult==false & missing else,  listToPlay may be null
     if(listToPlay != null) {
       // insert past this event
-      interpreter.addEventsDynamically(listToPlay, 1);
+      interpreter.getEventPlayer().addEventsDynamically(listToPlay, 1);
     }
 
   }
@@ -116,6 +137,11 @@ public class IfAction extends Action {
 
   }
 
+  public boolean isActive() {
+    if(stack == null) return false;
+    if(stack.isEmpty()) return false;
+    return stack.peek().active;
+  }
 }
 
 class IfState {

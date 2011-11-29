@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2010, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -16,8 +16,6 @@ package ch.qos.logback.core.spi;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertNotNull;
 
 /**
  * @author Ceki G&uuml;c&uuml;
@@ -26,9 +24,9 @@ public class ScenarioBasedCyclicBufferTrackerTest {
 
   CyclicBufferTrackerSimulator simulator;
 
-   void verify() {
-    CyclicBufferTrackerImpl<Object> at = simulator.realAppenderTracker;
-    CyclicBufferTrackerImpl<Object> t_at = simulator.t_appenderTracker;
+  void verify() {
+    CyclicBufferTrackerImpl<Object> at = simulator.realCBTracker;
+    CyclicBufferTracker_TImpl<Object> t_at = simulator.t_CBTracker;
     assertEquals(t_at.keyList(), at.keyList());
   }
 
@@ -48,7 +46,7 @@ public class ScenarioBasedCyclicBufferTrackerTest {
     verify();
   }
 
-    @Test
+  @Test
   public void longTest() {
     simulator = new CyclicBufferTrackerSimulator(128, CyclicBufferTracker.THRESHOLD / 2);
     simulator.buildScenario(200000);

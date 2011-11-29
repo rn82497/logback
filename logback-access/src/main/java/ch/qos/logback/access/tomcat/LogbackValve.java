@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -19,12 +19,18 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
+import ch.qos.logback.access.spi.IAccessEvent;
+//import org.apache.catalina.Lifecycle;
+import ch.qos.logback.core.spi.*;
 import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
@@ -38,11 +44,6 @@ import ch.qos.logback.core.Context;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.joran.spi.JoranException;
-import ch.qos.logback.core.spi.AppenderAttachable;
-import ch.qos.logback.core.spi.AppenderAttachableImpl;
-import ch.qos.logback.core.spi.FilterAttachable;
-import ch.qos.logback.core.spi.FilterAttachableImpl;
-import ch.qos.logback.core.spi.FilterReply;
 import ch.qos.logback.core.status.InfoStatus;
 import ch.qos.logback.core.status.StatusManager;
 import ch.qos.logback.core.status.WarnStatus;
@@ -62,7 +63,7 @@ import ch.qos.logback.core.util.StatusPrinter;
  * @author S&eacute;bastien Pennec
  */
 public class LogbackValve extends ValveBase implements Lifecycle, Context,
-    AppenderAttachable<AccessEvent>, FilterAttachable<AccessEvent> {
+    AppenderAttachable<IAccessEvent>, FilterAttachable<IAccessEvent> {
 
   public final static String DEFAULT_CONFIG_FILE = "conf" + File.separatorChar
       + "logback-access.xml";
@@ -78,19 +79,29 @@ public class LogbackValve extends ValveBase implements Lifecycle, Context,
   // serialized. For the time being, we ignore this shortcoming.
   Map<String, String> propertyMap = new HashMap<String, String>();
   Map<String, Object> objectMap = new HashMap<String, Object>();
-  private FilterAttachableImpl<AccessEvent> fai = new FilterAttachableImpl<AccessEvent>();
+  private FilterAttachableImpl<IAccessEvent> fai = new FilterAttachableImpl<IAccessEvent>();
 
-  AppenderAttachableImpl<AccessEvent> aai = new AppenderAttachableImpl<AccessEvent>();
+  AppenderAttachableImpl<IAccessEvent> aai = new AppenderAttachableImpl<IAccessEvent>();
   String filename;
   boolean quiet;
   boolean started;
   boolean alreadySetLogbackStatusManager = false;
 
+    // 0 idle threads, 2 maximum threads, no idle waiting
+  ExecutorService executorService = new ThreadPoolExecutor(0, 2,
+          0L, TimeUnit.MILLISECONDS,
+          new LinkedBlockingQueue<Runnable>());
+
   public LogbackValve() {
     putObject(CoreConstants.EVALUATOR_MAP, new HashMap());
   }
 
-  public void start() {
+  public boolean isStarted() {
+    return started;
+  }
+
+  public void startInternal() throws LifecycleException {
+    System.out.println("***startInternal() called");
     if (filename == null) {
       String tomcatHomeProperty = OptionHelper
           .getSystemProperty("catalina.home");
@@ -101,8 +112,10 @@ public class LogbackValve extends ValveBase implements Lifecycle, Context,
               + "]", this));
     }
     File configFile = new File(filename);
+
     if (configFile.exists()) {
       try {
+        System.out.println("***startInternal() JoranConfigurator");
         JoranConfigurator jc = new JoranConfigurator();
         jc.setContext(this);
         jc.doConfigure(filename);
@@ -120,6 +133,7 @@ public class LogbackValve extends ValveBase implements Lifecycle, Context,
     }
 
     started = true;
+    setState(LifecycleState.STARTING);
   }
 
   public String getFilename() {
@@ -158,7 +172,7 @@ public class LogbackValve extends ValveBase implements Lifecycle, Context,
       getNext().invoke(request, response);
 
       TomcatServerAdapter adapter = new TomcatServerAdapter(request, response);
-      AccessEvent accessEvent = new AccessEvent(request, response, adapter);
+      IAccessEvent accessEvent = new AccessEvent(request, response, adapter);
 
       if (getFilterChainDecision(accessEvent) == FilterReply.DENY) {
         return;
@@ -171,23 +185,24 @@ public class LogbackValve extends ValveBase implements Lifecycle, Context,
     }
   }
 
-  public void stop() {
+  protected void stopInternal() throws LifecycleException {
     started = false;
+    setState(LifecycleState.STOPPING);
   }
 
-  public void addAppender(Appender<AccessEvent> newAppender) {
+  public void addAppender(Appender<IAccessEvent> newAppender) {
     aai.addAppender(newAppender);
   }
 
-  public Iterator<Appender<AccessEvent>> iteratorForAppenders() {
+  public Iterator<Appender<IAccessEvent>> iteratorForAppenders() {
     return aai.iteratorForAppenders();
   }
 
-  public Appender<AccessEvent> getAppender(String name) {
+  public Appender<IAccessEvent> getAppender(String name) {
     return aai.getAppender(name);
   }
 
-  public boolean isAttached(Appender<AccessEvent> appender) {
+  public boolean isAttached(Appender<IAccessEvent> appender) {
     return aai.isAttached(appender);
   }
 
@@ -196,7 +211,7 @@ public class LogbackValve extends ValveBase implements Lifecycle, Context,
 
   }
 
-  public boolean detachAppender(Appender<AccessEvent> appender) {
+  public boolean detachAppender(Appender<IAccessEvent> appender) {
     return aai.detachAppender(appender);
   }
 
@@ -237,7 +252,7 @@ public class LogbackValve extends ValveBase implements Lifecycle, Context,
     objectMap.put(key, value);
   }
 
-  public void addFilter(Filter<AccessEvent> newFilter) {
+  public void addFilter(Filter<IAccessEvent> newFilter) {
     fai.addFilter(newFilter);
   }
 
@@ -245,12 +260,16 @@ public class LogbackValve extends ValveBase implements Lifecycle, Context,
     fai.clearAllFilters();
   }
 
-  public List<Filter<AccessEvent>> getCopyOfAttachedFiltersList() {
+  public List<Filter<IAccessEvent>> getCopyOfAttachedFiltersList() {
     return fai.getCopyOfAttachedFiltersList();
   }
 
-  public FilterReply getFilterChainDecision(AccessEvent event) {
+  public FilterReply getFilterChainDecision(IAccessEvent event) {
     return fai.getFilterChainDecision(event);
+  }
+
+  public ExecutorService getExecutorService() {
+    return  executorService;
   }
 
   public String getName() {
@@ -265,7 +284,7 @@ public class LogbackValve extends ValveBase implements Lifecycle, Context,
     this.name = name;
   }
 
-  public long getBithTime() {
+  public long getBirthTime() {
     return birthTime;
   }
 

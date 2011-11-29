@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -20,7 +20,6 @@ import java.net.Socket;
 import java.net.SocketAddress;
 
 import ch.qos.logback.classic.Logger;
-import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -48,7 +47,7 @@ public class SocketNode implements Runnable {
   ObjectInputStream ois;
   SocketAddress remoteSocketAddress;
   
-  static Logger logger = (Logger) LoggerFactory.getLogger(SocketNode.class);
+  Logger logger;
   boolean closed = false;
   SimpleSocketServer socketServer;
   
@@ -57,6 +56,8 @@ public class SocketNode implements Runnable {
     this.socket = socket;
     remoteSocketAddress = socket.getRemoteSocketAddress();
     this.context = context;
+    logger = context.getLogger(SocketNode.class);
+
     try {
       ois = new ObjectInputStream(new BufferedInputStream(socket
           .getInputStream()));

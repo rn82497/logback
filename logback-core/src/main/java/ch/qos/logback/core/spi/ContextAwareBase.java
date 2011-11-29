@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -24,11 +24,19 @@ import ch.qos.logback.core.status.WarnStatus;
  * A helper class that implements ContextAware methods. A class can implement
  * the ContextAware interface by deriving from this class.
  * 
- * @author Ceki G&uumllc&uuml;
+ * @author Ceki G&uuml;lc&uuml;
  */
 public class ContextAwareBase implements ContextAware {
   private int noContextWarning = 0;
   protected Context context;
+  final Object declaredOrigin;
+
+  public ContextAwareBase() {
+    declaredOrigin = this;
+  }
+  public ContextAwareBase(Object declaredOrigin) {
+    this.declaredOrigin = declaredOrigin;
+  }
 
   public void setContext(Context context) {
     if (this.context == null) {
@@ -56,7 +64,7 @@ public class ContextAwareBase implements ContextAware {
    * @return the declared origin, by default 'this'
    */ 
   protected Object getDeclaredOrigin() {
-    return this;
+    return declaredOrigin;
   }
 
   public void addStatus(Status status) {

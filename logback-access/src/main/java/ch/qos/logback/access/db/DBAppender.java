@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -19,7 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Enumeration;
 
-import ch.qos.logback.access.spi.AccessEvent;
+import ch.qos.logback.access.spi.IAccessEvent;
 import ch.qos.logback.core.db.DBAppenderBase;
 
 /**
@@ -33,7 +33,7 @@ import ch.qos.logback.core.db.DBAppenderBase;
  * @author Ray DeCampo
  * @author S&eacute;bastien Pennec
  */
-public class DBAppender extends DBAppenderBase<AccessEvent> {
+public class DBAppender extends DBAppenderBase<IAccessEvent> {
   protected static final String insertSQL;
   protected final String insertHeaderSQL = "INSERT INTO  access_event_header (event_id, header_key, header_value) VALUES (?, ?, ?)";
   protected static final Method GET_GENERATED_KEYS_METHOD; 
@@ -66,11 +66,8 @@ public class DBAppender extends DBAppenderBase<AccessEvent> {
     GET_GENERATED_KEYS_METHOD = getGeneratedKeysMethod;
   }
   
-  public DBAppender() {
-  }
-
   @Override
-  protected void subAppend(AccessEvent event, Connection connection,
+  protected void subAppend(IAccessEvent event, Connection connection,
       PreparedStatement insertStatement) throws Throwable {
 
     addAccessEvent(insertStatement, event);
@@ -81,14 +78,14 @@ public class DBAppender extends DBAppenderBase<AccessEvent> {
     }
   }
   
-  protected void secondarySubAppend(AccessEvent event, Connection connection,
+  protected void secondarySubAppend(IAccessEvent event, Connection connection,
       long eventId) throws Throwable {
     if (insertHeaders) {
       addRequestHeaders(event, connection, eventId);
     }
   }
   
-  void addAccessEvent(PreparedStatement stmt, AccessEvent event)
+  void addAccessEvent(PreparedStatement stmt, IAccessEvent event)
       throws SQLException {
     stmt.setLong(1, event.getTimeStamp());
     stmt.setString(2, event.getRequestURI());
@@ -102,7 +99,7 @@ public class DBAppender extends DBAppenderBase<AccessEvent> {
     stmt.setString(10, event.getRequestContent()); 
   }
   
-  void addRequestHeaders(AccessEvent event,
+  void addRequestHeaders(IAccessEvent event,
       Connection connection, long eventId) throws SQLException {
     Enumeration names = event.getRequestHeaderNames();
     if (names.hasMoreElements()) {
@@ -130,7 +127,6 @@ public class DBAppender extends DBAppenderBase<AccessEvent> {
       }
 
       insertHeaderStatement.close();
-      insertHeaderStatement = null;
     }
   }
 

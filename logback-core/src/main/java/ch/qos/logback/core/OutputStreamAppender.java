@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -50,12 +50,6 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
    * This is the {@link OutputStream outputStream} where output will be written.
    */
   private OutputStream outputStream;
-
-  /**
-   * The default constructor does nothing.
-   */
-  public OutputStreamAppender() {
-  }
 
   /**
    * The underlying output stream used by this appender.
@@ -210,8 +204,9 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
       if (event instanceof DeferredProcessingAware) {
         ((DeferredProcessingAware) event).prepareForDeferredProcessing();
       }
-      // the synchronized prevents the OutputStream from being closed while we
-      // are writing
+      // the synchronization prevents the OutputStream from being closed while we
+      // are writing. It also prevents multiple threads from entering the same
+      // converter. Converters assume that they are in a synchronized block.
       synchronized (lock) {
         writeOut(event);
       }

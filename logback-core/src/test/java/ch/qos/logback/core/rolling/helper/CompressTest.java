@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2009, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -84,10 +84,10 @@ public class CompressTest {
     compressor.setContext(context);
     compressor.compress(CoreTestConstants.TEST_DIR_PREFIX
         + "input/compress1.txt", CoreTestConstants.OUTPUT_DIR_PREFIX
-        + "compress1.txt.gz");
+        + "compress1.txt.gz", null);
 
     StatusChecker checker = new StatusChecker(context);
-    assertTrue(checker.isErrorFree());
+    assertTrue(checker.isErrorFree(0));
     assertTrue(Compare.gzCompare(CoreTestConstants.OUTPUT_DIR_PREFIX
         + "compress1.txt.gz", CoreTestConstants.TEST_DIR_PREFIX
         + "witness/compress1.txt.gz"));
@@ -99,10 +99,10 @@ public class CompressTest {
     compressor.setContext(context);
     compressor.compress(CoreTestConstants.TEST_DIR_PREFIX
         + "input/compress2.txt", CoreTestConstants.OUTPUT_DIR_PREFIX
-        + "compress2.txt");
+        + "compress2.txt", null);
 
     StatusChecker checker = new StatusChecker(context);
-    assertTrue(checker.isErrorFree());
+    assertTrue(checker.isErrorFree(0));
 
     assertTrue(Compare.gzCompare(CoreTestConstants.OUTPUT_DIR_PREFIX
         + "compress2.txt.gz", CoreTestConstants.TEST_DIR_PREFIX
@@ -115,9 +115,9 @@ public class CompressTest {
     compressor.setContext(context);
     compressor.compress(CoreTestConstants.TEST_DIR_PREFIX
         + "input/compress3.txt", CoreTestConstants.OUTPUT_DIR_PREFIX
-        + "compress3.txt");
+        + "compress3.txt", "compress3.txt");
     StatusChecker checker = new StatusChecker(context);
-    assertTrue(checker.isErrorFree());
+    assertTrue(checker.isErrorFree(0));
 
     // we don't know how to compare .zip files
     // assertTrue(Compare.compare(CoreTestConstants.OUTPUT_DIR_PREFIX
